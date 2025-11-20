@@ -238,8 +238,8 @@ const doSearch = async (params?: QueryDomainParams) => {
   pageParams.value.sortingFields =
     params?.pageParams?.sortingFields ?? pageParams.value.sortingFields
   await doLoadData({ ...params, pageParams: pageParams.value })
-  if (!isNullOrUnDef(params?.whereParamsList)) {
-    searchRef.value?.setWhereParams(params.whereParamsList)
+  if (!isNullOrUnDef(params?.whereParams)) {
+    searchRef.value?.setWhereParams(params.whereParams)
   }
 }
 
@@ -266,12 +266,12 @@ const doLoadData = async (params: QueryDomainParams) => {
     if (!isNullOrUnDef(props.loadData)) {
       const queryParams: QueryDomainParams = {}
       if (isEmpty(selectedWhereParams.value)) {
-        queryParams.whereParamsList = [
+        queryParams.whereParams = [
           ...(await getDefaultWhereParams()),
-          ...(params?.whereParamsList ?? searchRef.value?.getWhereParams() ?? [])
+          ...(params?.whereParams ?? searchRef.value?.getWhereParams() ?? [])
         ]
       } else {
-        queryParams.whereParamsList = selectedWhereParams.value
+        queryParams.whereParams = selectedWhereParams.value
       }
       if (props.enablePagination) {
         queryParams.pageParams = { ...params?.pageParams }

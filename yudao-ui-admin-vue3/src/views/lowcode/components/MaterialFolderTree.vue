@@ -133,10 +133,14 @@ const handleNodeContextMenu = (e: MouseEvent, row: MaterialFileVO) => {
       hidden: !hasEditorPermi.value,
       disabled: !isCreator(row),
       onClick: async () => {
+        const isCurrentDelete = folderTreeRef.value?.getCurrentKey() == row.id
         await message.delConfirm()
         await MaterialFileApi.deleteMaterialFile(row)
         message.success('删除成功')
         await getFolderList()
+        if (isCurrentDelete) {
+          emits('node-unselect', row)
+        }
       }
     },
     {

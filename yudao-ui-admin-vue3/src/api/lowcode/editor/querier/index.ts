@@ -23,7 +23,7 @@ export interface QueryDomainPageParams {
 
 export interface QueryDomainParams {
   pageParams?: QueryDomainPageParams
-  whereParamsList?: QueryDomainWhereParams[]
+  whereParams?: QueryDomainWhereParams[]
 }
 
 export interface TestQueryDomainReqVO {

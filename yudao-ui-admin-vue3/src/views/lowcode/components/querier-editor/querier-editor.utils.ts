@@ -16,12 +16,20 @@ export function jsFunctionBuiltInHelps() {
 
 // 表有消息验证函数
 export function defaultTableValid(): string {
-  return '/** 返回true代表该表配置本次查询有效 */\n' + 'return true'
+  return (
+    '/** 返回true代表该表配置本次查询有效 */\n' +
+    "const QueryDomainUtils = Java.type('cn.iocoder.yudao.module.lowcode.querier.utils.QueryDomainUtils')\n" +
+    'return true'
+  )
 }
 
 // 查询过滤器
 export function defaultQueryFilter(): string {
-  return '/** 校验不通过返回错误信息, 否则校验通过 */\n' + "return '错误信息'"
+  return (
+    '/** 校验不通过返回错误信息, 否则校验通过 */\n' +
+    "const QueryDomainUtils = Java.type('cn.iocoder.yudao.module.lowcode.querier.utils.QueryDomainUtils')\n" +
+    "return '错误信息'"
+  )
 }
 
 // 拦截器前处理
@@ -35,7 +43,11 @@ export function defaultQueryInterceptorPreHandle(): string {
 
 // 拦截器后处理
 export function defaultQueryInterceptorPostHandle(): string {
-  return '/** 后处理, 查询后对结果后处理, 返回处理后的结果 */\n' + 'return $results'
+  return (
+    '/** 后处理, 查询后对结果后处理, 返回处理后的结果 */\n' +
+    "const QueryDomainUtils = Java.type('cn.iocoder.yudao.module.lowcode.querier.utils.QueryDomainUtils')\n" +
+    'return $results'
+  )
 }
 
 export function copyApis(apiName?: string, apiCode?: string) {

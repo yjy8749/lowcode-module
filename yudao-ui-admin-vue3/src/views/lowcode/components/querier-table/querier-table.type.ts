@@ -28,8 +28,8 @@ export interface QueryDomainPageParams {
 }
 
 export interface QueryDomainParams {
-  whereParamsList?: QueryDomainWhereParams[]
   pageParams?: QueryDomainPageParams
+  whereParams?: QueryDomainWhereParams[]
 }
 
 export interface QuerierTableHelpTextProps {

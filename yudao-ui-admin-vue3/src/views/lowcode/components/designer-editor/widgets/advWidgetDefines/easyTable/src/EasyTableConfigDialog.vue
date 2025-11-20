@@ -54,37 +54,6 @@
       </ContentWrap>
       <ContentWrap>
         <el-tabs v-model="activeTab">
-          <el-tab-pane lazy label="查询配置" name="searchConfig">
-            <div class="flex gap-8">
-              <el-form-item label="是否自动加载数据" prop="loadOnInit">
-                <el-switch size="small" v-model="formModel.loadOnInit" />
-              </el-form-item>
-            </div>
-            <el-form-item label="默认查询参数" label-position="top" prop="defaultParamsFunction">
-              <EvalFunctionValueInput
-                name="读取默认查询参数函数"
-                type="simple-function"
-                :height="100"
-                :editor="editor"
-                :widget="dialogArgs!.widget"
-                :helps="`返回 ${highlightTextHtml('[{ name, symbol, value}]')} 查询参数数组`"
-                default-function="return []"
-                v-model="formModel.defaultParamsFunction"
-              />
-            </el-form-item>
-            <el-form-item label="数据转换函数" label-position="top" prop="itemProcessFunction">
-              <EvalFunctionValueInput
-                name="加载后对数据二次处理函数"
-                type="simple-function"
-                :height="100"
-                :editor="editor"
-                :widget="dialogArgs!.widget"
-                :helps="`${highlightTextHtml('args[0]')} 为列表数据`"
-                default-function="return args[0]"
-                v-model="formModel.itemProcessFunction"
-              />
-            </el-form-item>
-          </el-tab-pane>
           <el-tab-pane lazy label="查询条件配置" name="searchFields">
             <div class="flex gap-8">
               <el-form-item label="开启条件查询">
@@ -319,6 +288,37 @@
               />
             </el-form-item>
           </el-tab-pane>
+          <el-tab-pane lazy label="其他配置" name="otherConfigs">
+            <div class="flex gap-8">
+              <el-form-item label="是否自动加载数据" prop="loadOnInit">
+                <el-switch size="small" v-model="formModel.loadOnInit" />
+              </el-form-item>
+            </div>
+            <el-form-item label="默认查询参数" label-position="top" prop="defaultParamsFunction">
+              <EvalFunctionValueInput
+                name="读取默认查询参数函数"
+                type="simple-function"
+                :height="100"
+                :editor="editor"
+                :widget="dialogArgs!.widget"
+                :helps="`返回 ${highlightTextHtml('[{ name, symbol, value}]')} 查询参数数组`"
+                default-function="return []"
+                v-model="formModel.defaultParamsFunction"
+              />
+            </el-form-item>
+            <el-form-item label="数据转换函数" label-position="top" prop="itemProcessFunction">
+              <EvalFunctionValueInput
+                name="加载后对数据二次处理函数"
+                type="simple-function"
+                :height="100"
+                :editor="editor"
+                :widget="dialogArgs!.widget"
+                :helps="`${highlightTextHtml('args[0]')} 为列表数据`"
+                default-function="return args[0]"
+                v-model="formModel.itemProcessFunction"
+              />
+            </el-form-item>
+          </el-tab-pane>
         </el-tabs>
       </ContentWrap>
     </el-form>
@@ -438,7 +438,7 @@ const formRules = reactive({
   requestUrl: [{ required: true, message: '请输入请求接口地址', trigger: 'change' }]
 })
 
-const activeTab = ref('searchConfig')
+const activeTab = ref('searchFields')
 
 const onHideIndexAndActionChange = () => {
   formModel.value.columns = regenConstColumn(
@@ -468,25 +468,28 @@ const doAnalyze = async () => {
     const addQueryFields = (tables?: QueryTable[]) => {
       tables?.forEach((table) => {
         table.queryFieldList?.forEach((field) => {
-          if (!isEmpty(field.symbols)) {
-            formModel.value.searchs?.push({
-              label: field.comment,
-              prop: field.name,
-              symbolType: field.symbols?.split(',')[0],
-              inputType: 'input'
-            })
+          // 忽略租户字段, 逻辑删除字段
+          if (field.name && !['tenantId', 'deleted'].includes(field.name)) {
+            if (!isEmpty(field.symbols)) {
+              formModel.value.searchs?.push({
+                label: field.comment,
+                prop: field.name,
+                symbolType: field.symbols?.split(',')[0],
+                inputType: 'input'
+              })
+            }
+            const col: QuerierTableBodyColumnProps = { label: field.comment, prop: field.name }
+            if (['createTime', 'updateTime', 'deletedTime'].includes(col.prop ?? '')) {
+              col.columnType = 'datetime'
+              col.datetimeFormat = DEFAULT_DATETIME_FORMAT
+              col.width = calcDatetimeColumnWidth(DEFAULT_DATETIME_FORMAT)
+            }
+            if (col.prop == 'id') {
+              col.rowKey = true
+              col.width = '65px'
+            }
+            formModel.value.columns?.push(col)
           }
-          const col: QuerierTableBodyColumnProps = { label: field.comment, prop: field.name }
-          if (['createTime', 'updateTime', 'deletedTime'].includes(col.prop ?? '')) {
-            col.columnType = 'datetime'
-            col.datetimeFormat = DEFAULT_DATETIME_FORMAT
-            col.width = calcDatetimeColumnWidth(DEFAULT_DATETIME_FORMAT)
-          }
-          if (col.prop == 'id') {
-            col.rowKey = true
-            col.width = '65px'
-          }
-          formModel.value.columns?.push(col)
         })
       })
     }
@@ -719,7 +722,7 @@ const doConfirm = async () => {
 }
 
 const doReset = () => {
-  activeTab.value = 'searchConfig'
+  activeTab.value = 'searchFields'
   dialogArgs.value = undefined
   formModel.value = {}
 }

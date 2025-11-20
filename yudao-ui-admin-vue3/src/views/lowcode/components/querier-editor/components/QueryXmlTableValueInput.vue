@@ -130,7 +130,7 @@ const fromTableValue = computed({
     return valueVModel.value.querySql?.value ?? valueVModel.value.table
   },
   set(value?: string) {
-    if (!isNullOrUnDef(value) && value.includes('select')) {
+    if (!isNullOrUnDef(value) && value.toLowerCase().includes('select')) {
       valueVModel.value.querySql = { value }
       valueVModel.value.table = undefined
     } else {
