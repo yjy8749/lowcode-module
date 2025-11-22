@@ -68,6 +68,7 @@ export interface QuerierTableBodyRowActionsProps {
 }
 
 export interface QuerierTableSearchFieldProps {
+  // 公共属性
   label?: string
   helps?: string
   prop?: string
@@ -77,7 +78,46 @@ export interface QuerierTableSearchFieldProps {
   hidden?: boolean
   span?: number
   placeholder?: string
+  // 以下按输入类型扩展
+  remote?: boolean
+  filterable?: boolean
   dictType?: string
+  remoteMethod?: (query?: string) => Promise<any[]>
+  multiple?: boolean
+  collapseTags?: boolean
+  maxCollapseTags?: number
+  checkStrictly?: boolean
+  accordion?: boolean
+  lazy?: boolean
+  load?: (node?: any, resolve?: Function, reject?: Function) => Promise<any[]>
+  filterMethod?: (query?: string) => Promise<any[]>
+  activeValue?: string
+  inactiveValue?: string
+  datePickerType?:
+    | 'year'
+    | 'years'
+    | 'month'
+    | 'months'
+    | 'date'
+    | 'dates'
+    | 'datetime'
+    | 'week'
+    | 'datetimerange'
+    | 'daterange'
+    | 'monthrange'
+    | 'yearrange'
+  format?: string
+  valueFormat?: string
+  rangeSeparator?: string
+  startPlaceholder?: string
+  endPlaceholder?: string
+  beforeMinDays?: number
+  afterMaxDays?: number
+  maxDaysRange?: number
+  disabledDate?: (data: Date | Date[]) => boolean
+  minNumber?: number
+  maxNumber?: number
+  precision?: number
 }
 
 export interface QuerierTableBodyProps {

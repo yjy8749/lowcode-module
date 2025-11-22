@@ -19,16 +19,17 @@
 <script setup lang="ts">
 import ArrayValueInput from '../../../../../common/ArrayValueInput.vue'
 import { computedVModel } from '../../../../../common/hooks'
-import EasyTableSearchFieldValueInput from './EasyTableSearchFieldValueInput.vue'
-import { QuerierTableSearchFieldProps } from '../../../../../querier-table/querier-table.type'
+import EasyTableSearchFieldValueInput, {
+  EasyTableSearchFieldProps
+} from './EasyTableSearchFieldValueInput.vue'
 
 export interface EasyTableSearchFieldArrayValueInputProps {
-  modelValue?: QuerierTableSearchFieldProps[]
+  modelValue?: EasyTableSearchFieldProps[]
 }
 
 export type EasyTableSearchFieldArrayValueInputEmits = {
-  'update:modelValue': [val?: QuerierTableSearchFieldProps[]]
-  change: [val?: QuerierTableSearchFieldProps[]]
+  'update:modelValue': [val?: EasyTableSearchFieldProps[]]
+  change: [val?: EasyTableSearchFieldProps[]]
 }
 
 const defaultStyle = 'width: 115px'
@@ -56,13 +57,16 @@ const fieldHeaders = [
     style: flexStyle
   },
   {
-    label: '输入配置',
-    helps: '根据输入类型不同, 配置重要属性',
+    label: '宽度(Span)',
+    style: defaultStyle
+  },
+  {
+    label: '占位文本',
     style: flexStyle
   },
   {
-    label: '宽度(Span)',
-    style: defaultStyle
+    label: '设置',
+    style: 'width: 30px'
   }
 ]
 

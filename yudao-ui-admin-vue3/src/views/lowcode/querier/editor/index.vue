@@ -2,7 +2,7 @@
   <QuerierEditor v-if="fileId" class="editor-main" :file-id="fileId" :isPreview="isPreview" />
 </template>
 <script setup lang="ts">
-import QuerierEditor from '@/views/lowcode/components/querier-editor/index.vue'
+import QuerierEditor from '../../components/querier-editor/index.vue'
 
 defineOptions({ name: 'LowcodeQuerierEditor' })
 

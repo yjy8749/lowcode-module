@@ -26,7 +26,7 @@
       </el-select>
     </div>
     <div :style="fieldStyles[4]">
-      <el-select placeholder="输入类型" v-model="valueVModel.inputType">
+      <el-select placeholder="输入类型" v-model="valueVModel.inputType" @change="onInputTypeChange">
         <el-option
           v-for="opt in InputTypeOptions"
           :key="opt.label"
@@ -36,23 +36,6 @@
       </el-select>
     </div>
     <div :style="fieldStyles[5]">
-      <el-input
-        v-if="valueVModel.inputType == 'input'"
-        clearable
-        placeholder="占位文本"
-        v-model="valueVModel.placeholder"
-      />
-      <el-input
-        v-else-if="valueVModel.inputType == 'select'"
-        clearable
-        placeholder="绑定字典"
-        v-model="valueVModel.dictType"
-      />
-      <div class="h-full flex justify-center items-center" v-else>
-        <el-text type="info"> 请选择输入类型 </el-text>
-      </div>
-    </div>
-    <div :style="fieldStyles[6]">
       <el-input-number
         class="!w-full"
         placeholder="6"
@@ -64,34 +47,76 @@
         v-model="valueVModel.span"
       />
     </div>
+    <div :style="fieldStyles[6]">
+      <el-input
+        clearable
+        :placeholder="`请输入${valueVModel.label}`"
+        v-model="valueVModel.placeholder"
+      />
+    </div>
+    <div class="flex justify-center items-center" :style="fieldStyles[7]">
+      <Icon class="c-[--el-color-primary]" icon="ep:setting" @click="doConfig" />
+    </div>
   </div>
 </template>
 <script lang="ts" setup>
 import { getStrDictOptions } from '@/utils/dict'
 import { computedVModel } from '../../../../../common/hooks'
-import { QuerierTableSearchFieldProps } from '@/views/lowcode/components/querier-table/querier-table.type'
+import { QuerierTableSearchFieldProps } from '../../../../../querier-table/querier-table.type'
 import { LOWCODE_DICT_TYPE } from '../../../../../common/dict'
+import { DesignerEditorEvalFunction } from '../../../../designer-editor.type'
+
+export type EasyTableSearchFieldProps = {
+  remoteMethod?: DesignerEditorEvalFunction
+  load?: DesignerEditorEvalFunction
+  filterMethod?: DesignerEditorEvalFunction
+  disabledDate?: DesignerEditorEvalFunction
+} & Omit<QuerierTableSearchFieldProps, 'remoteMethod' | 'load' | 'filterMethod' | 'disabledDate'>
 
 const InputTypeOptions = [
   {
-    label: '输入框Input',
+    label: 'Input 输入框',
     value: 'input'
   },
   {
-    label: '下拉框Select',
+    label: 'Select 选择器',
     value: 'select'
+  },
+  {
+    label: 'TreeSelect 树形选择',
+    value: 'tree-select'
+  },
+  {
+    label: 'Radio 单选框',
+    value: 'radio'
+  },
+  {
+    label: 'Checkbox 多选框',
+    value: 'checkbox'
+  },
+  {
+    label: 'Switch 开关',
+    value: 'switch'
+  },
+  {
+    label: 'DatePicker 日期选择',
+    value: 'date-picker'
+  },
+  {
+    label: 'NumberRange 数字范围输入',
+    value: 'number-range'
   }
 ]
 
 export interface EasyTableSearchFieldValueInputProps {
   fieldStyles?: string[]
-  modelValue?: QuerierTableSearchFieldProps
+  modelValue?: EasyTableSearchFieldProps
 }
 
 export type EasyTableSearchFieldValueInputEmits = {
-  'update:modelValue': [val?: QuerierTableSearchFieldProps]
-  change: [val?: QuerierTableSearchFieldProps]
-  labelChange: [val?: QuerierTableSearchFieldProps]
+  'update:modelValue': [val?: EasyTableSearchFieldProps]
+  change: [val?: EasyTableSearchFieldProps]
+  labelChange: [val?: EasyTableSearchFieldProps]
 }
 
 const props = withDefaults(defineProps<EasyTableSearchFieldValueInputProps>(), {
@@ -99,6 +124,8 @@ const props = withDefaults(defineProps<EasyTableSearchFieldValueInputProps>(), {
 })
 
 const emits = defineEmits<EasyTableSearchFieldValueInputEmits>()
+
+const openSearchFieldConfigDialog = inject('openSearchFieldConfigDialog') as Function
 
 const { valueVModel } = computedVModel({
   get() {
@@ -112,6 +139,29 @@ const { valueVModel } = computedVModel({
 
 const toggleHidden = () => {
   valueVModel.value.hidden = !valueVModel.value.hidden
+}
+
+const doConfig = () => {
+  openSearchFieldConfigDialog({
+    value: valueVModel.value,
+    onConfirm: (val) => {
+      valueVModel.value = val
+    }
+  })
+}
+
+const onInputTypeChange = () => {
+  valueVModel.value = {
+    label: valueVModel.value.label,
+    helps: valueVModel.value.helps,
+    prop: valueVModel.value.prop,
+    symbolType: valueVModel.value.symbolType,
+    inputType: valueVModel.value.inputType,
+    defaultValue: valueVModel.value.defaultValue,
+    hidden: valueVModel.value.hidden,
+    span: valueVModel.value.span,
+    placeholder: valueVModel.value.placeholder
+  }
 }
 </script>
 

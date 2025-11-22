@@ -44,7 +44,6 @@ const {
 const tableAttrs = computed(() => {
   return {
     ...usePropObject(
-      'searchs',
       'columns',
       'height',
       'enableSearch',
@@ -60,6 +59,15 @@ const tableAttrs = computed(() => {
       'autoFoldNum',
       'loadOnInit'
     ),
+    searchs: usePropValue('searchs').map((e) => {
+      return {
+        ...e,
+        remoteMethod: toEvalFunction(e.remoteMethod),
+        load: toEvalFunction(e.load),
+        filterMethod: toEvalFunction(e.filterMethod),
+        disabledDate: toEvalFunction(e.disabledDate)
+      }
+    }),
     searchActions: toActionButtonProps(usePropValue('searchActions')),
     operationActions: toActionButtonProps(usePropValue('operationActions')),
     rowActions: toActionButtonProps(usePropValue('rowActions')),

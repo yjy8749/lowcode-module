@@ -10,7 +10,7 @@
 </template>
 <script setup lang="ts">
 import { useTagsViewStore } from '@/store/modules/tagsView'
-import DesignerEditor from '@/views/lowcode/components/designer-editor/index.vue'
+import DesignerEditor from '../../components/designer-editor/index.vue'
 
 defineOptions({ name: 'LowcodeDesignerEditor' })
 

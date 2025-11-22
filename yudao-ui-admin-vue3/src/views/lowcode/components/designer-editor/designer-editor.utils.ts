@@ -38,7 +38,7 @@ import { cloneDeep } from 'lodash-es'
 import { isArray, isEmpty, isFunction, isString, isNullOrUnDef } from '@/utils/is'
 import { jsonParse } from '@/utils'
 import { useWidgetDefine } from './widgets'
-import { readValueByJsonPath, joinKeys, generateVid, copyValue, isPromise } from '../common/utils'
+import { readValueByJsonPath, joinKeys, generateVid, copyValue } from '../common/utils'
 import { useDebounceFn, useThrottleFn } from '@vueuse/core'
 import {
   edgeInsetsDefine,
@@ -2106,7 +2106,7 @@ export function wrapEvalFunction(
   editor: DesignerEditor,
   evalFn?: DesignerEditorEvalFunction,
   context?: EvalFnContext
-): (...args: any[]) => Promise<any> {
+): (...args: any[]) => any {
   context ??= buildEvalFnContext(editor)
   const contextKeys = Object.keys(context)
   const evalFunction = (...args) => {
@@ -2116,7 +2116,7 @@ export function wrapEvalFunction(
       const callResult = eval(
         `function _fn(${contextKeys.join(',')},...$args) {${evalFn?.evalFunction ?? ''}};_fn;`
       ).call(context, ...contextKeys.map((key) => context[key]), ...args)
-      return isPromise(callResult) ? callResult : Promise.resolve(callResult)
+      return callResult
     } catch (e) {
       message.error(`函数执行异常${e}`)
       throw e
@@ -2131,10 +2131,7 @@ export function wrapEvalFunction(
 }
 
 /** 执行包装执行函数 */
-function _executeEvalFunction(
-  evalFunction: (...args: any[]) => Promise<any>,
-  ...args: any[]
-): Promise<any> {
+function _executeEvalFunction(evalFunction: (...args: any[]) => Promise<any>, ...args: any[]): any {
   return evalFunction(...args)
 }
 
@@ -2144,7 +2141,7 @@ export function executeEvalFunction(
   evalFunction?: DesignerEditorEvalFunction | DesignerEditorEvalFunction[],
   context?: EvalFnContext,
   ...args: any[]
-): Promise<any> {
+): any {
   if (!isNullOrUnDef(evalFunction)) {
     if (isArray(evalFunction)) {
       return Promise.all(
@@ -2153,8 +2150,6 @@ export function executeEvalFunction(
     } else {
       return _executeEvalFunction(wrapEvalFunction(editor, evalFunction, context), ...args)
     }
-  } else {
-    return Promise.resolve()
   }
 }
 
@@ -2300,7 +2295,7 @@ export function addWidgetToSlot(
 export function toggleDeffaultFunction(val?: string, defaultFn?: string) {
   val ??= ''
   defaultFn ??= ''
-  if (val != defaultFn) {
+  if (val != defaultFn && val.startsWith('return (async() => {')) {
     return defaultFn
   } else {
     val = val

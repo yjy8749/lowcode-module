@@ -16,7 +16,7 @@
       </ContentWrap>
       <ContentWrap>
         <div class="flex gap-2">
-          <el-form-item class="flex-1" prop="requestUrlMode">
+          <el-form-item class="flex-1 !mb-0" prop="requestUrlMode">
             <template #label>
               <TextLabel
                 label="地址模式"
@@ -36,7 +36,7 @@
               />
             </el-select>
           </el-form-item>
-          <el-form-item class="flex-1" label="Api地址" prop="requestUrl">
+          <el-form-item class="flex-1 !mb-0" label="Api地址" prop="requestUrl">
             <el-input v-model="formModel.requestUrl" placeholder="请输入Api地址" clearable>
               <template #prepend>
                 <el-select style="width: 100px" v-model="formModel.requestMethod">
@@ -326,6 +326,12 @@
       <el-button type="primary" :loading="dialogLoading" @click="doConfirm">确 定</el-button>
       <el-button @click="dialogVisible = false">取 消</el-button>
     </template>
+    <SearchFieldConfigDialog
+      v-if="dialogArgs"
+      :editor="editor"
+      :widget="dialogArgs.widget"
+      ref="searchFieldConfigDialogRef"
+    />
   </Dialog>
 </template>
 <script lang="ts" setup>
@@ -351,8 +357,7 @@ import {
 import {
   COLUMN_ACTION_PROP,
   COLUMN_INDEX_PROP,
-  QuerierTableBodyColumnProps,
-  QuerierTableSearchFieldProps
+  QuerierTableBodyColumnProps
 } from '../../../../../querier-table/querier-table.type'
 import { QueryDomain, QueryTable } from '../../../../../querier-editor/querier-editor.type'
 import { QuerierEditorApi } from '@/api/lowcode/editor/querier'
@@ -375,6 +380,8 @@ import {
 } from '../../../../designer-editor.utils'
 import { isActionColumn, isIndexColumn } from '../../../../../querier-table/querier-table.utils'
 import { cloneDeep } from 'lodash-es'
+import SearchFieldConfigDialog from './SearchFieldConfigDialog.vue'
+import { EasyTableSearchFieldProps } from './EasyTableSearchFieldValueInput.vue'
 
 export interface EasyTableFormModel {
   analyzeApiDesc?: string
@@ -384,7 +391,7 @@ export interface EasyTableFormModel {
   requestUrl?: string
   requestMethod?: WidgetDataDefineRequestMethod
   itemProcessFunction?: DesignerEditorEvalFunction
-  searchs?: QuerierTableSearchFieldProps[]
+  searchs?: EasyTableSearchFieldProps[]
   enableSearchActionSlot?: boolean
   searchActions?: ActionButtonConfig[]
   enableOperationActionSlot?: boolean
@@ -726,6 +733,14 @@ const doReset = () => {
   dialogArgs.value = undefined
   formModel.value = {}
 }
+
+const searchFieldConfigDialogRef = ref<InstanceType<typeof SearchFieldConfigDialog>>()
+
+const openSearchFieldConfigDialog = (args) => {
+  searchFieldConfigDialogRef.value?.open(args)
+}
+
+provide('openSearchFieldConfigDialog', openSearchFieldConfigDialog)
 </script>
 
 <style scoped lang="scss"></style>

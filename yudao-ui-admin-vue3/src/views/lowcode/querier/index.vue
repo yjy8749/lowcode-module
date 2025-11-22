@@ -27,9 +27,9 @@
 </template>
 
 <script setup lang="ts">
-import MaterialFileList from '@/views/lowcode/components/MaterialFileList.vue'
-import MaterialFolderTree from '@/views/lowcode/components/MaterialFolderTree.vue'
 import { MaterialFileVO } from '@/api/lowcode/materialfile'
+import MaterialFileList from '../components/MaterialFileList.vue'
+import MaterialFolderTree from '../components/MaterialFolderTree.vue'
 
 export interface QuerierIndexProps {
   integratorSelectable?: boolean

@@ -2,7 +2,7 @@
   <IntegratorEditor v-if="fileId" class="editor-main" :file-id="fileId" :isPreview="isPreview" />
 </template>
 <script setup lang="ts">
-import IntegratorEditor from '@/views/lowcode/components/integrator-editor/index.vue'
+import IntegratorEditor from '../../components/integrator-editor/index.vue'
 
 defineOptions({ name: 'LowcodeQuerierEditor' })
 
