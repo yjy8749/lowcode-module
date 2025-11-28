@@ -213,32 +213,32 @@ export function createWidgetInstanceDefault(
   }
 }
 /** 创建带有上下文的组件实例-默认 */
-export function createWidgetContextDefault(
+export function createWidgetRenderContextDefault(
   editor: DesignerEditor,
   widgetDef: WidgetDefine,
   slotKey?: string,
   args?: {
     parentWidget?: WidgetInstance
-    parentContext?: WidgetRenderContext
+    parentRenderContext?: WidgetRenderContext
     options?: WidgetItemOptions
     defaultProps?: Record<string, any>
   }
 ): {
   editor: DesignerEditor
   parentWidget?: WidgetInstance
-  parentContext?: WidgetRenderContext
+  parentRenderContext?: WidgetRenderContext
   widget: WidgetInstance
-  widgetContext: WidgetRenderContext
+  widgetRenderContext: WidgetRenderContext
 } {
   return {
     editor,
     parentWidget: args?.parentWidget,
-    parentContext: args?.parentContext,
+    parentRenderContext: args?.parentRenderContext,
     widget: createWidgetInstanceDefault(editor, widgetDef, slotKey, args?.defaultProps),
-    widgetContext: regenWidgetContext(
+    widgetRenderContext: regenWidgetRenderContext(
       editor,
       args?.parentWidget,
-      args?.parentContext,
+      args?.parentRenderContext,
       args?.options
     )
   }
@@ -258,7 +258,7 @@ export async function createWidgetInstance(
     _var?: string
     slotKey?: string
     parentWidget?: WidgetInstance
-    parentContext?: WidgetRenderContext
+    parentRenderContext?: WidgetRenderContext
     options?: WidgetItemOptions
     defaultProps?: Record<string, any>
     slots?: WidgetInstance[]
@@ -493,7 +493,7 @@ function regenerateVid(_oldVid: string, _regenVidMap?: Record<string, string>) {
   return _vid === _oldVid ? generateVid() : _vid
 }
 
-/** 重新生成数据模型ID */
+/** 重新生成数据定义ID */
 function regenOtherIdAndReBind(widget: WidgetInstance, _regenVidMap: Record<string, string>) {
   useWidgetDataDefines(widget).forEach((data) => {
     const _oldVid = data._vid
@@ -878,7 +878,7 @@ export function defaultSeekDataFunction(editor: DesignerEditor): SeekDataFunctio
 /** 父组件检索函数包装 */
 function wrapSeekParentFunction(
   parentWidget?: WidgetInstance,
-  parentContext?: WidgetRenderContext
+  parentRenderContext?: WidgetRenderContext
 ): SeekWidgetFunction {
   return (args, seekLink): SeekWidgetFunctionResult => {
     seekLink ??= []
@@ -893,17 +893,19 @@ function wrapSeekParentFunction(
         (!isNullOrUnDef(args?._moduleName) &&
           isNullOrUnDef(args?._key) &&
           parentWidget._moduleName == args._moduleName) ||
-        (!isNullOrUnDef(args?.putable) && args.putable && parentContext?.options?.putable == true)
+        (!isNullOrUnDef(args?.putable) &&
+          args.putable &&
+          parentRenderContext?.options?.putable == true)
       ) {
         console.log('检索到父组件', args, parentWidget.label)
         return { seekWidget: parentWidget, seekLink }
-      } else if (!isNullOrUnDef(parentContext?.seekParent)) {
+      } else if (!isNullOrUnDef(parentRenderContext?.seekParent)) {
         if (args?.directParent) {
-          console.warn('未检索到直接上级组件, 当前上级组件', parentWidget.label)
+          console.warn('未检索到直接上级组件, 当前上级组件', parentWidget.label, args)
           return { seekWidget: undefined, seekLink }
         } else {
-          console.warn('父组件不正确，继续向上检索', parentWidget.label)
-          return parentContext.seekParent(args, seekLink)
+          console.warn('父组件不正确，继续向上检索', parentWidget.label, args)
+          return parentRenderContext.seekParent(args, seekLink)
         }
       }
     }
@@ -925,17 +927,17 @@ export function customWidgetOptions(options?: WidgetItemOptions): WidgetItemOpti
 }
 
 /** 重新生成组件上下文 */
-export function regenWidgetContext(
+export function regenWidgetRenderContext(
   editor: DesignerEditor,
   parentWidget?: WidgetInstance,
-  parentContext?: WidgetRenderContext,
+  parentRenderContext?: WidgetRenderContext,
   options?: WidgetItemOptions
 ): WidgetRenderContext {
-  const contextOptions = parentContext?.options
+  const contextOptions = parentRenderContext?.options
   return {
-    ...parentContext,
-    seekParent: wrapSeekParentFunction(parentWidget, parentContext),
-    seekData: parentContext?.seekData ?? defaultSeekDataFunction(editor),
+    ...parentRenderContext,
+    seekParent: wrapSeekParentFunction(parentWidget, parentRenderContext),
+    seekData: parentRenderContext?.seekData ?? defaultSeekDataFunction(editor),
     options: {
       ...options,
       selectable: (contextOptions?.selectable ?? true) && (options?.selectable ?? true),
@@ -980,21 +982,21 @@ export function seekDataDefine(
   return seekResult
 }
 
-/** 根据 id 获取数据模型定义实际函数 */
+/** 根据 id 获取数据定义实际函数 */
 export function useDataDefineByIdActual(
   editor: DesignerEditor,
   _vid?: string
 ): WidgetDataDefine | undefined {
-  console.time(`数据模型检索 useDataDefineByIdActual ${_vid}`)
+  console.time(`数据定义检索 useDataDefineByIdActual ${_vid}`)
   const r = seekDataDefine(editor, useWidgetTree(editor), { _vid })
-  console.timeEnd(`数据模型检索 useDataDefineByIdActual ${_vid}`)
+  console.timeEnd(`数据定义检索 useDataDefineByIdActual ${_vid}`)
   return r
 }
 
-/** 根据 id 获取数据模型定义缓存函数 */
+/** 根据 id 获取数据定义缓存函数 */
 const useDataDefineByIdCacheable = useCacheable(useDataDefineByIdActual)
 
-/** 根据 id 获取数据模型定义 */
+/** 根据 id 获取数据定义 */
 export function useDataDefineById(
   editor: DesignerEditor,
   _vid?: string
@@ -1002,21 +1004,21 @@ export function useDataDefineById(
   return useDataDefineByIdCacheable(editor, _vid) as any
 }
 
-/** 根据 var 获取数据模型定义实际函数 */
+/** 根据 var 获取数据定义实际函数 */
 export function useDataDefineByVarActual(
   editor: DesignerEditor,
   _var?: string
 ): WidgetDataDefine | undefined {
-  console.time(`数据模型检索 useDataDefineByVarActual ${_var}`)
+  console.time(`数据定义检索 useDataDefineByVarActual ${_var}`)
   const r = seekDataDefine(editor, useWidgetTree(editor), { _var })
-  console.timeEnd(`数据模型检索 useDataDefineByVarActual ${_var}`)
+  console.timeEnd(`数据定义检索 useDataDefineByVarActual ${_var}`)
   return r
 }
 
-/** 根据 var 获取数据模型定义缓存函数 */
+/** 根据 var 获取数据定义缓存函数 */
 const useDataDefineByVarCacheable = useCacheable(useDataDefineByVarActual)
 
-/** 根据 var 获取数据模型定义 */
+/** 根据 var 获取数据定义 */
 export function useDataDefineByVar(
   editor: DesignerEditor,
   _var?: string
@@ -1024,14 +1026,14 @@ export function useDataDefineByVar(
   return useDataDefineByVarCacheable(editor, _var) as any
 }
 
-/** 获取组件数据模型定义实际函数 */
+/** 获取组件数据定义实际函数 */
 export function useDataDefineActual(
   editor: DesignerEditor,
   widgetArgs?: { _vid?: string; _var?: string },
   dataArgs?: { _vid?: string; _var?: string }
 ): WidgetDataDefine | undefined {
   const fullTimeKey = `${JSON.stringify(widgetArgs ?? {})} ${JSON.stringify(dataArgs ?? {})}`
-  console.time(`获取组件数据模型定义 useDataDefineActual ${fullTimeKey}`)
+  console.time(`获取组件数据定义 useDataDefineActual ${fullTimeKey}`)
   let widget: WidgetInstance | undefined = undefined
   if (!isNullOrUnDef(widgetArgs?._var)) {
     widget = useWidgetByVarActual(editor, widgetArgs._var)
@@ -1045,11 +1047,11 @@ export function useDataDefineActual(
       (!isNullOrUnDef(dataArgs?._vid) && d._vid == dataArgs?._vid) ||
       (!isNullOrUnDef(dataArgs?._var) && d._var == dataArgs?._var)
   )
-  console.timeEnd(`获取组件数据模型定义 useDataDefineActual ${fullTimeKey}`)
+  console.timeEnd(`获取组件数据定义 useDataDefineActual ${fullTimeKey}`)
   return r
 }
 
-/** 获取组件数据模型定义缓存函数 */
+/** 获取组件数据定义缓存函数 */
 const useDataDefineCacheable = useCacheable(useDataDefineActual, {
   ...DEFAULT_CACHE_OPTIONS,
   cacheKey: (args) => {
@@ -1057,7 +1059,7 @@ const useDataDefineCacheable = useCacheable(useDataDefineActual, {
   }
 })
 
-/** 获取组件数据模型定义 */
+/** 获取组件数据定义 */
 export function useDataDefine(
   editor: DesignerEditor,
   widgetArgs?: { _vid?: string; _var?: string },
@@ -1066,7 +1068,7 @@ export function useDataDefine(
   return useDataDefineCacheable(editor, widgetArgs, dataArgs) as any
 }
 
-/** 获取组件全部数据模型定义 */
+/** 获取组件全部数据定义 */
 export function useWidgetDataDefines(widget?: WidgetInstance): WidgetDataDefine[] {
   return [...(widget?.dataDefines ?? [])]
 }
@@ -1082,12 +1084,12 @@ export function megeRuntimeDataDefines(a: WidgetDataDefine, b: WidgetDataDefine)
   }
 }
 
-/** 获取组件全部数据模型定义包括Runtime实际函数 */
+/** 获取组件全部数据定义包括Runtime实际函数 */
 export function useWidgetDataDefinesAndRuntimeActual(
   editor: DesignerEditor,
   widget?: WidgetInstance
 ): WidgetDataDefine[] {
-  console.time(`数据模型检索 useWidgetDataDefinesAndRuntimeActual ${widget?._vid}`)
+  console.time(`数据定义检索 useWidgetDataDefinesAndRuntimeActual ${widget?._vid}`)
   const dataDefines = useWidgetDataDefines(widget)
   if (!isNullOrUnDef(widget)) {
     const widgetDefine = useWidgetDefine(widget)
@@ -1097,11 +1099,11 @@ export function useWidgetDataDefinesAndRuntimeActual(
       return [...runtimeList, ...dataDefines]
     }
   }
-  console.timeEnd(`数据模型检索 useWidgetDataDefinesAndRuntimeActual ${widget?._vid}`)
+  console.timeEnd(`数据定义检索 useWidgetDataDefinesAndRuntimeActual ${widget?._vid}`)
   return dataDefines
 }
 
-/** 获取组件全部数据模型定义包括Runtime缓存函数 */
+/** 获取组件全部数据定义包括Runtime缓存函数 */
 const useWidgetDataDefinesAndRuntimeCacheable = useCacheable(useWidgetDataDefinesAndRuntimeActual, {
   ...DEFAULT_CACHE_OPTIONS,
   cacheKey(args) {
@@ -1109,7 +1111,7 @@ const useWidgetDataDefinesAndRuntimeCacheable = useCacheable(useWidgetDataDefine
   }
 })
 
-/** 获取组件全部数据模型定义包括Runtime */
+/** 获取组件全部数据定义包括Runtime */
 export function useWidgetDataDefinesAndRuntime(
   editor: DesignerEditor,
   widget?: WidgetInstance
@@ -1337,7 +1339,7 @@ export function checkInvalidPropBindByScopeFor(
   return [...invalidBindValues.values()]
 }
 
-/** 获取数据模型定义被引用的list */
+/** 获取数据定义被引用的list */
 export function checkDataDefineAreRefed(
   editor: DesignerEditor,
   widget?: WidgetInstance,
@@ -1346,7 +1348,7 @@ export function checkDataDefineAreRefed(
   key?: string,
   excludeSelf?: boolean
 ): CheckDataDefineResult[] {
-  console.time('数据模型引用检索 checkDataDefineAreRefed')
+  console.time('数据定义引用检索 checkDataDefineAreRefed')
   const r = checkDataDefineAreRefedFor(
     editor,
     useWidgetTree(editor),
@@ -1356,11 +1358,11 @@ export function checkDataDefineAreRefed(
     key,
     excludeSelf
   )
-  console.timeEnd('数据模型引用检索 checkDataDefineAreRefed')
+  console.timeEnd('数据定义引用检索 checkDataDefineAreRefed')
   return r
 }
 
-/** 获取数据模型定义被绑定的list */
+/** 获取数据定义被绑定的list */
 export function checkDataDefineAreBound(
   editor: DesignerEditor,
   widget?: WidgetInstance,
@@ -1369,7 +1371,7 @@ export function checkDataDefineAreBound(
   key?: string,
   excludeSelf?: boolean
 ): CheckDataDefineResult[] {
-  console.time('数据模型绑定检索 checkDataDefineAreBound')
+  console.time('数据定义绑定检索 checkDataDefineAreBound')
   const r = checkDataDefineAreBoundFor(
     useWidgetTree(editor),
     widget,
@@ -1378,7 +1380,7 @@ export function checkDataDefineAreBound(
     key,
     excludeSelf
   )
-  console.timeEnd('数据模型绑定检索 checkDataDefineAreBound')
+  console.timeEnd('数据定义绑定检索 checkDataDefineAreBound')
   return r
 }
 
@@ -1387,16 +1389,16 @@ export function checkInvalidPropBindByScope(
   editor: DesignerEditor,
   widget?: WidgetInstance,
   toSlot?: WidgetInstance,
-  slotContext?: WidgetRenderContext,
+  slotRenderContext?: WidgetRenderContext,
   existQuery?: boolean
 ): WidgetPropDefineBind[] {
-  console.time('绑定的数据模型作用域检查 checkInvalidPropBindByScope')
-  let parentLink = slotContext?.seekParent().seekLink ?? []
+  console.time('绑定的数据定义作用域检查 checkInvalidPropBindByScope')
+  let parentLink = slotRenderContext?.seekParent().seekLink ?? []
   if (!isNullOrUnDef(toSlot)) {
     parentLink = [toSlot, ...parentLink]
   }
   const r = checkInvalidPropBindByScopeFor(editor, widget, parentLink, existQuery)
-  console.timeEnd('绑定的数据模型作用域检查 checkInvalidPropBindByScope')
+  console.timeEnd('绑定的数据定义作用域检查 checkInvalidPropBindByScope')
   return r
 }
 
@@ -1493,9 +1495,9 @@ export function useDataDefines(
   editor: DesignerEditor,
   args?: { _types?: string[]; isAutoLoad?: boolean }
 ) {
-  console.time('数据模型检索 useDataDefines')
+  console.time('数据定义检索 useDataDefines')
   const r = useDataDefinesFor(editor, useWidgetTree(editor), args)
-  console.timeEnd('数据模型检索 useDataDefines')
+  console.timeEnd('数据定义检索 useDataDefines')
   return r
 }
 
@@ -1526,13 +1528,15 @@ export function useSelectedWidget(editor: DesignerEditor): WidgetInstance | unde
 }
 
 /** 获取当前选择组件上下文 */
-export function useSelectedWidgetContext(editor: DesignerEditor): WidgetRenderContext | undefined {
-  const { state, useWidgetContext } = editor.getStore()
-  return useWidgetContext(state.value.selectedWidgetId)
+export function useSelectedWidgetRenderContext(
+  editor: DesignerEditor
+): WidgetRenderContext | undefined {
+  const { state, useWidgetRenderContext } = editor.getStore()
+  return useWidgetRenderContext(state.value.selectedWidgetId)
 }
 
 /** 获取页面root上下文 */
-export function useRootContext(editor: DesignerEditor): WidgetRenderContext {
+export function useRootRenderContext(editor: DesignerEditor): WidgetRenderContext {
   return {
     seekParent: defaultSeekParentFunction(),
     seekData: defaultSeekDataFunction(editor)
@@ -1548,14 +1552,14 @@ export function createSlotItem(editor: DesignerEditor, slotKey?: string): Widget
 }
 
 /** 获取组件上下文 */
-export function useWidgetContext(
+export function useWidgetRenderContext(
   editor: DesignerEditor,
   _vid?: string
 ): WidgetRenderContext | undefined {
   if (!isNullOrUnDef(_vid)) {
-    return editor.getStore().useWidgetContext(_vid)
+    return editor.getStore().useWidgetRenderContext(_vid)
   } else {
-    return useRootContext(editor)
+    return useRootRenderContext(editor)
   }
 }
 
@@ -1565,28 +1569,30 @@ export function useSelectedWidgetDefine(editor: DesignerEditor): WidgetDefine | 
 }
 
 /** 获取父组件检索函数 */
-export function useSeekParentFunction(context?: WidgetRenderContext): SeekWidgetFunction {
-  return context?.seekParent ?? defaultSeekParentFunction()
+export function useSeekParentFunction(
+  widgetRenderContext?: WidgetRenderContext
+): SeekWidgetFunction {
+  return widgetRenderContext?.seekParent ?? defaultSeekParentFunction()
 }
 
 /** 获取组件数据检索函数 */
 export function useSeekDataFunction(
   editor: DesignerEditor,
-  context?: WidgetRenderContext
+  widgetRenderContext?: WidgetRenderContext
 ): SeekDataFunction {
-  return context?.seekData ?? defaultSeekDataFunction(editor)
+  return widgetRenderContext?.seekData ?? defaultSeekDataFunction(editor)
 }
 
 /** 运行时重新生成获取组件数据检索函数 */
 export function regenSeekDataFunctionRuntime(
   editor: DesignerEditor,
-  context?: WidgetRenderContext,
+  widgetRenderContext?: WidgetRenderContext,
   runtimeData?: Record<string, any>,
   propBind?: WidgetPropDefineBind,
   defaultValue?: any
 ): any | undefined {
   try {
-    const seekData = useSeekDataFunction(editor, context)
+    const seekData = useSeekDataFunction(editor, widgetRenderContext)
     if (!isNullOrUnDef(propBind?.bindList) && !isNullOrUnDef(runtimeData)) {
       const bindListArgs: any[] = []
       for (const refBind of propBind.bindList) {
@@ -1889,14 +1895,14 @@ export function mergeUrls(urlBase: string, relativeUrl: string): string {
   return `${urlBase}/${relativeUrl}`
 }
 
-/** 执行 promise 显示 loading 动画 */
+/** 执行 Promise 显示 loading 动画 */
 export async function promiseWithLoading(
   setLoading: (val: boolean) => void,
-  promise: Promise<any>
+  promiseResult: Promise<any>
 ): Promise<any> {
   setLoading(true)
   try {
-    return await promise
+    return await promiseResult
   } finally {
     setLoading(false)
   }
@@ -2068,7 +2074,7 @@ export function defaultLifecycleEvents(): DesignerEditorEventDefine[] {
   ]
 }
 
-// 执行函数函数内置变量说明
+// 可执行函数内置变量说明
 export function evalFunctionBuiltInHelps(exts?: string[] | string) {
   if (isString(exts)) {
     exts = [exts]
@@ -2081,7 +2087,7 @@ export function evalFunctionBuiltInHelps(exts?: string[] | string) {
     `变量:${highlightTextHtml('$emit(key, ...args)')}, 发布页面维度自定义事件`,
     `变量:${highlightTextHtml('$close(...args) => Promise<结果>')}, 触发页面关闭,获取结果`,
     `变量:${highlightTextHtml('$dialog({title, width, fileId, version, params}) => Promise<结果>')}, 触发弹框弹框关闭时返回结果`,
-    `变量:${highlightTextHtml('$context(_vid|_var) => Promise<上下文>')}, 获取组件上下文, 默认获取当前组件上下文`,
+    `变量:${highlightTextHtml('$useExposeContext(_vid|_var) => Promise<上下文>')}, 获取组件暴露上下文, 默认获取当前组件的上下文`,
     `变量:${highlightTextHtml('$data(_var|参数, 数据) => Promise<数据>')}, 根据数据变量获取数据或设置数据`,
     `变量:${highlightTextHtml('$submit(_var|参数) => Promise<结果>')}, 触发提交数据`,
     `变量:${highlightTextHtml('$log(...args)')}, 打印日志, 显示数据`,
@@ -2092,7 +2098,7 @@ export function evalFunctionBuiltInHelps(exts?: string[] | string) {
   return `<p>${helps.join('</p><p>')}</p>`
 }
 
-/** 执行函数tips */
+/** 可执行函数tips */
 export function getEvalFunctionTips(evalFunction: DesignerEditorEvalFunction): string | undefined {
   if (evalFunction.debounce) {
     return `防抖(${evalFunction.dealy ?? DEFAULT_EVAL_FUNCTION_DEALY}ms)`
@@ -2101,21 +2107,21 @@ export function getEvalFunctionTips(evalFunction: DesignerEditorEvalFunction): s
   }
 }
 
-/** 包装执行函数 */
+/** 包装可执行函数 */
 export function wrapEvalFunction(
   editor: DesignerEditor,
   evalFn?: DesignerEditorEvalFunction,
-  context?: EvalFnContext
+  evalFnContext?: EvalFnContext
 ): (...args: any[]) => any {
-  context ??= buildEvalFnContext(editor)
-  const contextKeys = Object.keys(context)
+  evalFnContext ??= buildEvalFnContext(editor)
+  const contextKeys = Object.keys(evalFnContext)
   const evalFunction = (...args) => {
     try {
       evalFn?.stop && args?.[0]?.stopPropagation && args?.[0]?.stopPropagation()
       evalFn?.prevent && args?.[0]?.preventDefault && args?.[0]?.preventDefault()
       const callResult = eval(
         `function _fn(${contextKeys.join(',')},...$args) {${evalFn?.evalFunction ?? ''}};_fn;`
-      ).call(context, ...contextKeys.map((key) => context[key]), ...args)
+      ).call(evalFnContext, ...contextKeys.map((key) => evalFnContext[key]), ...args)
       return callResult
     } catch (e) {
       message.error(`函数执行异常${e}`)
@@ -2130,43 +2136,46 @@ export function wrapEvalFunction(
   return evalFunction
 }
 
-/** 执行包装执行函数 */
+/** 执行包装可执行函数 */
 function _executeEvalFunction(evalFunction: (...args: any[]) => Promise<any>, ...args: any[]): any {
   return evalFunction(...args)
 }
 
-/** 执行执行函数免包装 */
+/** 执行可执行函数免包装 */
 export function executeEvalFunction(
   editor: DesignerEditor,
   evalFunction?: DesignerEditorEvalFunction | DesignerEditorEvalFunction[],
-  context?: EvalFnContext,
+  evalFnContext?: EvalFnContext,
   ...args: any[]
 ): any {
   if (!isNullOrUnDef(evalFunction)) {
     if (isArray(evalFunction)) {
       return Promise.all(
-        evalFunction.map((item) => executeEvalFunction(editor, item, context, ...args))
+        evalFunction.map((item) => executeEvalFunction(editor, item, evalFnContext, ...args))
       )
     } else {
-      return _executeEvalFunction(wrapEvalFunction(editor, evalFunction, context), ...args)
+      return _executeEvalFunction(wrapEvalFunction(editor, evalFunction, evalFnContext), ...args)
     }
   }
 }
 
-/** 函数执行上下文检索 */
-export function seekEvalFnContext(editor: DesignerEditor, key: any): any {
+/** 组件Expose上下文检索 */
+export function seekWidgetExposeContext(
+  editor: DesignerEditor,
+  key: any
+): Record<string, any> | undefined {
   if (!isNullOrUnDef(key)) {
-    let ctx: any | undefined
-    const evalFnContext = editor.getStore().state.value.evalFnContext
+    let ctx: Record<string, any> | undefined
+    const exposeContext = editor.getStore().state.value.widgetExposeContext
     if (!isNullOrUnDef(key._vid)) {
-      ctx = evalFnContext[key._vid]
+      ctx = exposeContext[key._vid]
     } else if (!isNullOrUnDef(key._var)) {
       const _vid = useWidgetByVar(editor, key._var)?._vid ?? ''
-      ctx = evalFnContext[_vid]
+      ctx = exposeContext[_vid]
     } else {
-      ctx = seekEvalFnContext(editor, { _vid: key })
+      ctx = seekWidgetExposeContext(editor, { _vid: key })
       if (isNullOrUnDef(ctx)) {
-        ctx = seekEvalFnContext(editor, { _var: key })
+        ctx = seekWidgetExposeContext(editor, { _var: key })
       }
     }
     return ctx
@@ -2174,8 +2183,8 @@ export function seekEvalFnContext(editor: DesignerEditor, key: any): any {
   console.warn('must assign widget _vid o _var')
 }
 
-/** 数据检索 */
-export async function getDataEvalFnContext(
+/** 执行数据定义 getData 获取结果 */
+export async function executeGetData(
   editor: DesignerEditor,
   key?: string | { _var?: string },
   args?: GetDataArgs & { refresh?: boolean },
@@ -2193,8 +2202,8 @@ export async function getDataEvalFnContext(
         return args?.refresh || isNotExecuted.value ? await getData(args) : value.value
       }
     } else {
-      message.error('数据模型定义不存在')
-      throw new Error('数据模型定义不存在')
+      message.error('数据定义不存在')
+      throw new Error('数据定义不存在')
     }
   }
   console.error('must assign data _var')
@@ -2222,7 +2231,7 @@ export async function alwaysWaitFor<T>(
   return undefined
 }
 
-/** 构建执行函数上下文 */
+/** 构建可执行函数上下文 */
 export function buildEvalFnContext(editor: DesignerEditor, defaultKey?: string): EvalFnContext {
   return {
     $request: (arg1, arg2) => {
@@ -2237,31 +2246,33 @@ export function buildEvalFnContext(editor: DesignerEditor, defaultKey?: string):
     $emit: (key, data) => editor.getEmitter().emit(getCustomEventKey(key), data),
     $close: (...args) => editor.close(...args),
     $dialog: (options) => editor.dialog(options),
-    $context: (arg1) => {
-      const ctx = alwaysWaitFor(
+    $useExposeContext: async (arg1) => {
+      const ctx = await alwaysWaitFor<Record<string, any>>(
         (val) => !isNullOrUnDef(val),
-        () => seekEvalFnContext(editor, arg1 ?? defaultKey)
+        async () => seekWidgetExposeContext(editor, arg1 ?? defaultKey)
       )
       if (!ctx) {
-        console.error(
-          '未检索到组件上下文, 请检查参数是否正确, 组件上下文是否已正确注册 参数:',
-          arg1 ?? defaultKey
-        )
+        const msg = `未检索到组件上下文, 请检查参数是否正确, 组件是否暴露上下文 参数: ${arg1 ?? defaultKey}`
+        console.error(msg)
+        if (!editor.getStore().isPreviewMode.value) {
+          message.error(msg)
+        }
+        return undefined
       }
       return ctx
     },
     $data: (arg1, data) => {
       if (isString(arg1)) {
-        return getDataEvalFnContext(editor, arg1, undefined, data)
+        return executeGetData(editor, arg1, undefined, data)
       } else {
-        return getDataEvalFnContext(editor, arg1._var, arg1, data)
+        return executeGetData(editor, arg1._var, arg1, data)
       }
     },
     $submit: (arg1) => {
       if (isString(arg1)) {
-        return getDataEvalFnContext(editor, arg1, { refresh: true })
+        return executeGetData(editor, arg1, { refresh: true })
       } else {
-        return getDataEvalFnContext(editor, arg1?._var, { ...arg1, refresh: true })
+        return executeGetData(editor, arg1?._var, { ...arg1, refresh: true })
       }
     },
     $log: (...args) => {

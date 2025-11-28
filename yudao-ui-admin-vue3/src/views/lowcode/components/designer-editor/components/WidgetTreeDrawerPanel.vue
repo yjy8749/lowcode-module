@@ -31,7 +31,7 @@
 import { isEmpty } from '@/utils/is'
 import { showContextMenu } from '../../common/contextMenu'
 import { DesignerEditor, WidgetInstance } from '../designer-editor.type'
-import { useWidgetById, useWidgetContext, useWidgetTree } from '../designer-editor.utils'
+import { useWidgetById, useWidgetRenderContext, useWidgetTree } from '../designer-editor.utils'
 import { useWidgetMenus } from '../designer-editor.menu'
 
 const props = defineProps<{ editor: DesignerEditor }>()
@@ -72,18 +72,18 @@ const handleNodeClick = (data: any) => {
 }
 const handleNodeContextmenu = (e, data: any) => {
   const parentWidget = useWidgetById(props.editor, data.parentId)
-  const parentContext = useWidgetContext(props.editor, data.parentId)
+  const parentRenderContext = useWidgetRenderContext(props.editor, data.parentId)
   const widget = useWidgetById(props.editor, data._vid)
-  const widgetContext = useWidgetContext(props.editor, data._vid)
+  const widgetRenderContext = useWidgetRenderContext(props.editor, data._vid)
   store.setSelected(widget)
   nextTick(() => {
     showContextMenu(
       e,
       useWidgetMenus(props.editor, {
         parentWidget,
-        parentContext,
+        parentRenderContext,
         widget,
-        widgetContext,
+        widgetRenderContext,
         widgetIndex: data.index,
         widgetMenus: [
           {

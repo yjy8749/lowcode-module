@@ -3,7 +3,7 @@
     <el-select
       class="w-full"
       value-key="refDataId"
-      placeholder="请选择数据模型"
+      placeholder="请选择数据定义"
       :disabled="disabled"
       v-model="valueVModel.bind"
       @change="onBindChange"

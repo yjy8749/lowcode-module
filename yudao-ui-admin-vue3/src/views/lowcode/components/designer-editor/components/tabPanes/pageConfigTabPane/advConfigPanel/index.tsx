@@ -3,7 +3,7 @@ import { joinKeys } from '../../../../../common/utils'
 import { usePageDefine, usePageInstance } from '../../../../widgets/pageDefine'
 import WidgetPropItem from '../../../../components/WidgetPropItem.vue'
 import { DesignerEditor } from '../../../../designer-editor.type'
-import { useRootContext } from '../../../../designer-editor.utils'
+import { useRootRenderContext } from '../../../../designer-editor.utils'
 
 export default defineComponent({
   label: '高级配置',
@@ -17,7 +17,7 @@ export default defineComponent({
   setup(props) {
     const widgetDef = computed(() => usePageDefine())
     const widget = ref(usePageInstance(props.editor))
-    const context = computed(() => useRootContext(props.editor))
+    const widgetRenderContext = computed(() => useRootRenderContext(props.editor))
 
     const DynamicPropsList = () => {
       return (widgetDef.value?.advDesignerProps ?? []).map((define) => {
@@ -28,7 +28,7 @@ export default defineComponent({
               editor={props.editor}
               widget={widget.value}
               widgetDefine={widgetDef.value}
-              context={context.value}
+              widgetRenderContext={widgetRenderContext.value}
               propDefine={define}
               vModel:propValue={widget.value.props[define.key]}
             />

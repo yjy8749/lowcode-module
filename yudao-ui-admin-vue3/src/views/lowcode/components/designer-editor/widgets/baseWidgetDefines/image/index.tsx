@@ -1,5 +1,4 @@
 // index.tsx
-import { generateVid } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { CssSymbols, WidgetDefine, WidgetInstance } from '../../../designer-editor.type'
 import {
@@ -30,7 +29,6 @@ function isAliyun(widget: WidgetInstance): boolean {
 }
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '图片Image',
   icon: 'ep:picture',
   render: (args) => () => {

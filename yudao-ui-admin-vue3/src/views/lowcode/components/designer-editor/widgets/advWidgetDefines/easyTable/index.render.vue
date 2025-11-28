@@ -4,8 +4,8 @@
     <template v-for="slotWidget in tableSlots" :key="slotWidget.slotKey" #[slotWidget.slotKey]>
       <WidgetItem
         :editor="editor"
-        :parentWidget="widget"
-        :parentContext="widgetContext"
+        :parent-widget="widget"
+        :parent-render-context="widgetRenderContext"
         :widget="slotWidget"
         :options="widgetItemOptions"
       />
@@ -33,7 +33,7 @@ const props = defineProps<WidgetRenderProps>()
 
 const {
   refresh,
-  context,
+  exposeContext,
   useSlotObject,
   usePropValue,
   usePropObject,
@@ -127,7 +127,7 @@ const loadData = async (params) => {
   )
 }
 
-context({
+exposeContext({
   refresh,
   tableRef: () => tableRef.value,
   isSelectable: () => tableAttrs.value.selectable

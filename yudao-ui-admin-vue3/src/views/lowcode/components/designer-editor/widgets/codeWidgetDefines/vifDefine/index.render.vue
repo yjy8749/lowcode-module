@@ -2,8 +2,8 @@
   <WidgetItem
     v-if="isShow"
     :editor="editor"
-    :parentWidget="widget"
-    :parentContext="widgetContext"
+    :parent-widget="widget"
+    :parent-render-context="widgetRenderContext"
     :widget="defaultSlotWidget"
     :options="widgetItemOptions"
   />

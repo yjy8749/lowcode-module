@@ -161,7 +161,7 @@ export function useSortDownMenu(editor: DesignerEditor, args: UseWidgetMenusArgs
   return {
     icon: 'ep:sort-down',
     label: '排序-下移',
-    hidden: !(args.widgetContext.options?.sortable ?? true),
+    hidden: !(args.widgetRenderContext.options?.sortable ?? true),
     onClick: () => {
       editor.executeCmd(
         moveWidgetCmd(editor, {
@@ -180,7 +180,7 @@ export function useSortUpMenu(editor: DesignerEditor, args: UseWidgetMenusArgs):
   return {
     icon: 'ep:sort-up',
     label: '排序-上移',
-    hidden: !(args.widgetContext.options?.sortable ?? true),
+    hidden: !(args.widgetRenderContext.options?.sortable ?? true),
     onClick: () => {
       editor.executeCmd(
         moveWidgetCmd(editor, {
@@ -199,7 +199,7 @@ export function useWidgetCopyMenu(editor: DesignerEditor, args: UseWidgetMenusAr
   return {
     icon: 'ep:copy-document',
     label: '复制',
-    hidden: !(args.widgetContext.options?.copyable ?? true),
+    hidden: !(args.widgetRenderContext.options?.copyable ?? true),
     onClick: () => {
       editor.executeCmd(
         copyWidgetCmd(editor, {
@@ -215,7 +215,7 @@ export function useWidgetDeleteMenu(editor: DesignerEditor, args: UseWidgetMenus
   return {
     icon: 'ep:delete',
     label: '删除',
-    hidden: !(args.widgetContext.options?.deleteable ?? true),
+    hidden: !(args.widgetRenderContext.options?.deleteable ?? true),
     onClick: () => {
       const unDeleteDefine = useWidgetDataDefinesAndRuntime(editor, args.widget).find((def) => {
         const refedList = checkDataDefineAreRefed(editor, args.widget, def, true, undefined, true)
@@ -326,12 +326,12 @@ export function useWidgetAddMenu(
 
   let putableParent: WidgetInstance | undefined
 
-  if (args?.widgetContext?.options?.putable == true) {
+  if (args?.widgetRenderContext?.options?.putable == true) {
     putableParent = args.widget
   }
 
   if (isNullOrUnDef(putableParent)) {
-    const seekParentResult = args?.widgetContext?.seekParent({ putable: true })
+    const seekParentResult = args?.widgetRenderContext?.seekParent({ putable: true })
     putableParent = seekParentResult?.seekWidget
   }
 
@@ -339,8 +339,16 @@ export function useWidgetAddMenu(
     label: !isNullOrUnDef(putableParent) ? getWidgetShowLabel(putableParent) : '添加组件',
     icon: 'ep:circle-plus',
     children: allModules.map((moduleInfo) => {
-      const hiddenInMenu = moduleInfo.hiddenInMenu?.(action, putableParent, args?.widgetContext)
-      const disableInMenu = moduleInfo.disableInMenu?.(action, putableParent, args?.widgetContext)
+      const hiddenInMenu = moduleInfo.hiddenInMenu?.(
+        action,
+        putableParent,
+        args?.widgetRenderContext
+      )
+      const disableInMenu = moduleInfo.disableInMenu?.(
+        action,
+        putableParent,
+        args?.widgetRenderContext
+      )
       return {
         label: moduleInfo.label,
         icon: moduleInfo.icon,
@@ -350,12 +358,12 @@ export function useWidgetAddMenu(
           return {
             label: define.label,
             icon: define.icon,
-            hidden: define.hiddenInMenu?.(action, putableParent, args?.widgetContext),
-            disabled: define.disableInMenu?.(action, putableParent, args?.widgetContext),
+            hidden: define.hiddenInMenu?.(action, putableParent, args?.widgetRenderContext),
+            disabled: define.disableInMenu?.(action, putableParent, args?.widgetRenderContext),
             onClick: async () => {
               const widget = await createWidgetInstance(editor, define, {
                 parentWidget: args?.widget,
-                parentContext: args?.widgetContext,
+                parentRenderContext: args?.widgetRenderContext,
                 defaultProps: args?.options
               })
               editor.executeCmd(addWidgetCmd(editor, { toSlotId: putableParent?._vid, widget }))
@@ -371,9 +379,9 @@ export function useWidgetAddMenu(
 /** 获取菜单参数 */
 export interface UseWidgetMenusArgs {
   parentWidget?: WidgetInstance
-  parentContext?: WidgetRenderContext
+  parentRenderContext?: WidgetRenderContext
   widget: WidgetInstance
-  widgetContext: WidgetRenderContext
+  widgetRenderContext: WidgetRenderContext
   widgetIndex: number
   options?: WidgetItemOptions
   widgetMenus?: MenuItem[]
@@ -424,7 +432,7 @@ export function useWidgetMenus(
   // 组件信息
   if (
     !isNullOrUnDef(args?.widget) &&
-    !isNullOrUnDef(args?.widgetContext) &&
+    !isNullOrUnDef(args?.widgetRenderContext) &&
     !isNullOrUnDef(args?.widgetIndex)
   ) {
     pushMenu({

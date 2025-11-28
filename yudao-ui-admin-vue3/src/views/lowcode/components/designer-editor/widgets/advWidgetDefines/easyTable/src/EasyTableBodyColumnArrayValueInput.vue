@@ -23,18 +23,18 @@ import { computedVModel } from '../../../../../common/hooks'
 import EasyTableBodyColumnValueInput from './EasyTableBodyColumnValueInput.vue'
 import {
   COLUMN_ACTION_PROP,
-  COLUMN_INDEX_PROP,
-  QuerierTableBodyColumnProps
+  COLUMN_INDEX_PROP
 } from '../../../../../querier-table/querier-table.type'
 import { isIndexColumn, isActionColumn } from '../../../../../querier-table/querier-table.utils'
+import { EasyTableBodyColumnProps } from './types'
 
 export interface EasyTableSearchFieldArrayValueInputProps {
-  modelValue?: QuerierTableBodyColumnProps[]
+  modelValue?: EasyTableBodyColumnProps[]
 }
 
 export type EasyTableSearchFieldArrayValueInputEmits = {
-  'update:modelValue': [val?: QuerierTableBodyColumnProps[]]
-  change: [val?: QuerierTableBodyColumnProps[]]
+  'update:modelValue': [val?: EasyTableBodyColumnProps[]]
+  change: [val?: EasyTableBodyColumnProps[]]
 }
 
 const defaultStyle = 'width: 115px'
@@ -64,12 +64,12 @@ const fieldHeaders = [
   },
   {
     label: '主键',
-    helps: '用于唯一确定一条数据',
+    helps: '用于唯一确定一条数据，可组合配置',
     style: 'width: 50px'
   },
   {
     label: '数据分割',
-    helps: '配置后,自动分割字符串',
+    helps: '配置后,自动分割字符串为数组',
     style: defaultStyle
   },
   {
@@ -80,6 +80,10 @@ const fieldHeaders = [
     label: '列格式',
     helps: '根据列类型不同, 配置参数, 模版变量: 列数据 ${data}, 行数据 ${row.id}',
     style: flexStyle
+  },
+  {
+    label: '配置',
+    style: 'width: 30px'
   }
 ]
 

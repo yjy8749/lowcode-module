@@ -39,7 +39,7 @@ import { createDataDefine, useWidgetTree } from '../../designer-editor.utils'
 export interface PropBindInputProps {
   editor: DesignerEditor
   widget: WidgetInstance
-  context: WidgetRenderContext
+  widgetRenderContext: WidgetRenderContext
   widgetDefine: WidgetDefine
   propDefine: WidgetPropDefine
   modelValue?: WidgetPropDefineBind
@@ -94,7 +94,7 @@ const doOpenBindForm = async () => {
   const bindDefine: WidgetDataDefine = await openDataDefineForm({
     title: '数据&属性绑定',
     widget: props.widget,
-    context: props.context,
+    widgetRenderContext: props.widgetRenderContext,
     widgetDefine: props.widgetDefine,
     widgetTree: useWidgetTree(props.editor),
     propDefine: props.propDefine,

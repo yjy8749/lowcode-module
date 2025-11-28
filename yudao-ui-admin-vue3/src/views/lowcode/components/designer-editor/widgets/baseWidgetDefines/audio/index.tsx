@@ -1,10 +1,8 @@
-import { generateVid } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { WidgetDefine } from '../../../designer-editor.type'
 import { colorPickerDefine, inputDefine, switchDefine } from '../../../designer-editor.props'
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '音频Audio',
   icon: 'svg-icon:lowcode-icon-audio',
   render: (args) => () => {

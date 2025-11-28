@@ -1,13 +1,11 @@
 import Render from './index.render.vue'
-import { generateVid } from '../../../../common/utils'
 import { DesignerEditor, WidgetDefine } from '../../../designer-editor.type'
 import { inputNumberDefine, propBindDefine, switchDefine } from '../../../designer-editor.props'
 import { UseWidgetMenusArgs } from '../../../designer-editor.menu'
-import { createWidgetContextDefault } from '../../../designer-editor.utils'
+import { createWidgetRenderContextDefault } from '../../../designer-editor.utils'
 import { writeWidgetValuesCmd } from '../../../designer-editor.cmd'
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: 'EasyTable',
   icon: 'svg-icon:lowcode-icon-table',
   render: (args) => () => {
@@ -35,11 +33,11 @@ const widget: WidgetDefine = {
       }
     })
   ],
-  async create(editor, define) {
+  async create(editor, define, args) {
     const { openEasyTableConfigDialog } = editor.inject
-    const context = createWidgetContextDefault(editor, define)
-    const { props, slots, dataDefines } = await openEasyTableConfigDialog(context)
-    const { widget } = context
+    const widgetRenderContext = createWidgetRenderContextDefault(editor, define, undefined, args)
+    const { props, slots, dataDefines } = await openEasyTableConfigDialog(widgetRenderContext)
+    const { widget } = widgetRenderContext
     widget.props = props
     widget.slots = slots
     widget.dataDefines = dataDefines

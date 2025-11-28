@@ -8,7 +8,6 @@ import {
   WidgetRenderContext,
   DesignerEditorData,
   FILE_SOURCE_DESIGNER,
-  EvalFnContext,
   DesignerStoreState,
   DraggingData,
   DesignerStore,
@@ -55,9 +54,9 @@ function defaultDesignerStoreState(isPreview?: boolean, isDesign?: boolean): Des
     loadErrorMsg: undefined,
     materialFileData: undefined,
     editorData: defaultEditorData(),
-    evalFnContext: {},
+    widgetRenderContext: {},
+    widgetExposeContext: {},
     executorResult: {},
-    widgetContext: {},
     undoLogList: [],
     redoLogList: [],
     selectedWidgetId: undefined,
@@ -204,20 +203,20 @@ export function useDesignerStore(args: {
     }
   }
 
-  const putEvalFnContext = (_vid?: string, value?: EvalFnContext) => {
+  const putWidgetExposeContext = (_vid?: string, value?: Record<string, any>) => {
     if (!isNullOrUnDef(_vid)) {
-      state.value.evalFnContext[_vid] = value
+      state.value.widgetExposeContext[_vid] = value
     }
   }
 
-  const putWidgetContext = (_vid?: string, value?: WidgetRenderContext) => {
+  const putWidgetRenderContext = (_vid?: string, value?: WidgetRenderContext) => {
     if (!isNullOrUnDef(_vid)) {
-      state.value.widgetContext[_vid] = value
+      state.value.widgetRenderContext[_vid] = value
     }
   }
 
-  const useWidgetContext = (_vid: string) => {
-    return state.value.widgetContext[_vid]
+  const useWidgetRenderContext = (_vid: string) => {
+    return state.value.widgetRenderContext[_vid]
   }
 
   const loadMaterialFileData = async (isPreview?: boolean) => {
@@ -312,9 +311,9 @@ export function useDesignerStore(args: {
     addRedoLog,
     getAndPopRedoLog,
     putExecutorResult,
-    putEvalFnContext,
-    putWidgetContext,
-    useWidgetContext,
+    putWidgetExposeContext,
+    putWidgetRenderContext,
+    useWidgetRenderContext,
     loadMaterialFileData,
     saveMaterialFileData,
     refreshEditor,

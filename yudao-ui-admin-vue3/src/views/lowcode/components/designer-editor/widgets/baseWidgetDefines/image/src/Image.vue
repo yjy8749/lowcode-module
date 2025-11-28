@@ -1,7 +1,7 @@
 <template>
   <div class="Image w-full h-full overflow-hidden line-height-0" :style="sizeStyle">
     <el-image
-      class="w-full h-full"
+      class="w-full h-full min-h-32px"
       :class="{ 'thumbnail-image': isProgressive, 'image-fade-in': realImageLoaded }"
       :src="imageSrc"
       :alt="alt"
@@ -13,7 +13,18 @@
       preview-teleported
       hide-on-clickModal
       show-progress
-    />
+    >
+      <template #placeholder>
+        <div class="h-full min-h-32px w-full flex items-center justify-center c-[--el-color-info]">
+          <Icon :size="24" icon="ep:loading" class="animate-spin animate-duration-3000" />
+        </div>
+      </template>
+      <template #error>
+        <div class="h-full min-h-32px w-full flex items-center justify-center c-[--el-color-info]">
+          加载失败
+        </div>
+      </template>
+    </el-image>
     <el-image
       v-if="isProgressive && !realImageLoaded"
       style="width: 0; height: 0"
@@ -30,7 +41,7 @@ import { ImageProps as ElImageProps } from 'element-plus'
 
 export interface ImageProps {
   // 图片路径
-  src: string
+  src?: string
   // 宽度
   width?: string
   // 高度
@@ -90,7 +101,7 @@ const previewImageSrcList = computed(() => {
   if (props.preview) {
     const list = [...(props.previewSrcList ?? [])]
     if (isEmpty(list) && !isEmpty(props.src)) {
-      list.push(props.src)
+      list.push(props.src!)
     }
     return list.map((e) => previewImageSrc(e))
   }

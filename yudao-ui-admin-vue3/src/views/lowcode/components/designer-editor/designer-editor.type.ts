@@ -27,7 +27,7 @@ export const WIDGET_VIF_PERMIS_KEY = '_vIfPermis'
 export const SLOT_DEFAULT_KEY = 'slot#default'
 
 // 菜单操作类型
-export type WidgetMenuAction = 'add'
+export type WidgetMenuAction = 'add' | 'move'
 
 // 菜单定义
 export type WidgetMenuItem = {
@@ -58,7 +58,7 @@ export interface EdgeInsetsInputData {
 
 //数据定义检查结果
 export interface CheckDataDefineResult {
-  /** 数据模型所在组件Id */
+  /** 数据定义所在组件Id */
   refedWidgetId?: string
   /** 数据Id */
   refedDataId?: string
@@ -70,7 +70,7 @@ export interface CheckDataDefineResult {
 
 //组件属性数据绑定信息
 export interface WidgetPropDefineBindBind {
-  /** 引用数据模型所在组件Id */
+  /** 引用数据定义所在组件Id */
   refWidgetId?: string
   /** 引用数据type */
   refDataType?: WidgetDataDefineType
@@ -96,7 +96,7 @@ export interface WidgetPropDefineBind {
   refFunction?: string
 }
 
-// 数据模型类型
+// 数据定义类型
 export type WidgetDataDefineType =
   | 'def'
   | 'remote'
@@ -125,7 +125,7 @@ export interface WidgetDataDefineRequestFormData {
   value?: string
 }
 
-// 数据模型属性类型
+// 数据定义属性类型
 export type WidgetDataDefinePropType =
   | 'string'
   | 'number'
@@ -134,7 +134,7 @@ export type WidgetDataDefinePropType =
   | 'array'
   | 'undefined'
 
-// 数据模型属性绑定接收类型
+// 数据定义属性绑定接收类型
 export type WidgetPropDefineBindType =
   | 'string'
   | 'number'
@@ -162,19 +162,19 @@ export interface WidgetPrd {
   content?: string
 }
 
-// 数据模型
+// 数据定义
 export interface WidgetDataDefine {
-  /** 数据模型唯一id */
+  /** 数据定义唯一id */
   _vid: string
-  /** 数据模型变量名 */
+  /** 数据定义变量名 */
   _var?: string
-  /** 数据模型类型 */
+  /** 数据定义类型 */
   _type: WidgetDataDefineType
   /** 所在组件id */
   widgetId?: string
-  /** 数据模型名称 */
+  /** 数据定义名称 */
   name?: string
-  /** 数据模型作用域 */
+  /** 数据定义作用域 */
   scope?: WidgetDataDefeinScope
   /** 数据属性定义 */
   propDefines?: WidgetDataDefinePropDefine[]
@@ -218,13 +218,13 @@ export interface WidgetDataDefine {
   runtimeFunction?: string
   /** 数据结构分析转换函数 */
   analyzerFunction?: string
-  /** 数据加载成功触发执行函数 */
+  /** 数据加载成功触发可执行函数 */
   onSuccess?: DesignerEditorEvalFunction
-  /** 数据加载失败触发执行函数 */
+  /** 数据加载失败触发可执行函数 */
   onError?: DesignerEditorEvalFunction
 }
 
-// 数据模型属性
+// 数据定义属性
 export interface WidgetDataDefinePropDefine {
   /** 数据属性唯一id */
   _vid: string
@@ -285,9 +285,9 @@ export interface DesignerStoreState {
   drawerPanelOpened: boolean
   materialFileData?: MaterialFileDataVO
   editorData: DesignerEditorData
-  evalFnContext: Record<string, EvalFnContext | undefined>
+  widgetRenderContext: Record<string, WidgetRenderContext | undefined>
+  widgetExposeContext: Record<string, Record<string, any> | undefined>
   executorResult: Record<string, GetDataResult | undefined>
-  widgetContext: Record<string, WidgetRenderContext | undefined>
   undoLogList: DesignerEditorCmd[]
   redoLogList: DesignerEditorCmd[]
   selectedWidgetId?: string
@@ -325,9 +325,9 @@ export interface DesignerStore {
   addRedoLog: (log: DesignerEditorCmd) => void
   getAndPopRedoLog: () => DesignerEditorCmd | undefined
   putExecutorResult: (def?: WidgetDataDefine, value?: GetDataResult) => void
-  putEvalFnContext: (_vid?: string, value?: EvalFnContext) => void
-  putWidgetContext: (_vid?: string, value?: WidgetRenderContext) => void
-  useWidgetContext: (_vid?: string) => WidgetRenderContext | undefined
+  putWidgetExposeContext: (_vid?: string, value?: Record<string, any>) => void
+  putWidgetRenderContext: (_vid?: string, value?: WidgetRenderContext) => void
+  useWidgetRenderContext: (_vid?: string) => WidgetRenderContext | undefined
   executeTask: () => Promise<void>
   addTask: (task: DesignerEditorTask) => void
   loadMaterialFileData: (isPreview?: boolean) => Promise<void>
@@ -364,7 +364,7 @@ export interface WidgetRenderContext {
 export interface WidgetItemProps {
   editor: DesignerEditor
   parentWidget?: WidgetInstance
-  parentContext: WidgetRenderContext
+  parentRenderContext: WidgetRenderContext
   widget: WidgetInstance
   widgetIndex?: number
   options?: WidgetItemOptions
@@ -373,10 +373,10 @@ export interface WidgetItemProps {
 export interface WidgetRenderProps {
   editor: DesignerEditor
   parentWidget?: WidgetInstance
-  parentContext: WidgetRenderContext
+  parentRenderContext: WidgetRenderContext
   widget: WidgetInstance
   widgetDefine: WidgetDefine
-  widgetContext: WidgetRenderContext
+  widgetRenderContext: WidgetRenderContext
   widgetIndex?: number
 }
 
@@ -432,7 +432,7 @@ export interface WidgetPropRenderContext {
   /** 组件实例 */
   widget: WidgetInstance
   /** 编辑器上下文 */
-  context: WidgetRenderContext
+  widgetRenderContext: WidgetRenderContext
   /** 组件定义 */
   widgetDefine: WidgetDefine
   /** 组件属性定义 */
@@ -442,7 +442,7 @@ export interface WidgetPropRenderContext {
 // 组件渲染函数
 export type WidgetPropRender = (
   modelValue: WritableComputedRef<any>,
-  context: WidgetPropRenderContext
+  propRenderContext: WidgetPropRenderContext
 ) => () => JSX.Element
 
 // 组件编辑器属性
@@ -462,7 +462,7 @@ export interface WidgetPropDefine {
   /** 属性最小长度 */
   minLength?: number
   /** 属性是否显示 */
-  isShow?: (context: WidgetPropRenderContext) => boolean
+  isShow?: (propRenderContext: WidgetPropRenderContext) => boolean
   /** 属性保存hook */
   onSave?: (editor: DesignerEditor, widget: WidgetInstance, propKey: string, propValue: any) => void
   /** 属性绑定保存hook */
@@ -537,7 +537,7 @@ export interface GetDataResult {
   data?: any
 }
 
-// 执行函数上下文
+// 可执行函数上下文
 export interface EvalFnContext {
   $request: (arg1?: any, arg2?: GetDataArgs) => Promise<any>
   $download: () => any
@@ -545,7 +545,7 @@ export interface EvalFnContext {
   $emit: (key: string, data: any) => void
   $close: (...args: any[]) => Promise<any>
   $dialog: (options: any) => Promise<any>
-  $context: (arg1?: string) => Promise<any>
+  $useExposeContext: (arg1?: string) => Promise<Record<string, any> | undefined>
   $data: (
     arg1: string | (GetDataArgs & { _var: string; refresh?: boolean }),
     data?: any
@@ -554,14 +554,14 @@ export interface EvalFnContext {
   $log: (...args: any[]) => void
 }
 
-// 执行函数类型 简单函数 自定义函数(防抖,节流), 鼠标函数(阻止默认, 阻止冒泡)
+// 可执行函数类型 简单函数 自定义函数(防抖,节流), 鼠标函数(阻止默认, 阻止冒泡)
 export type DesignerEditorEvalFunctionType = 'simple-function' | 'function' | 'mouse-function'
 
-// 执行函数
+// 可执行函数
 export interface DesignerEditorEvalFunction {
   /** 函数类型 */
   type?: DesignerEditorEvalFunctionType
-  /** 执行函数 */
+  /** 可执行函数 */
   evalFunction?: string
   /** 函数防抖 */
   debounce?: boolean
@@ -648,7 +648,9 @@ export interface WidgetInstance {
 
 // 组件定义
 export type WidgetDefine = {
-  /** 组件name */
+  /** 组件唯一id */
+  _vid?: string
+  /** 组件key */
   _key?: string
   /** 组件所属模块名称 */
   _moduleName?: string
@@ -682,7 +684,7 @@ export type WidgetDefine = {
     define: WidgetDefine,
     args?: {
       parentWidget?: WidgetInstance
-      parentContext?: WidgetRenderContext
+      parentRenderContext?: WidgetRenderContext
       options?: WidgetItemOptions
       defaultProps?: Record<string, any>
     }
@@ -717,20 +719,20 @@ export type WidgetDefine = {
   /** 是否菜单中禁用 */
   disableInMenu?: (
     action: WidgetMenuAction,
-    w?: WidgetInstance,
-    ctx?: WidgetRenderContext
+    widget?: WidgetInstance,
+    widgetRenderContext?: WidgetRenderContext
   ) => boolean | ComputedRef<boolean>
   /** 是否菜单中隐藏 */
   hiddenInMenu?: (
     action: WidgetMenuAction,
-    w?: WidgetInstance,
-    ctx?: WidgetRenderContext
+    widget?: WidgetInstance,
+    widgetRenderContext?: WidgetRenderContext
   ) => boolean | ComputedRef<boolean>
   /** 运行时数据定义 */
   runtimeDataDefines?: (editor: DesignerEditor, widget: WidgetInstance) => WidgetDataDefine[]
-} & Omit<WidgetInstance, '_key' | '_moduleName' | 'props' | 'slots' | 'slotChildren'>
+} & Omit<WidgetInstance, '_vid' | '_key' | '_moduleName' | 'props' | 'slots' | 'slotChildren'>
 
-// 组件分组配置
+// 组件模块配置
 export interface WidgetModuleInfo {
   /** 模块名称 */
   name?: string
@@ -747,14 +749,14 @@ export interface WidgetModuleInfo {
   /** 是否菜单中禁用 */
   disableInMenu?: (
     action: WidgetMenuAction,
-    w?: WidgetInstance,
-    ctx?: WidgetRenderContext
+    widget?: WidgetInstance,
+    widgetRenderContext?: WidgetRenderContext
   ) => boolean | ComputedRef<boolean>
   /** 是否菜单中隐藏 */
   hiddenInMenu?: (
     action: WidgetMenuAction,
-    w?: WidgetInstance,
-    ctc?: WidgetRenderContext
+    widget?: WidgetInstance,
+    widgetRenderContext?: WidgetRenderContext
   ) => boolean | ComputedRef<boolean>
 }
 
@@ -762,7 +764,7 @@ export interface WidgetModuleInfo {
 export interface DesignerEditorCmd {
   /** 指令Key */
   cmd: string
-  /** 指令执行函数 */
+  /** 指令可执行函数 */
   execute: () => boolean
   /** 指令回滚函数 */
   rollback?: () => boolean
@@ -808,7 +810,7 @@ export interface DesignerEditorData {
 export interface DesignerEditorTask {
   /** 任务id */
   id: string | WidgetDataDefine
-  /** 任务执行函数 */
+  /** 任务可执行函数 */
   execute: () => Promise<void>
 }
 

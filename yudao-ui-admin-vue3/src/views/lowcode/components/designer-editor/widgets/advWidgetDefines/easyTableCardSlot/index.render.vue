@@ -12,8 +12,8 @@
         <el-col v-bind="colAttrs">
           <WidgetItem
             :editor="editor"
-            :parentWidget="widget"
-            :parentContext="widgetContext"
+            :parent-widget="widget"
+            :parent-render-context="widgetRenderContext"
             :widget="defaultSlotWidget"
             :options="widgetItemOptions"
           />
@@ -52,7 +52,7 @@ const widgetItemOptions = customWidgetOptions({ putable: true, selectable: true 
 
 const props = defineProps<WidgetRenderProps>()
 
-const { usePropAndEvent, useDefaultSlot, useParent, useVForItemRefData, useContext } =
+const { usePropAndEvent, useDefaultSlot, useParent, useVForItemRefData, useExposeContext } =
   useWidget(props)
 
 const cardAttrs = computed(() => usePropAndEvent({ omit: ['justify'] }))
@@ -64,7 +64,7 @@ const colAttrs = computed(() => useElColPropAttrs(defaultSlotWidget.value))
 const rowAttrs = computed(() => usePropAndEvent({ only: ['justify'] }))
 
 const parentTableContext = computed(() => {
-  return useContext(useParent({ _moduleName: 'advWidgetDefines', _key: 'easyTable' }))
+  return useExposeContext(useParent({ _moduleName: 'advWidgetDefines', _key: 'easyTable' }))
 })
 
 const parentTableRef = (): any | undefined => {

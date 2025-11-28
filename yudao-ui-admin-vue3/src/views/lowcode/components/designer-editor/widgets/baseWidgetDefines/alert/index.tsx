@@ -1,5 +1,4 @@
 // index.tsx
-import { generateVid } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { ElCommonTypeOptions, WidgetDefine } from '../../../designer-editor.type'
 import {
@@ -11,14 +10,16 @@ import {
 } from '../../../designer-editor.props'
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '提示Alert',
   icon: 'ep:warning',
   render: (args) => () => {
     return <Render {...args} />
   },
   baseDesignerProps: [
-    selectDefine({ key: 'type', label: '提示类型类型' }, ElCommonTypeOptions),
+    selectDefine(
+      { key: 'type', label: '提示类型' },
+      ElCommonTypeOptions.map((e) => (e.value == 'danger' ? { label: '错误', value: 'error' } : e))
+    ),
     switchDefine({ key: 'center', label: '文字是否居中' }),
     switchDefine({ key: 'closable', label: '是否可以关闭', defaultValue: false }),
     inputDefine({ key: 'closeText', label: '关闭按钮文本' }),

@@ -7,7 +7,7 @@ import WidgetEventItem from '../../../WidgetEventItem.vue'
 import {
   defaultLifecycleEvents,
   readEditorDataValue,
-  useRootContext
+  useRootRenderContext
 } from '../../../../designer-editor.utils'
 import { DesignerEditor } from '../../../../designer-editor.type'
 
@@ -23,7 +23,7 @@ export default defineComponent({
   setup(props) {
     const widgetDef = computed(() => usePageDefine())
     const widget = computed(() => usePageInstance(props.editor))
-    const context = computed(() => useRootContext(props.editor))
+    const widgetRenderContext = computed(() => useRootRenderContext(props.editor))
     const events = computed(() => defaultLifecycleEvents())
     const eventsBind = computed(() => readEditorDataValue(props.editor, 'eventsBind'))
 
@@ -40,7 +40,7 @@ export default defineComponent({
               editor={props.editor}
               widget={widget.value}
               widgetDefine={widgetDef.value}
-              context={context.value}
+              widgetRenderContext={widgetRenderContext.value}
               event={event}
               eventBind={eventsBind?.value?.[event.key]}
             />

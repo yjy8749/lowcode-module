@@ -1,5 +1,5 @@
 <template>
-  <Dialog title="发布菜单" width="900px" v-model="dialogVisible">
+  <Dialog title="发布页面" width="900px" v-model="dialogVisible">
     <div class="my-9px">
       <div class="flex gap-2 items-center">
         <div class="w-120px flex justify-center">
@@ -26,6 +26,7 @@
         <div class="flex-1 flex flex-wrap gap-2" v-loading="refMenuLoading">
           <div class="flex gap-2">
             <el-button
+              v-if="isEmpty(refMenuList)"
               class="!m-0"
               type="primary"
               plain
@@ -39,16 +40,20 @@
               type="primary"
               plain
               @click="
-                openMenuForm('create', { type: 2, component: latestComponent }, [
-                  'type',
-                  'component'
-                ])
+                openMenuForm(
+                  'create',
+                  {
+                    type: 2,
+                    component: latestComponent
+                  },
+                  ['type', 'component']
+                )
               "
             >
-              部署菜单({{ latestFileVersion }})
+              创建菜单（最新版本：{{ latestFileVersion }}）
             </el-button>
             <el-button v-else class="!m-0" type="primary" plain @click="deployLatestMenu()">
-              更新菜单({{ latestFileVersion }})
+              更新菜单（最新版本：{{ latestFileVersion }}）
             </el-button>
             <el-text type="primary">当前配置: {{ refMenuResp.refMenu?.component }}</el-text>
           </div>

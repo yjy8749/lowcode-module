@@ -2,6 +2,7 @@ import { DeepReadonly } from 'vue'
 import { isEmpty, isNullOrUnDef } from '@/utils/is'
 import { WidgetDefine, WidgetModuleInfo } from '../designer-editor.type'
 import { widgetFullKey } from '../designer-editor.utils'
+import { generateVid } from '../../common/utils'
 
 /** 导入组件模块数据 */
 function importModuleInfos(): Record<string, WidgetModuleInfo> {
@@ -34,6 +35,7 @@ function importWidgetDefines(): Record<string, Record<string, WidgetDefine>> {
     try {
       const [_moduleName, _key] = filePath.replace(/\.\/(.*)\/index\.(tsx|ts|vue)/, '$1').split('/')
       widgetDefinesMap[_moduleName] ??= {}
+      widgetDefine._vid ??= generateVid()
       widgetDefinesMap[_moduleName][_key] = widgetDefine
     } catch (e) {
       console.error(`${filePath} importWidgetDefines error`, e)

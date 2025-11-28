@@ -3,7 +3,7 @@ import { joinKeys } from '../../../../../common/utils'
 import {
   buildCSSStyleDef,
   useSelectedWidget,
-  useSelectedWidgetContext,
+  useSelectedWidgetRenderContext,
   useSelectedWidgetDefine
 } from '../../../../designer-editor.utils'
 import WidgetPropItem from '../../../WidgetPropItem.vue'
@@ -25,7 +25,7 @@ export default defineComponent({
   setup(props) {
     const widgetDef = computed(() => useSelectedWidgetDefine(props.editor))
     const widget = computed(() => useSelectedWidget(props.editor))
-    const context = computed(() => useSelectedWidgetContext(props.editor))
+    const widgetRenderContext = computed(() => useSelectedWidgetRenderContext(props.editor))
 
     const DynamicPropsList = () => {
       return [
@@ -39,7 +39,7 @@ export default defineComponent({
               editor={props.editor}
               widget={widget.value}
               widgetDefine={widgetDef.value}
-              context={context.value}
+              widgetRenderContext={widgetRenderContext.value}
               propDefine={define}
               propValue={widget.value?.props[define.key]}
               propBind={widget.value?.propsBind?.[define.key]}

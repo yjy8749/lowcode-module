@@ -1,4 +1,3 @@
-import { seekEvalFnContext } from '../../designer-editor.utils'
 import { useWidget } from './useWidget'
 import {
   formatInputNumberDefine,
@@ -114,13 +113,13 @@ const formItemInputExcludeKeys = [...formItemBaseDefine(), ...formItemAdvDefine(
 
 export function useFormItemWidget(props: ReturnType<typeof useWidget>) {
   const {
-    editor,
     usePropValue,
     usePropObject,
     usePropAndEvent,
     useParent,
     toEvalFunction,
-    context: superContext
+    exposeContext: superExposeContext,
+    useExposeContext
   } = props
 
   const propLabel = computed(() => usePropValue('label'))
@@ -129,7 +128,7 @@ export function useFormItemWidget(props: ReturnType<typeof useWidget>) {
 
   const form = computed(() => useParent({ _moduleName: 'containerWidgetDefines', _key: 'form' }))
 
-  const formContext = computed(() => seekEvalFnContext(editor, form.value?._vid))
+  const formContext = computed(() => useExposeContext(form.value?._vid))
 
   const useFormItemAttrs = () => {
     const args = usePropObject(
@@ -142,7 +141,7 @@ export function useFormItemWidget(props: ReturnType<typeof useWidget>) {
     )
     const isHideLabel =
       args.labelControl != 'show' &&
-      (args.labelControl == 'hide' || formContext.value.isHideLabel())
+      (args.labelControl == 'hide' || formContext.value?.isHideLabel())
     return {
       prop: args.prop,
       label: isHideLabel ? undefined : args.label,
@@ -157,8 +156,8 @@ export function useFormItemWidget(props: ReturnType<typeof useWidget>) {
       ...args,
       omit: [...(args?.omit ?? []), ...formItemInputExcludeKeys]
     })
-    attrs.readonly = attrs.readonly || formContext.value.isReadonly()
-    attrs.disabled = attrs.disabled || formContext.value.isDisabled()
+    attrs.readonly = attrs.readonly || formContext.value?.isReadonly()
+    attrs.disabled = attrs.disabled || formContext.value?.isDisabled()
     attrs.placeholder = isEmpty(attrs.placeholder) ? `请输入${propLabel.value}` : attrs.placeholder
     return attrs
   }
@@ -168,8 +167,8 @@ export function useFormItemWidget(props: ReturnType<typeof useWidget>) {
   const propWriteFun = computed(() => toEvalFunction(usePropValue('propWriteFun')))
 
   const valueModelAsync = computedAsync(() => {
-    const formModel = formContext.value.formModel()
-    const val = formModel.value[propKey.value]
+    const formModel = formContext.value?.formModel()
+    const val = formModel.value?.[propKey.value]
     return !isNullOrUnDef(propReadFun.value) ? propReadFun.value(val) : val
   })
 
@@ -178,30 +177,34 @@ export function useFormItemWidget(props: ReturnType<typeof useWidget>) {
       return valueModelAsync.value
     },
     set(val?: any) {
-      const formModel = formContext.value.formModel()
-      if (!isNullOrUnDef(propWriteFun.value)) {
-        propWriteFun.value(val).then((result) => {
-          formModel.value[propKey.value] = result
-        })
-      } else {
-        formModel.value[propKey.value] = val
+      if (formContext.value) {
+        const formModel = formContext.value.formModel()
+        if (!isNullOrUnDef(propWriteFun.value)) {
+          propWriteFun.value(val).then((result) => {
+            formModel.value[propKey.value] = result
+          })
+        } else {
+          formModel.value[propKey.value] = val
+        }
       }
     }
   })
 
-  const context = (ctx?: any) => {
-    return superContext({
+  const exposeContext = (ctx?: any) => {
+    return superExposeContext({
       ...ctx,
       getValue() {
-        return formContext.value.formModel().value[propKey.value]
+        return formContext.value?.formModel().value[propKey.value]
       },
       setFormValue(val?: any) {
-        formContext.value.formModel().value[propKey.value] = val
+        if (formContext.value) {
+          formContext.value.formModel().value[propKey.value] = val
+        }
       }
     })
   }
 
-  context()
+  exposeContext()
 
   return {
     ...props,
@@ -210,6 +213,6 @@ export function useFormItemWidget(props: ReturnType<typeof useWidget>) {
     useFormItemAttrs,
     useFormInputAttrs,
     valueModel,
-    context
+    exposeContext
   }
 }

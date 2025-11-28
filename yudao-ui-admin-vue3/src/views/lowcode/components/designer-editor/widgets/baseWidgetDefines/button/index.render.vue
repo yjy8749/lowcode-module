@@ -8,18 +8,18 @@
 import { isEmpty } from '@/utils/is'
 import { useWidget, type WidgetRenderProps } from '../../hooks'
 
+const message = useMessage()
+
 const props = defineProps<WidgetRenderProps>()
 
 const { usePropValue, usePropAndEvent, useEventBind, toEvalFunction } = useWidget(props)
 
 const label = computed(() => usePropValue('label'))
 
-const message = useMessage()
-
 const buttonAttrs = computed(() => {
   return {
     ...usePropAndEvent({ omit: ['label', 'click', 'showConfirm', 'confirmMsg'] }),
-    style: usePropValue('auto') ? { width: '100%', height: '100%' } : undefined
+    style: usePropValue('fullSize') ? { width: '100%', height: '100%' } : undefined
   }
 })
 

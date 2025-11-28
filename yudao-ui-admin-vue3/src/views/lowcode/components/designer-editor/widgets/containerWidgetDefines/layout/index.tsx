@@ -1,4 +1,3 @@
-import { generateVid } from '../../../../common/utils'
 import Render from './index.render.vue'
 import {
   DesignerEditor,
@@ -33,7 +32,6 @@ function createSlots(
 }
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '布局容器',
   icon: 'ep:grid',
   render: (args) => () => {

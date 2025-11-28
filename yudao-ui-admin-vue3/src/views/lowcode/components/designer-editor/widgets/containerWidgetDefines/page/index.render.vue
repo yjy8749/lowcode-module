@@ -12,7 +12,7 @@ import DesignerPreview from '../../../index.preview.vue'
 
 const props = defineProps<WidgetRenderProps>()
 
-const { usePropAndEvent, context } = useWidget(props)
+const { usePropAndEvent, exposeContext } = useWidget(props)
 
 const rowAttrs = computed(() => usePropAndEvent({ only: ['justify'] }))
 
@@ -22,7 +22,7 @@ const editorAttrs = computed(() => usePropAndEvent({ only: ['fileId', 'version']
 
 const refreshFlag = ref(true)
 
-context({
+exposeContext({
   refresh() {
     refreshFlag.value = false
     nextTick(() => {

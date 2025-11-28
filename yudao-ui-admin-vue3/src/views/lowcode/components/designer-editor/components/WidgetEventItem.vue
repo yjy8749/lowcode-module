@@ -38,7 +38,7 @@ export interface WidgetPropItemProps {
   eventType: DesignerEditorEventType
   widget: WidgetInstance
   widgetDefine: WidgetDefine
-  context: WidgetRenderContext
+  widgetRenderContext: WidgetRenderContext
   event: DesignerEditorEventDefine
   eventBind?: DesignerEditorEventBind
   defaultFunction?: string

@@ -1,5 +1,4 @@
 // index.tsx
-import { generateVid } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { WidgetDefine } from '../../../designer-editor.type'
 import { eventDefine, inputDefine, switchDefine } from '../../../designer-editor.props'
@@ -7,7 +6,6 @@ import { formItemAdvDefine, formItemBaseDefine } from '../../hooks/useFormItemWi
 import { textFormItemValidDefine } from '../utils'
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '输入框Input',
   icon: 'ep:edit',
   render: (args) => () => {

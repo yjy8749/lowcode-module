@@ -67,8 +67,8 @@ const actions = computed(() => {
       type: 'success',
       label: '运行',
       onClick: async () => {
-        const context = buildEvalFnContext(props.editor, props.widget?._vid)
-        const result = await executeEvalFunction(props.editor, valueVModel.value, context)
+        const evalFnContext = buildEvalFnContext(props.editor, props.widget?._vid)
+        const result = await executeEvalFunction(props.editor, valueVModel.value, evalFnContext)
         message.info(`执行结果${JSON.stringify(result)}`)
       }
     },

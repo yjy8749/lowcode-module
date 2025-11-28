@@ -1,0 +1,298 @@
+{
+  "_vid": "mifge0bsg5UwXCmndRUDHUyn",
+  "widgetTree": [
+    {
+      "_key": "alert",
+      "_vid": "miipup29j0RgRQ9DNstlVPm7",
+      "label": "提示Alert",
+      "props": {
+        "type": "error",
+        "closable": false,
+        "description": "导出"
+      },
+      "slots": [],
+      "__key__": "miipup2gnsQxu1eUXriGFdj5",
+      "_moduleName": "baseWidgetDefines",
+      "slotChildren": []
+    },
+    {
+      "_key": "pageSlot",
+      "_vid": "miipz51v92SlkxXxtTgoRy6i",
+      "label": "页面插槽",
+      "props": {
+        "slotName": "userInfo"
+      },
+      "slots": [],
+      "__key__": "miipz54h539VfHcKrhJLA3Qn",
+      "propsBind": {
+        "scope": {
+          "bindList": [
+            {
+              "bind": {
+                "label": "测试数据 [ goRy6i ]",
+                "refDataId": "miiq4rnlFB3n8VCQAA3M43aj",
+                "refDataType": "def",
+                "refWidgetId": "miipz51v92SlkxXxtTgoRy6i"
+              },
+              "__key__": "miiqda1q8FKWBRoaKY76audn",
+              "refPropKey": "#"
+            }
+          ]
+        }
+      },
+      "_moduleName": "baseWidgetDefines",
+      "dataDefines": [
+        {
+          "_vid": "miiq4rnlFB3n8VCQAA3M43aj",
+          "name": "测试数据",
+          "_type": "def",
+          "scope": "global",
+          "__key__": "miiq6dy3101FRUzyLwENd6tA",
+          "refBind": {},
+          "jsonData": "{\n  \"userId\": \"U789456123\",\n  \"username\": \"li_wei_88\",\n  \"email\": \"liwei1988@example.com\",\n  \"phoneNumber\": \"+86 138 5678 9012\",\n  \"profile\": {\n    \"firstName\": \"Wei\",\n    \"lastName\": \"Li\",\n    \"dateOfBirth\": \"1988-05-23\",\n    \"gender\": \"male\",\n    \"avatarUrl\": \"https://example.com/avatars/li_wei.jpg\"\n  },\n  \"address\": {\n    \"country\": \"China\",\n    \"province\": \"Guangdong\",\n    \"city\": \"Shenzhen\",\n    \"street\": \"Nanshan Avenue, No. 1024\",\n    \"postalCode\": \"518000\"\n  },\n  \"accountCreated\": \"2022-11-15T08:30:45Z\",\n  \"isActive\": true,\n  \"preferences\": {\n    \"language\": \"zh-CN\",\n    \"timezone\": \"Asia/Shanghai\",\n    \"notifications\": {\n      \"email\": true,\n      \"sms\": false,\n      \"push\": true\n    }\n  }\n}",
+          "widgetId": "miipz51v92SlkxXxtTgoRy6i",
+          "isAutoLoad": true,
+          "propDefines": [
+            {
+              "_key": "#.userId",
+              "_vid": "miiq6bx1HRO1Idhq9W0Xdmz5",
+              "name": "userId",
+              "type": "string",
+              "value": "U789456123",
+              "__key__": "miiq6bx3Zq4QbPKFm6Xyx6lR",
+              "itemDefines": []
+            },
+            {
+              "_key": "#.username",
+              "_vid": "miiq6bx1TTNCJFy0VL8qEgtv",
+              "name": "username",
+              "type": "string",
+              "value": "li_wei_88",
+              "__key__": "miiq6bx3MoTnKpfDuFedZ0ik",
+              "itemDefines": []
+            },
+            {
+              "_key": "#.email",
+              "_vid": "miiq6bx1HMTzIaNTQxUbmfVm",
+              "name": "email",
+              "type": "string",
+              "value": "liwei1988@example.com",
+              "__key__": "miiq6bx327wVNf5G0kCNIkLY",
+              "itemDefines": []
+            },
+            {
+              "_key": "#.phoneNumber",
+              "_vid": "miiq6bx1DozyM3mER5DVl7Zi",
+              "name": "phoneNumber",
+              "type": "string",
+              "value": "+86 138 5678 9012",
+              "__key__": "miiq6bx34oFjzAY1mAsG47wK",
+              "itemDefines": []
+            },
+            {
+              "_key": "#.profile",
+              "_vid": "miiq6bx1V0lZwIfoGpknR98c",
+              "name": "profile",
+              "type": "object",
+              "__key__": "miiq6bx3QFRshtfTk5Zj9RDn",
+              "itemDefines": [
+                {
+                  "_key": "#.profile.firstName",
+                  "_vid": "miiq6bx1A3FJabfETc84rAuX",
+                  "name": "firstName",
+                  "type": "string",
+                  "value": "Wei",
+                  "__key__": "miiq6bx7zhS5huDY48kK0mCB",
+                  "itemDefines": []
+                },
+                {
+                  "_key": "#.profile.lastName",
+                  "_vid": "miiq6bx17ZrarA3j3NV7j4eu",
+                  "name": "lastName",
+                  "type": "string",
+                  "value": "Li",
+                  "__key__": "miiq6bx7sO5FODDHhDw9dMn2",
+                  "itemDefines": []
+                },
+                {
+                  "_key": "#.profile.dateOfBirth",
+                  "_vid": "miiq6bx1DtQKoxFCwd36ZU5C",
+                  "name": "dateOfBirth",
+                  "type": "string",
+                  "value": "1988-05-23",
+                  "__key__": "miiq6bx77d1Bf4TYlHMNwIOX",
+                  "itemDefines": []
+                },
+                {
+                  "_key": "#.profile.gender",
+                  "_vid": "miiq6bx1zQDuvfsvOlkBdNNz",
+                  "name": "gender",
+                  "type": "string",
+                  "value": "male",
+                  "__key__": "miiq6bx704nkJy2d2DBem8ss",
+                  "itemDefines": []
+                },
+                {
+                  "_key": "#.profile.avatarUrl",
+                  "_vid": "miiq6bx1TJ9KRmLxhtdz9XUW",
+                  "name": "avatarUrl",
+                  "type": "string",
+                  "value": "https://example.com/avatars/li_wei.jpg",
+                  "__key__": "miiq6bx7715OLwoEN2tfRkbC",
+                  "itemDefines": []
+                }
+              ]
+            },
+            {
+              "_key": "#.address",
+              "_vid": "miiq6bx1ZV9wFqzibB7DOX2m",
+              "name": "address",
+              "type": "object",
+              "__key__": "miiq6bx3NVNvWaav5Znhu75j",
+              "itemDefines": [
+                {
+                  "_key": "#.address.country",
+                  "_vid": "miiq6bx12rhyn8ocGyq9pFg6",
+                  "name": "country",
+                  "type": "string",
+                  "value": "China",
+                  "__key__": "miiq6bx910SSfb2mPUUB6Bkt",
+                  "itemDefines": []
+                },
+                {
+                  "_key": "#.address.province",
+                  "_vid": "miiq6bx1DOApTEPj4QqfkKBI",
+                  "name": "province",
+                  "type": "string",
+                  "value": "Guangdong",
+                  "__key__": "miiq6bx9gmM3s205Gvo4uf8l",
+                  "itemDefines": []
+                },
+                {
+                  "_key": "#.address.city",
+                  "_vid": "miiq6bx1hCSXbfLOWjl17k3y",
+                  "name": "city",
+                  "type": "string",
+                  "value": "Shenzhen",
+                  "__key__": "miiq6bx9DDY4ExsyAXAAEdoz",
+                  "itemDefines": []
+                },
+                {
+                  "_key": "#.address.street",
+                  "_vid": "miiq6bx1CdqVvwAdxOaPgtE6",
+                  "name": "street",
+                  "type": "string",
+                  "value": "Nanshan Avenue, No. 1024",
+                  "__key__": "miiq6bx9szWiWLOT1Udde8Pc",
+                  "itemDefines": []
+                },
+                {
+                  "_key": "#.address.postalCode",
+                  "_vid": "miiq6bx17tS0Q33w5KP1g9mF",
+                  "name": "postalCode",
+                  "type": "string",
+                  "value": "518000",
+                  "__key__": "miiq6bx9h4g7ruKyXG9peSlC",
+                  "itemDefines": []
+                }
+              ]
+            },
+            {
+              "_key": "#.accountCreated",
+              "_vid": "miiq6bx1PC8iPxXH7o1oG0fk",
+              "name": "accountCreated",
+              "type": "string",
+              "value": "2022-11-15T08:30:45Z",
+              "__key__": "miiq6bx3fEjl8bsIjc3Bz4f2",
+              "itemDefines": []
+            },
+            {
+              "_key": "#.isActive",
+              "_vid": "miiq6bx1K67Z0l6RIqVOWprS",
+              "name": "isActive",
+              "type": "boolean",
+              "value": "true",
+              "__key__": "miiq6bx3eNlcoidyXQY3gnER",
+              "itemDefines": []
+            },
+            {
+              "_key": "#.preferences",
+              "_vid": "miiq6bx1rJL1kzQ4MsymMVLp",
+              "name": "preferences",
+              "type": "object",
+              "__key__": "miiq6bx3FyQvpmI00fHgSa6s",
+              "itemDefines": [
+                {
+                  "_key": "#.preferences.language",
+                  "_vid": "miiq6bx1mnE3Wle5sF6bRtlM",
+                  "name": "language",
+                  "type": "string",
+                  "value": "zh-CN",
+                  "__key__": "miiq6bxaDhYW9nXthwJW85qC",
+                  "itemDefines": []
+                },
+                {
+                  "_key": "#.preferences.timezone",
+                  "_vid": "miiq6bx1BtDmKrHQAQJZFkuC",
+                  "name": "timezone",
+                  "type": "string",
+                  "value": "Asia/Shanghai",
+                  "__key__": "miiq6bxaJMspqkGPUxO6KKgQ",
+                  "itemDefines": []
+                },
+                {
+                  "_key": "#.preferences.notifications",
+                  "_vid": "miiq6bx1HyMd953p4ZguQ49i",
+                  "name": "notifications",
+                  "type": "object",
+                  "__key__": "miiq6bxafpTsVrO2JcUbP4Nc",
+                  "itemDefines": [
+                    {
+                      "_key": "#.preferences.notifications.email",
+                      "_vid": "miiq6bx184rcWt8ktKKuy29h",
+                      "name": "email",
+                      "type": "boolean",
+                      "value": "true",
+                      "__key__": "miiq6bxaHbZ9MIjiOol4zgCJ",
+                      "itemDefines": []
+                    },
+                    {
+                      "_key": "#.preferences.notifications.sms",
+                      "_vid": "miiq6bx1XTUuVsDZIhiap77l",
+                      "name": "sms",
+                      "type": "boolean",
+                      "value": "false",
+                      "__key__": "miiq6bxa9K3HvNIq0VFOWBhn",
+                      "itemDefines": []
+                    },
+                    {
+                      "_key": "#.preferences.notifications.push",
+                      "_vid": "miiq6bx1XpDgsQYg9Pmnnbhu",
+                      "name": "push",
+                      "type": "boolean",
+                      "value": "true",
+                      "__key__": "miiq6bxagpJwM9Qm4NR0w2Bm",
+                      "itemDefines": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "jsonDataPath": "data",
+          "isShowLoading": true,
+          "requestMethod": "get",
+          "isShowErrorMsg": true,
+          "requestUrlMode": "REF_PROJECT",
+          "requestBodyType": "disable",
+          "isShowSuccessMsg": false,
+          "requestHeadersType": "disable",
+          "requestFormDataType": "disable"
+        }
+      ],
+      "slotChildren": []
+    }
+  ],
+  "requestUrlMode": "REF_PROJECT",
+  "drawerPanelAutoOpen": false
+}

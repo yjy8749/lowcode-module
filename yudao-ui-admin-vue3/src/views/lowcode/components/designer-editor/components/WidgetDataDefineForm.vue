@@ -204,7 +204,7 @@
         <template
           v-if="
             analyzerDataDefine.requestFormDataType == 'enable-input' &&
-            asType<WidgetDataDefineRequestHeaders[]>(analyzerDataDefine.requestFormData)
+            asType<WidgetDataDefineRequestFormData[]>(analyzerDataDefine.requestFormData)
           "
         >
           <el-form-item label="FormData输入" prop="requestFormData">
@@ -370,7 +370,7 @@
         v-if="isType('def', 'remote', 'const', 'submit')"
       >
         <EvalFunctionValueInput
-          name="数据加载成功时触发执行函数"
+          name="数据加载成功时触发可执行函数"
           type="simple-function"
           :editor="editor"
           :widget="dialogArgs!.widget"
@@ -386,7 +386,7 @@
         v-if="isType('def', 'remote', 'const', 'submit')"
       >
         <EvalFunctionValueInput
-          name="数据加载错误时触发执行函数"
+          name="数据加载错误时触发可执行函数"
           type="simple-function"
           :editor="editor"
           :widget="dialogArgs!.widget"
@@ -519,7 +519,7 @@ const props = defineProps<{ editor: DesignerEditor }>()
 export interface WidgetDataDefineFormArgs {
   title: string
   widget: WidgetInstance
-  context: WidgetRenderContext
+  widgetRenderContext: WidgetRenderContext
   widgetDefine: WidgetDefine
   widgetTree: WidgetInstance[]
   propDefine?: WidgetPropDefine
@@ -618,7 +618,7 @@ const validatePropDefineBind = (label: string, value: WidgetPropDefineBind | und
     }
     for (const bind of value?.bindList ?? []) {
       if (isNullOrUnDef(bind.bind)) {
-        return `请选择${label}的数据模型`
+        return `请选择${label}的数据定义`
       }
       if (isEmpty(bind.refPropKey)) {
         return `请选择${label}的数据属性`
@@ -680,7 +680,7 @@ const formRules = computed(() => {
     ],
     jsonData: [{ required: true, message: '请输入JSON示例数据', trigger: 'change' }],
     refBind: [
-      { required: true, message: '请选择数据模型', trigger: 'change' },
+      { required: true, message: '请选择数据定义', trigger: 'change' },
       { validator: validateRefBind, trigger: 'change' }
     ],
     requestUrlMode: [{ required: true, message: '请选择Api地址模式', trigger: 'change' }],
@@ -708,7 +708,7 @@ const formRules = computed(() => {
   }
 })
 
-// 可用模型类型
+// 可用数据定义类型
 const validDataType = computed<WidgetDataDefineType[]>(() => {
   return dialogArgs.value?.widgetDefine?.enableDataDefineTypes ?? ['def', 'remote', 'ref', 'submit']
 })
@@ -729,14 +729,14 @@ const refBindLabel = computed(() => {
   }
 })
 
-// 模型类型选项
+// 数据定义类型选项
 const dataTypeSelectOptions = computed(() => {
   return DATA_TYPE_OPTIONS.filter((e) => validDataType.value.includes(e.value))
 })
 
 // 父组件id
 const parentWidgetIdList = computed<string[]>(() => {
-  return dialogArgs.value?.context.seekParent().seekLink?.map((i) => i._vid) ?? []
+  return dialogArgs.value?.widgetRenderContext.seekParent().seekLink?.map((i) => i._vid) ?? []
 })
 
 // 根据类型过滤可用的数据定义
@@ -985,7 +985,7 @@ const doAnalysisRemoteRequest = async () => {
   }
 }
 
-// 绑定|引用数据模型 change
+// 绑定|引用数据定义 change
 const onRefBindChange = () => {
   analyzer.value.setJsonData('{}')
   analyzer.value.setPropDefines([])

@@ -97,8 +97,8 @@ const doBind = () => {
 //
 // const doAction = async () => {
 //   if (!isNullOrUnDef(onClickVModel.value)) {
-//     const context = buildEvalFnContext(props.editor, props.widget._vid)
-//     const result = await executeEvalFunction(props.editor, onClickVModel.value, context)
+//     const evalFnContext = buildEvalFnContext(props.editor, props.widget._vid)
+//     const result = await executeEvalFunction(props.editor, onClickVModel.value, evalFnContext)
 //     message.info(`执行结果${JSON.stringify(result)}`)
 //   }
 // }

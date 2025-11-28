@@ -99,7 +99,7 @@ export default class DataDefineAnalyzer {
     }
   }
 
-  // 根据模型定义生成json对象
+  // 根据数据结构定义生成json对象
   private generateJsonObject(propDefines?: WidgetDataDefinePropDefine[]): any {
     const jsonData = {}
     propDefines?.forEach((def) => {

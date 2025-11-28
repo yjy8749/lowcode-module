@@ -866,13 +866,13 @@ export function evalFunctionDefine(
     },
     bindType: ['object'],
     ...defaultDefine(define),
-    render: (modelValue, context) => {
+    render: (modelValue, propRenderContext) => {
       return () => (
         <>
           <EvalFunctionInput
             vModel={modelValue.value}
-            editor={context.editor}
-            widget={context.widget}
+            editor={propRenderContext.editor}
+            widget={propRenderContext.widget}
             {...props}
           />
         </>
@@ -890,13 +890,13 @@ export function aceInputDefine(
     formItemProps: { labelPosition: 'top' },
     bindType: ['string'],
     ...defaultDefine(define),
-    render: (modelValue, context) => {
+    render: (modelValue, propRenderContext) => {
       return () => (
         <>
           <AceEditorInput
             vModel={modelValue.value}
-            editor={context.editor}
-            widget={context.widget}
+            editor={propRenderContext.editor}
+            widget={propRenderContext.widget}
             name={define.label}
             {...props}
           />
@@ -921,13 +921,13 @@ export function actionButtonDefine(
     },
     bindType: ['object'],
     ...defaultDefine(define),
-    render: (modelValue, context) => {
+    render: (modelValue, propRenderContext) => {
       return () => (
         <>
           <ActionButtonInput
             vModel={modelValue.value}
-            editor={context.editor}
-            widget={context.widget}
+            editor={propRenderContext.editor}
+            widget={propRenderContext.widget}
             {...props}
           />
         </>

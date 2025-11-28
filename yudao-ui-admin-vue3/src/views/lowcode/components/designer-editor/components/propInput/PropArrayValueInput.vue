@@ -13,7 +13,7 @@
       <PropValueInput
         :editor="editor"
         :widget="widget"
-        :context="context"
+        :widget-render-context="widgetRenderContext"
         :widget-define="widgetDefine"
         :prop-define="propDefine"
         v-model="valueVModel[index]"
@@ -40,7 +40,7 @@ import { computedVModel } from '../../../common/hooks'
 export interface PropArrayValueInputProps {
   editor: DesignerEditor
   widget: WidgetInstance
-  context: WidgetRenderContext
+  widgetRenderContext: WidgetRenderContext
   widgetDefine: WidgetDefine
   propDefine: WidgetPropDefine
   modelValue?: any[]

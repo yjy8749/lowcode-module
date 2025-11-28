@@ -1,10 +1,8 @@
-import { generateVid } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { WidgetDefine } from '../../../designer-editor.type'
 import { inputDefine, propBindDefine } from '../../../designer-editor.props'
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '页面插槽',
   icon: 'svg-icon:lowcode-icon-slots',
   render: (args) => () => {

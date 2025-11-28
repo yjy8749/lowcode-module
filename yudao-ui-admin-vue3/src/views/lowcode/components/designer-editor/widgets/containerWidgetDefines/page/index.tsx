@@ -1,4 +1,3 @@
-import { generateVid } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { LayoutJustifyOptions, WidgetDefine } from '../../../designer-editor.type'
 import { inputDefine, radioButtonDefine } from '../../../designer-editor.props'
@@ -6,7 +5,6 @@ import { writePropValueCmd } from '../../../designer-editor.cmd'
 import { ElColPropDefines } from '../../hooks'
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '页面容器',
   icon: 'svg-icon:lowcode-icon-page',
   render: (args) => () => {

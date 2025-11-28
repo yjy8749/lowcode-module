@@ -1,3 +1,6 @@
 <template>
-  <el-text type="danger">Hello World!!! BBBB</el-text>
+  <el-text>VueImport导入:{{ scope.username }}</el-text>
 </template>
+<script lang="ts" setup>
+defineProps<{ scope?: any }>()
+</script>

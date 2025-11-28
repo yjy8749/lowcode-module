@@ -12,7 +12,7 @@
   >
     <template #item="{ index }">
       <QueryXmlInterceptorValueInput
-        name="拦截器执行函数配置"
+        name="拦截器可执行函数配置"
         tips="配置拦截器, 对查询参数或结果拦截处理"
         :disabled="disabled"
         v-model="valueVModel[index]"

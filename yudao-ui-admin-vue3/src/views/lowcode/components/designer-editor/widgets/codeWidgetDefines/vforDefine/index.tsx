@@ -1,5 +1,4 @@
 import { isNullOrUnDef, isEmpty } from '@/utils/is'
-import { generateVid } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { WidgetDefine } from '../../../designer-editor.type'
 import {
@@ -14,7 +13,6 @@ import { writePropBindCmd } from '../../../designer-editor.cmd'
 const message = useMessage()
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '循环v-for',
   icon: 'svg-icon:lowcode-icon-vfor',
   render: (args) => () => {

@@ -1,5 +1,4 @@
 // index.tsx
-import { generateVid } from '../../../../common/utils'
 import Render from './index.render.vue'
 import {
   CssSymbols,
@@ -31,7 +30,6 @@ const TextFontWeightOptions = [
 ]
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '文本Text',
   icon: 'ep:edit-pen',
   render: (args) => () => {

@@ -14,7 +14,7 @@
         v-if="propDefine.type === 'propBind'"
         :editor="editor"
         :widget="widget"
-        :context="context"
+        :widget-render-context="widgetRenderContext"
         :widget-define="widgetDefine"
         :prop-define="propDefine"
         v-model="bindVModel"
@@ -23,7 +23,7 @@
         v-else-if="propDefine.isArray"
         :editor="editor"
         :widget="widget"
-        :context="context"
+        :widget-render-context="widgetRenderContext"
         :widget-define="widgetDefine"
         :prop-define="propDefine"
         v-model="valueVModel"
@@ -32,7 +32,7 @@
         v-else
         :editor="editor"
         :widget="widget"
-        :context="context"
+        :widget-render-context="widgetRenderContext"
         :widget-define="widgetDefine"
         :prop-define="propDefine"
         v-model="valueVModel"
@@ -60,7 +60,7 @@ import TextLabel from '../../common/TextLabel.vue'
 export interface WidgetPropItemProps {
   editor: DesignerEditor
   widget: WidgetInstance
-  context: WidgetRenderContext
+  widgetRenderContext: WidgetRenderContext
   widgetDefine: WidgetDefine
   propDefine: WidgetPropDefine
   propValue?: any
@@ -99,7 +99,7 @@ const formItemProps = computed(() => {
 })
 
 const propItemIsShow = computed(() => {
-  return props.propDefine.isShow ? props.propDefine.isShow(renderContext) : true
+  return props.propDefine.isShow ? props.propDefine.isShow(props) : true
 })
 
 const labelPosition = computed(() => {
@@ -115,18 +115,9 @@ const isPropLabelTop = computed(() => {
   return labelPosition.value == 'top'
 })
 
-const renderContext = {
-  editor: props.editor,
-  widget: props.widget,
-  context: props.context,
-  widgetDefine: props.widgetDefine,
-  propDefine: props.propDefine,
-  propBind: props.propBind
-}
+const labelRender = props.propDefine.slots?.label?.(valueVModel, props)
 
-const labelRender = props.propDefine.slots?.label?.(valueVModel, renderContext)
-
-const labelRightRender = props.propDefine.slots?.labelRight?.(valueVModel, renderContext)
+const labelRightRender = props.propDefine.slots?.labelRight?.(valueVModel, props)
 
 const doHandlePropChange = (val?: any) => {
   if (props.propDefine.onSave) {

@@ -19,9 +19,8 @@
 <script setup lang="ts">
 import ArrayValueInput from '../../../../../common/ArrayValueInput.vue'
 import { computedVModel } from '../../../../../common/hooks'
-import EasyTableSearchFieldValueInput, {
-  EasyTableSearchFieldProps
-} from './EasyTableSearchFieldValueInput.vue'
+import EasyTableSearchFieldValueInput from './EasyTableSearchFieldValueInput.vue'
+import { EasyTableSearchFieldProps } from './types'
 
 export interface EasyTableSearchFieldArrayValueInputProps {
   modelValue?: EasyTableSearchFieldProps[]
@@ -38,7 +37,8 @@ const flexStyle = 'flex:1'
 const fieldHeaders = [
   {
     label: '显示',
-    style: 'width: 30px'
+    helps: '隐藏的查询条件默认不显示，点击展开按钮才会显示',
+    style: 'width: 48px'
   },
   {
     label: '属性名称',

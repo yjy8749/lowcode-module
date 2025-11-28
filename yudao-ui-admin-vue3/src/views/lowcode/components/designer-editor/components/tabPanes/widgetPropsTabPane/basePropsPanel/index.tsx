@@ -9,7 +9,7 @@ import {
 import {
   readWidgetValue,
   useSelectedWidget,
-  useSelectedWidgetContext,
+  useSelectedWidgetRenderContext,
   useSelectedWidgetDefine
 } from '../../../../designer-editor.utils'
 import { writeWidgetValueCmd } from '../../../../designer-editor.cmd'
@@ -33,7 +33,7 @@ export default defineComponent({
   setup(props) {
     const widgetDef = computed(() => useSelectedWidgetDefine(props.editor))
     const widget = computed(() => useSelectedWidget(props.editor))
-    const context = computed(() => useSelectedWidgetContext(props.editor))
+    const widgetRenderContext = computed(() => useSelectedWidgetRenderContext(props.editor))
 
     const saveWidgetValue = (
       editor: DesignerEditor,
@@ -91,7 +91,7 @@ export default defineComponent({
             type: 'simple-function',
             defaultFunction:
               '/** 支持同步或异步返回结果 */\n' +
-              '/** return promise.resolve(true) */\n' +
+              '/** return Promise.resolve(true) */\n' +
               'return true'
           }
         )
@@ -103,7 +103,7 @@ export default defineComponent({
               editor={props.editor}
               widget={widget.value}
               widgetDefine={widgetDef.value}
-              context={context.value}
+              widgetRenderContext={widgetRenderContext.value}
               propDefine={define}
               propValue={readWidgetValue(widget.value, define.key)}
             />
@@ -121,7 +121,7 @@ export default defineComponent({
               editor={props.editor}
               widget={widget.value}
               widgetDefine={widgetDef.value}
-              context={context.value}
+              widgetRenderContext={widgetRenderContext.value}
               propDefine={define}
               propValue={widget.value?.props[define.key]}
               propBind={widget.value?.propsBind?.[define.key]}

@@ -1,7 +1,7 @@
 import { DesignerEditor } from '../../../../designer-editor.type'
 import {
   useSelectedWidget,
-  useSelectedWidgetContext,
+  useSelectedWidgetRenderContext,
   useSelectedWidgetDefine,
   useWidgetTree
 } from '../../../../designer-editor.utils'
@@ -19,7 +19,7 @@ export default defineComponent({
   setup(props) {
     const widgetDef = computed(() => useSelectedWidgetDefine(props.editor))
     const widget = computed(() => useSelectedWidget(props.editor))
-    const context = computed(() => useSelectedWidgetContext(props.editor))
+    const widgetRenderContext = computed(() => useSelectedWidgetRenderContext(props.editor))
 
     const widgetTree = computed(() => useWidgetTree(props.editor))
 
@@ -28,7 +28,7 @@ export default defineComponent({
         <WidgetDataDefine
           editor={props.editor}
           widget={widget.value}
-          context={context.value}
+          widgetRenderContext={widgetRenderContext.value}
           widgetDefine={widgetDef.value}
           widgetTree={widgetTree.value}
         />

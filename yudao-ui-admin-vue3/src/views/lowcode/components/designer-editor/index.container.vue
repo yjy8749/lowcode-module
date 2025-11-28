@@ -13,7 +13,7 @@
       <WidgetItem
         :editor="editor"
         :parent-widget="undefined"
-        :parent-context="rootContext"
+        :parent-render-context="rootRenderContext"
         :widget="element"
         :widget-index="index"
       />
@@ -27,7 +27,7 @@ import {
   promiseWithLoading,
   readPageEventBind,
   useDataDefines,
-  useRootContext,
+  useRootRenderContext,
   useWidgetTree
 } from './designer-editor.utils'
 import DraggableContainer from '../common/DraggableContainer.vue'
@@ -41,7 +41,7 @@ const props = defineProps<{ editor: DesignerEditor }>()
 
 const { isPreviewMode, isLoading } = props.editor.getStore()
 
-const rootContext = computed(() => useRootContext(props.editor))
+const rootRenderContext = computed(() => useRootRenderContext(props.editor))
 
 const widgetTree = computed(() => useWidgetTree(props.editor))
 

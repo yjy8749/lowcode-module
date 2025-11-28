@@ -2,11 +2,12 @@ import { isNullOrUnDef, isEmpty } from '@/utils/is'
 import { moveWidgetCmd } from '../designer-editor.cmd'
 import { WidgetRenderContext, WidgetInstance, DesignerEditor } from '../designer-editor.type'
 import { checkInvalidPropBindByScope } from '../designer-editor.utils'
+import { useWidgetDefine, useWidgetModule } from '../widgets'
 
 export function useDraggableContainer(
   editor: DesignerEditor,
   slot?: WidgetInstance,
-  context?: WidgetRenderContext
+  slotRenderContext?: WidgetRenderContext
 ) {
   const store = editor.getStore()
   const message = useMessage()
@@ -30,7 +31,24 @@ export function useDraggableContainer(
       const { newIndex: toIndex } = e.added
       const { element: widget, index: fromIndex } = e.added.element
 
-      const scopeCheckResults = checkInvalidPropBindByScope(editor, widget, slot, context, true)
+      const widgetDefine = useWidgetDefine(widget)
+      const widgetModuleInfo = useWidgetModule(widget)
+      if (
+        widgetDefine?.disableInMenu?.('move', slot, slotRenderContext) ||
+        widgetModuleInfo?.disableInMenu?.('move', slot, slotRenderContext) ||
+        widgetDefine?.hiddenInMenu?.('move', slot, slotRenderContext) ||
+        widgetModuleInfo?.hiddenInMenu?.('move', slot, slotRenderContext)
+      ) {
+        return message.error('不能这样移动组件')
+      }
+
+      const scopeCheckResults = checkInvalidPropBindByScope(
+        editor,
+        widget,
+        slot,
+        slotRenderContext,
+        true
+      )
       if (!isEmpty(scopeCheckResults)) {
         message.error('移动将导致仅作用于子组件的绑定数据失效')
         return

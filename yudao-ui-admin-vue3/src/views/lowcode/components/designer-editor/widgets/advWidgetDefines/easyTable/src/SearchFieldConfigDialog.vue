@@ -1,6 +1,58 @@
 <template>
   <Dialog title="查询属性配置" :width="900" v-model="dialogVisible">
-    <el-form label-width="100px" :model="formModel" :rules="formRules">
+    <el-form ref="formRef" label-width="100px" :model="formModel" :rules="formRules">
+      <div class="flex">
+        <el-form-item class="flex-1" label="属性名称" prop="label">
+          <el-input clearable :placeholder="`请输入属性名称`" v-model="formModel.label" />
+        </el-form-item>
+        <el-form-item class="flex-1" label="查询字段" prop="prop">
+          <el-input clearable :placeholder="`请输入查询字段`" v-model="formModel.prop" />
+        </el-form-item>
+        <el-form-item class="flex-1" label="查询类型" prop="symbolType">
+          <el-select placeholder="请选择查询类型" v-model="formModel.symbolType">
+            <el-option
+              v-for="dict in getStrDictOptions(LOWCODE_DICT_TYPE.LOWCODE_QUERIER_FIELD_SYMBOLS)"
+              :key="dict.value"
+              :label="dict.label"
+              :value="dict.value"
+            />
+          </el-select>
+        </el-form-item>
+      </div>
+      <div class="flex">
+        <el-form-item class="flex-1" label="输入类型" prop="inputType">
+          <el-select
+            class="!w-full"
+            placeholder="请选择输入类型"
+            v-model="formModel.inputType"
+            @change="onInputTypeChange"
+          >
+            <el-option
+              v-for="opt in SearchFieldInputTypeOptions"
+              :key="opt.label"
+              :label="opt.label"
+              :value="opt.value"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item class="flex-1" label="宽度(Span)" prop="span">
+          <el-input-number
+            placeholder="6"
+            clearable
+            :max="24"
+            :min="6"
+            :step="1"
+            :precision="0"
+            v-model="formModel.span"
+          />
+        </el-form-item>
+        <el-form-item class="flex-1" prop="hidden">
+          <template #label>
+            <TextLabel label="是否显示" helps="隐藏的查询条件默认不显示，点击展开按钮才会显示" />
+          </template>
+          <el-switch :active-value="false" :inactive-value="true" v-model="formModel.hidden" />
+        </el-form-item>
+      </div>
       <el-form-item label="占位文本" prop="placeholder">
         <el-input
           clearable
@@ -168,7 +220,7 @@
           <el-input clearable placeholder="输入框显示格式" v-model="formModel.format" />
         </el-form-item>
         <el-form-item label="后端值格式" prop="valueFormat">
-          <el-input clearable placeholder="后端数据值格式" v-model="formModel.valueFormat" />
+          <el-input disabled placeholder="后端数据值格式" v-model="formModel.valueFormat" />
         </el-form-item>
         <div class="flex justify-between" v-if="isRangeDatePicker">
           <el-form-item label="范围分隔符" prop="rangeSeparator">
@@ -269,10 +321,14 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { cloneDeep } from 'lodash-es'
-import { EasyTableSearchFieldProps } from './EasyTableSearchFieldValueInput.vue'
 import { DesignerEditor, WidgetInstance } from '../../../../designer-editor.type'
 import { highlightTextHtml } from '../../../../../common/utils'
 import EvalFunctionValueInput from '../../../../components/EvalFunctionValueInput.vue'
+import { getStrDictOptions } from '@/utils/dict'
+import { LOWCODE_DICT_TYPE } from '../../../../../common/dict'
+import { EasyTableSearchFieldProps, SearchFieldInputTypeOptions } from './types'
+import { ElForm } from 'element-plus'
+import TextLabel from '../../../../../common/TextLabel.vue'
 
 const inputNumberProps: any = {
   placeholder: '不限',
@@ -314,11 +370,30 @@ const dialogArgs = ref<SearchFieldConfigDialogArgs>({
   onConfirm: () => {}
 })
 
+const formRef = ref<InstanceType<typeof ElForm>>()
+
 const formModel = ref<EasyTableSearchFieldProps>({})
 
 const formRules = reactive({
-  // requestUrlMode: [{ required: true, message: '请选择地址模式', trigger: 'change' }],
+  label: [{ required: true, message: '请输入属性名称' }],
+  prop: [{ required: true, message: '请输入查询字段' }],
+  symbolType: [{ required: true, message: '请选择查询类型' }],
+  inputType: [{ required: true, message: '请选择输入类型' }]
 })
+
+const onInputTypeChange = () => {
+  formModel.value = {
+    label: formModel.value.label,
+    helps: formModel.value.helps,
+    prop: formModel.value.prop,
+    symbolType: formModel.value.symbolType,
+    inputType: formModel.value.inputType,
+    defaultValue: formModel.value.defaultValue,
+    hidden: formModel.value.hidden,
+    span: formModel.value.span,
+    placeholder: formModel.value.placeholder
+  }
+}
 
 const isRangeDatePicker = computed(() => {
   return ['daterange', 'datetimerange', 'monthrange', 'yearrange'].includes(
@@ -363,7 +438,8 @@ const open = async (args: SearchFieldConfigDialogArgs) => {
 
 defineExpose({ open })
 
-const doConfirm = () => {
+const doConfirm = async () => {
+  await formRef.value?.validate()
   dialogArgs.value.onConfirm(formModel.value)
   dialogVisible.value = false
 }

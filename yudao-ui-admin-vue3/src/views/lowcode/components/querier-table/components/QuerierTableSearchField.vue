@@ -162,6 +162,17 @@ const { valueVModel } = computedVModel({
     return props.modelValue
   },
   set(val) {
+    if (props.datePickerType == 'date' && props.valueFormat == 'YYYY-MM-DD') {
+      if (props.symbolType == 'LT' || props.symbolType == 'LE') {
+        val = `${val} 23:59:59`
+      } else if (props.symbolType == 'GT' || props.symbolType == 'GE') {
+        val = `${val} 00:00:00`
+      }
+    } else if (props.datePickerType == 'daterange' && props.valueFormat == 'YYYY-MM-DD') {
+      if (val && val.length == 2) {
+        val = [`${val[0]} 00:00:00`, `${val[1]} 23:59:59`]
+      }
+    }
     emits('update:modelValue', val)
     emits('change', val)
   }

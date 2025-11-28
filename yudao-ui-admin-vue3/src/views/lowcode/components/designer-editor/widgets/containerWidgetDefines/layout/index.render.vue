@@ -4,8 +4,8 @@
       <el-col v-bind="colAttrs(r, c)" v-for="(__, c) in colCnt" :key="c">
         <WidgetItem
           :editor="editor"
-          :parentWidget="widget"
-          :parentContext="widgetContext"
+          :parent-widget="widget"
+          :parent-render-context="widgetRenderContext"
           :widget="slotWidget(r, c)!"
           :widget-index="slotWidgetIndex(r, c)"
           :options="widgetItemOptions"

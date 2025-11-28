@@ -1,9 +1,7 @@
-import { generateVid } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { WidgetDefine } from '../../../designer-editor.type'
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '变量var',
   icon: 'svg-icon:lowcode-icon-var',
   render: (args) => () => {

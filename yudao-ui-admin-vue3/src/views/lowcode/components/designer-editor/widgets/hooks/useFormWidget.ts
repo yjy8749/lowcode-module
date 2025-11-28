@@ -17,7 +17,7 @@ export function getFormModelDataId(widget: WidgetInstance): string {
 function buildItemRules(
   editor: DesignerEditor,
   formModel: ComputedRef<any>,
-  context: EvalFnContext,
+  evalFnContext: EvalFnContext,
   widget: WidgetInstance
 ): any[] {
   const { props } = widget
@@ -34,7 +34,7 @@ function buildItemRules(
   rules.push(...textFormItemValidRules(widget))
   //添加自定义校验规则
   if (props.isCustomValid && !isEmpty(props.customValidFun?.evalFunction)) {
-    const evalFn = wrapEvalFunction(editor, props.customValidFun, context)
+    const evalFn = wrapEvalFunction(editor, props.customValidFun, evalFnContext)
     rules.push({
       validator: async (_, value, callback) => {
         try {

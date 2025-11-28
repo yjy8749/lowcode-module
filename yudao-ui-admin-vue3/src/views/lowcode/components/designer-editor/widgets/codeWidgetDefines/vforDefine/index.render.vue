@@ -4,8 +4,8 @@
       v-for="(item, index) in bindData"
       :key="item.__key__"
       :editor="editor"
-      :parentWidget="widget"
-      :parentContext="wrapItemContext(item, index)"
+      :parent-widget="widget"
+      :parent-render-context="wrapItemRenderContext(item, index)"
       :widget="defaultSlotWidget"
       :widget-index="index"
       :options="customWidgetOptions({ putable: index == 0, selectable: index == 0 })"
@@ -33,13 +33,13 @@ const bindData = computed(() => {
   return generateVForKey(!isPreviewMode.value && isEmpty(vals) ? [{}] : vals)
 })
 
-const wrapItemContext = (data: any, index: number): WidgetRenderContext => {
+const wrapItemRenderContext = (data: any, index: number): WidgetRenderContext => {
   return {
-    ...props.widgetContext,
+    ...props.widgetRenderContext,
     seekData: (propBind, defaultVal) => {
       return regenSeekDataFunctionRuntime(
         editor,
-        props.widgetContext,
+        props.widgetRenderContext,
         {
           [getForItemDataId(props.widget)]: {
             __key__: data.id ?? data.__key__,

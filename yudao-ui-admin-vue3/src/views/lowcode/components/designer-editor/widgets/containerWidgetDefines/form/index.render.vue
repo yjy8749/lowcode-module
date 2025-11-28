@@ -10,8 +10,8 @@
       >
         <WidgetItem
           :editor="editor"
-          :parentWidget="widget"
-          :parentContext="widgetContext"
+          :parent-widget="widget"
+          :parent-render-context="widgetRenderContext"
           :widget="defaultSlotWidget"
           :options="widgetItemOptions"
         />
@@ -37,7 +37,7 @@ const {
   formRules,
   usePropValue,
   usePropAndEvent,
-  context,
+  exposeContext,
   useDefaultSlot,
   updateFormModel
 } = useFormWidget(useWidget(props))
@@ -54,7 +54,7 @@ const formAttrs = computed(() => {
   return usePropAndEvent({ omit: ['data', 'justify', 'compact', 'hideLabel'] })
 })
 
-context({
+exposeContext({
   formRef: () => formRef.value,
   formModel: () => formModel,
   isHideLabel: () => usePropValue('hideLabel'),

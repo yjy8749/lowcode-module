@@ -56,7 +56,7 @@ const {
   usePropValue,
   toActionButtonProps,
   refresh,
-  context,
+  exposeContext,
   useEventBind
 } = useWidget(props)
 
@@ -173,7 +173,7 @@ const onNodeClick = async (row: any) => {
   }
 }
 
-context({
+exposeContext({
   refresh
 })
 </script>

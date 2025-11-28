@@ -2,8 +2,8 @@
   <WidgetItem
     v-if="widgetDef && widget"
     :editor="editor"
-    :parentWidget="parentWidget"
-    :parentContext="parentContext"
+    :parent-widget="parentWidget"
+    :parent-render-context="parentRenderContext"
     :widget="widget"
     :widget-define="widgetDef"
     :widget-index="widgetIndex"
@@ -33,7 +33,7 @@ onBeforeMount(async () => {
   widgetDef.value = useWidgetDefine({ _moduleName: props._moduleName, _key: props._key })
   widget.value = await createWidgetInstance(props.editor, widgetDef.value, {
     parentWidget: props.parentWidget,
-    parentContext: props.parentContext,
+    parentRenderContext: props.parentRenderContext,
     options: props.options,
     defaultProps: props.defaultProps
   })

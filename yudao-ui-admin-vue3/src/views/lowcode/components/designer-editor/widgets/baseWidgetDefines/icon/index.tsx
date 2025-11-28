@@ -1,5 +1,4 @@
 // index.tsx
-import { generateVid } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { WidgetDefine } from '../../../designer-editor.type'
 import {
@@ -10,7 +9,6 @@ import {
 } from '../../../designer-editor.props'
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '图标Icon',
   icon: 'ep:picture-rounded',
   render: (args) => () => {

@@ -53,12 +53,8 @@ export function useDataDefineExecutor(editor: DesignerEditor, args?: UseDataDefi
     }
     if (!isEmpty(callbackFn?.evalFunction)) {
       nextTick(async () => {
-        const result = await executeEvalFunction(
-          editor,
-          callbackFn,
-          buildEvalFnContext(editor, dataDefine.value!.widgetId),
-          val?.data
-        )
+        const evalFnContext = buildEvalFnContext(editor, dataDefine.value!.widgetId)
+        const result = await executeEvalFunction(editor, callbackFn, evalFnContext, val?.data)
         console.log(`executeCallback dataDefine`, dataDefine.value, 'result', result, 'val', val)
       })
     }

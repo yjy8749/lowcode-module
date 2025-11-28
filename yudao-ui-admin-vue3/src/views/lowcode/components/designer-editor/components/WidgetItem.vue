@@ -4,10 +4,10 @@
       v-if="refreshFlag"
       :editor="editor"
       :parent-widget="parentWidget"
-      :parent-context="parentContext"
+      :parent-render-context="parentRenderContext"
       :widget="widget"
       :widget-define="widgetDef"
-      :widget-context="currWidgetContext"
+      :widget-render-context="currWidgetRenderContext"
       :widget-index="widgetIndex"
     />
   </template>
@@ -26,10 +26,10 @@
         v-if="refreshFlag"
         :editor="editor"
         :parent-widget="parentWidget"
-        :parent-context="parentContext"
+        :parent-render-context="parentRenderContext"
         :widget="widget"
         :widget-define="widgetDef"
-        :widget-context="currWidgetContext"
+        :widget-render-context="currWidgetRenderContext"
         :widget-index="widgetIndex"
       />
 
@@ -50,7 +50,7 @@ import { MenuItem } from '@imengyu/vue3-context-menu'
 import { showContextMenu } from '../../common/contextMenu'
 import { WidgetItemProps } from '../designer-editor.type'
 import {
-  regenWidgetContext,
+  regenWidgetRenderContext,
   getWidgetShortVidOrVar,
   copyWidgetVidOrVar
 } from '../designer-editor.utils'
@@ -78,13 +78,18 @@ const { isPreviewMode, isDesignMode } = store
 
 const vidOrVar = computed(() => getWidgetShortVidOrVar(props.widget))
 
-const currWidgetContext = computed(() => {
-  return regenWidgetContext(props.editor, props.parentWidget, props.parentContext, props.options)
+const currWidgetRenderContext = computed(() => {
+  return regenWidgetRenderContext(
+    props.editor,
+    props.parentWidget,
+    props.parentRenderContext,
+    props.options
+  )
 })
 
 const widgetDef = computed(() => useWidgetDefine(props.widget))
 
-store.putWidgetContext(props.widget._vid, currWidgetContext.value)
+store.putWidgetRenderContext(props.widget._vid, currWidgetRenderContext.value)
 
 const onLabelClick = () => {
   copyWidgetVidOrVar(props.widget)
@@ -115,9 +120,9 @@ const openEditorDataDialog = inject('openEditorDataDialog') as Function
 const widgetAction = computed<MenuItem[]>(() => {
   const args = {
     parentWidget: props.parentWidget,
-    parentContext: props.parentContext,
+    parentRenderContext: props.parentRenderContext,
     widget: props.widget,
-    widgetContext: currWidgetContext.value,
+    widgetRenderContext: currWidgetRenderContext.value,
     widgetIndex: props.widgetIndex ?? 0,
     options: props.options,
     inject: {
@@ -149,7 +154,7 @@ const widgetAction = computed<MenuItem[]>(() => {
 })
 
 const isWidgetSelectable = computed(() => {
-  return currWidgetContext.value.options?.selectable ?? true
+  return currWidgetRenderContext.value.options?.selectable ?? true
 })
 
 const isWidgetSelected = computed(() => {
@@ -188,9 +193,9 @@ const openContextMenu = (e: MouseEvent) => {
           e,
           useWidgetMenus(props.editor, {
             parentWidget: props.parentWidget,
-            parentContext: props.parentContext,
+            parentRenderContext: props.parentRenderContext,
             widget: props.widget,
-            widgetContext: currWidgetContext.value,
+            widgetRenderContext: currWidgetRenderContext.value,
             widgetIndex: props.widgetIndex,
             options: props.options,
             widgetMenus: [useRefreshMenu()],

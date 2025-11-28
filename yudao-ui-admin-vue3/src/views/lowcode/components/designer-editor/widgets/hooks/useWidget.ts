@@ -9,13 +9,14 @@ import {
   WidgetPropRenderContext,
   WidgetRenderProps as WidgetRenderPropsType,
   ActionButtonConfig,
-  SLOT_DEFAULT_KEY
+  SLOT_DEFAULT_KEY,
+  DesignerEditorEvalFunction
 } from '../../designer-editor.type'
 import {
   buildEvalFnContext,
   executeEvalFunction,
   isCSSPropKey,
-  seekEvalFnContext,
+  seekWidgetExposeContext,
   useSeekDataFunction,
   wrapEvalFunction
 } from '../../designer-editor.utils'
@@ -31,8 +32,13 @@ export type WidgetRenderProps = WidgetRenderPropsType
 
 export type EventBindType = DesignerEditorEventBind & { key: string }
 
-export function isDirectParent({ context }: WidgetPropRenderContext, _moduleName: string): boolean {
-  return !isNullOrUnDef(context.seekParent?.({ _moduleName, directParent: true }).seekWidget)
+export function isDirectParent(
+  { widgetRenderContext }: WidgetPropRenderContext,
+  _moduleName: string
+): boolean {
+  return !isNullOrUnDef(
+    widgetRenderContext.seekParent?.({ _moduleName, directParent: true }).seekWidget
+  )
 }
 function _inputNumberDefine(key: string, label: string) {
   return inputNumberDefine({ key, label }, { min: 0, step: 1, precision: 0 })
@@ -68,10 +74,9 @@ export function useWidget(props: WidgetRenderProps) {
       .map(([key, val]) => ({ ...val, key: key }) as EventBindType)
   })
   const store = props.editor.getStore()
-  const getEditor = () => props.editor
   const getEmitter = () => props.editor.getEmitter()
 
-  const seekData = useSeekDataFunction(props.editor, props.widgetContext)
+  const seekData = useSeekDataFunction(props.editor, props.widgetRenderContext)
   const seekPropValue = (key: string): any | undefined => {
     return seekData(widgetPropsBind.value?.[key], widgetProps.value?.[key])
   }
@@ -86,9 +91,9 @@ export function useWidget(props: WidgetRenderProps) {
   const useEventBind = (key: string) => {
     return widgetEventBinds.value.find((e) => e.eventType == 'widget' && e.key == key)
   }
-  const toEvalFunction = (bind) => {
-    if (!isEmpty(bind?.evalFunction)) {
-      return wrapEvalFunction(props.editor, bind, evalFnContext)
+  const toEvalFunction = (val?: DesignerEditorEvalFunction) => {
+    if (!isEmpty(val?.evalFunction)) {
+      return wrapEvalFunction(props.editor, val, evalFnContext)
     }
   }
 
@@ -140,16 +145,16 @@ export function useWidget(props: WidgetRenderProps) {
     return results
   }
 
-  const context = (ctx: any) => {
-    store.putEvalFnContext(props.widget._vid, ctx)
+  const exposeContext = (ctx?: Record<string, any>) => {
+    store.putWidgetExposeContext(props.widget._vid, ctx)
   }
 
-  const useContext = (key: any) => {
-    return seekEvalFnContext(props.editor, key)
+  const useExposeContext = (key?: any) => {
+    return seekWidgetExposeContext(props.editor, key ?? props.widget._vid)
   }
 
   const useParent = (args: Parameters<SeekWidgetFunction>[0]) => {
-    return props.widgetContext.seekParent(args).seekWidget
+    return props.widgetRenderContext.seekParent(args).seekWidget
   }
 
   const useDefaultSlot = (): WidgetInstance => {
@@ -176,7 +181,7 @@ export function useWidget(props: WidgetRenderProps) {
     )
   }
 
-  /** 执行函数isShow判断 */
+  /** 可执行函数isShow判断 */
   const useIsShowFunction = (obj?: { _vIfPermis?: any; _vIfFun?: any }) => {
     const _vIfPermisVal = obj?.[WIDGET_VIF_PERMIS_KEY]
     const _vIfFunVal = toEvalFunction(obj?.[WIDGET_VIF_FUNCTION_KEY])
@@ -289,14 +294,13 @@ export function useWidget(props: WidgetRenderProps) {
     isPreviewMode,
     evalFnContext,
     isShow,
-    getEditor,
     getEmitter,
     seekData,
     usePropValue,
     usePropObject,
     usePropAndEvent,
-    context,
-    useContext,
+    exposeContext,
+    useExposeContext,
     useParent,
     useSlot,
     useDefaultSlot,

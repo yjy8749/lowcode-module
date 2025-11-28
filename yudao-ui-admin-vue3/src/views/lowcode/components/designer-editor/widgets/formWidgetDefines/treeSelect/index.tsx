@@ -1,5 +1,5 @@
 // index.tsx
-import { generateVid, highlightTextHtml } from '../../../../common/utils'
+import { highlightTextHtml } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { WidgetDefine } from '../../../designer-editor.type'
 import {
@@ -11,7 +11,6 @@ import {
 import { formItemAdvDefine, formItemBaseDefine } from '../../hooks/useFormItemWidget'
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '树形选择TreeSelect',
   icon: 'ep:edit',
   render: (args) => () => {

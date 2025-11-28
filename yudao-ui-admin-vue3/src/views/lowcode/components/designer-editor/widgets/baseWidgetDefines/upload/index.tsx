@@ -1,5 +1,5 @@
 // index.tsx
-import { generateVid, highlightTextHtml } from '../../../../common/utils'
+import { highlightTextHtml } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { WidgetDefine } from '../../../designer-editor.type'
 import {
@@ -10,7 +10,6 @@ import {
 } from '../../../designer-editor.props'
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '上传Button',
   icon: 'ep:upload-filled',
   render: (args) => () => {
@@ -19,8 +18,12 @@ const widget: WidgetDefine = {
   baseDesignerProps: [
     inputDefine({ key: 'fileType', label: '文件类型', isArray: true }),
     inputNumberDefine({ key: 'fileSize', label: '大小限制(MB)' }),
-    inputNumberDefine({ key: 'limit', label: '数量限制' }),
-    switchDefine({ key: 'autoUpload', label: '是否自动上传' }),
+    inputNumberDefine({ key: 'limit', label: '数量限制', defaultValue: 1 }),
+    switchDefine({
+      key: 'autoJoin',
+      label: '是否逗号拼接',
+      isShow: ({ widget }) => (widget.props.limit ?? 1) > 1
+    }),
     switchDefine({ key: 'drag', label: '是否拖拽上传' }),
     switchDefine({ key: 'isShowTip', label: '是否显示提示', defaultValue: true }),
     switchDefine({ key: 'hiddenFileList', label: '是否隐藏文件列表' }),

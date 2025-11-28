@@ -17,7 +17,7 @@ import {
 export interface PropValueInputProps {
   editor: DesignerEditor
   widget: WidgetInstance
-  context: WidgetRenderContext
+  widgetRenderContext: WidgetRenderContext
   widgetDefine: WidgetDefine
   propDefine: WidgetPropDefine
   modelValue?: any
@@ -45,7 +45,7 @@ const { valueVModel } = computedVModel({
 const valueInputRender = props.propDefine.render?.(valueVModel, {
   editor: props.editor,
   widget: props.widget,
-  context: props.context,
+  widgetRenderContext: props.widgetRenderContext,
   widgetDefine: props.widgetDefine,
   propDefine: props.propDefine
 })

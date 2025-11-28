@@ -12,7 +12,7 @@
   >
     <template #item="{ index }">
       <QueryXmlBeanInput
-        name="过滤器执行函数配置"
+        name="过滤器可执行函数配置"
         tips="配置过滤器校验, 校验不通过不执行查询"
         :disabled="disabled"
         :default-js-function="defaultQueryFilter"

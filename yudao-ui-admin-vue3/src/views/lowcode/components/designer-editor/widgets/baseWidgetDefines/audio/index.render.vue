@@ -9,11 +9,11 @@ const audioRef = ref<InstanceType<typeof Audio>>()
 
 const props = defineProps<WidgetRenderProps>()
 
-const { usePropAndEvent, context } = useWidget(props)
+const { usePropAndEvent, exposeContext } = useWidget(props)
 
 const audioAttrs = computed(() => usePropAndEvent())
 
-context({
+exposeContext({
   audioRef: () => audioRef.value
 })
 </script>

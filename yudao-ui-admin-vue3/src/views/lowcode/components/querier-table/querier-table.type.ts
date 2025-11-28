@@ -44,7 +44,16 @@ export interface QuerierTableBodyColumnProps {
   width?: string
   hidden?: boolean
   splitChar?: string
-  columnType?: 'index' | 'action' | 'datetime' | 'route' | 'link' | 'html' | 'dict' | 'image'
+  columnType?:
+    | 'index'
+    | 'action'
+    | 'datetime'
+    | 'route'
+    | 'link'
+    | 'html'
+    | 'dict'
+    | 'image'
+    | 'amount'
   datetimeFormat?: string
   dataPattern?: string
   dictType?: string

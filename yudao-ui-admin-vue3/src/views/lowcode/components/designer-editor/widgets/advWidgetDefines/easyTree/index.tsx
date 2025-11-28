@@ -1,4 +1,4 @@
-import { generateVid, highlightTextHtml } from '../../../../common/utils'
+import { highlightTextHtml } from '../../../../common/utils'
 import {
   actionButtonDefine,
   evalFunctionDefine,
@@ -9,7 +9,6 @@ import { WidgetDefine } from '../../../designer-editor.type'
 import Render from './index.render.vue'
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: 'EasyTree',
   icon: 'svg-icon:lowcode-icon-tree',
   render: (args) => () => {

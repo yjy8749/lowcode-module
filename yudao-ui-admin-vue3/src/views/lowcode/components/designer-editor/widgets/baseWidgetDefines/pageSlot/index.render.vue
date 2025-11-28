@@ -7,9 +7,12 @@
     <TextLabel
       class="!c-#fff"
       placement="top"
-      :label="`页面插槽 ${slotName}`"
+      :label="`${slotName} 插槽`"
       :helps="`可通过 ${slotName} 插槽传入内容, 动态渲染`"
     />
+    <div class="flex-1">
+      <el-text class="!c-#fff"> 绑定数据： {{ scope || '未绑定' }}</el-text>
+    </div>
   </div>
   <component v-else :is="slotRender" :key="widget._vid" :scope="scope" />
 </template>

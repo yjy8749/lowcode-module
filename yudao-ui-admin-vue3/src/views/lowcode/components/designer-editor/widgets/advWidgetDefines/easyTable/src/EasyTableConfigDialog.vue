@@ -67,46 +67,7 @@
               <EasyTableSearchFieldArrayValueInput v-model="formModel.searchs" />
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane lazy label="查询按钮配置" name="searchActions">
-            <div class="flex justify-between">
-              <div class="flex gap-8">
-                <el-form-item label="开启查询区动态插槽">
-                  <el-switch size="small" v-model="formModel.enableSearchActionSlot" />
-                </el-form-item>
-              </div>
-              <div class="flex gap-8">
-                <el-form-item>
-                  <el-button type="primary" link size="small" @click="addExportAction">
-                    添加导出按钮
-                  </el-button>
-                </el-form-item>
-              </div>
-            </div>
-            <el-form-item label-position="top" prop="searchActions">
-              <ActionButtonArrayValueInput
-                v-if="dialogArgs?.widget"
-                :editor="editor"
-                :widget="dialogArgs.widget"
-                v-model="formModel.searchActions"
-              />
-            </el-form-item>
-          </el-tab-pane>
-          <el-tab-pane lazy label="操作按钮配置" name="operationActions">
-            <div class="flex gap-8">
-              <el-form-item label="开启操作区动态插槽">
-                <el-switch size="small" v-model="formModel.enableOperationActionSlot" />
-              </el-form-item>
-            </div>
-            <el-form-item label-position="top" prop="operationActions">
-              <ActionButtonArrayValueInput
-                v-if="dialogArgs?.widget"
-                :editor="editor"
-                :widget="dialogArgs.widget"
-                v-model="formModel.operationActions"
-              />
-            </el-form-item>
-          </el-tab-pane>
-          <el-tab-pane lazy label="表格配置" name="tableColumns">
+          <el-tab-pane lazy label="表格列配置" name="tableColumns">
             <div class="flex gap-8">
               <el-form-item label="自定义表格元素">
                 <el-switch
@@ -164,6 +125,45 @@
             </div>
             <el-form-item label-position="top" prop="columns">
               <EasyTableBodyColumnArrayValueInput v-model="formModel.columns" />
+            </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane lazy label="查询按钮配置" name="searchActions">
+            <div class="flex justify-between">
+              <div class="flex gap-8">
+                <el-form-item label="开启查询区动态插槽">
+                  <el-switch size="small" v-model="formModel.enableSearchActionSlot" />
+                </el-form-item>
+              </div>
+              <div class="flex gap-8">
+                <el-form-item>
+                  <el-button type="primary" link size="small" @click="addExportAction">
+                    添加导出按钮
+                  </el-button>
+                </el-form-item>
+              </div>
+            </div>
+            <el-form-item label-position="top" prop="searchActions">
+              <ActionButtonArrayValueInput
+                v-if="dialogArgs?.widget"
+                :editor="editor"
+                :widget="dialogArgs.widget"
+                v-model="formModel.searchActions"
+              />
+            </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane lazy label="操作按钮配置" name="operationActions">
+            <div class="flex gap-8">
+              <el-form-item label="开启操作区动态插槽">
+                <el-switch size="small" v-model="formModel.enableOperationActionSlot" />
+              </el-form-item>
+            </div>
+            <el-form-item label-position="top" prop="operationActions">
+              <ActionButtonArrayValueInput
+                v-if="dialogArgs?.widget"
+                :editor="editor"
+                :widget="dialogArgs.widget"
+                v-model="formModel.operationActions"
+              />
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane lazy label="操作配置" name="rowActions" v-if="formModel.showRowAction">
@@ -332,6 +332,12 @@
       :widget="dialogArgs.widget"
       ref="searchFieldConfigDialogRef"
     />
+    <ColumnConfigDialog
+      v-if="dialogArgs"
+      :editor="editor"
+      :widget="dialogArgs.widget"
+      ref="columnConfigDialogRef"
+    />
   </Dialog>
 </template>
 <script lang="ts" setup>
@@ -345,14 +351,10 @@ import {
   PromiseCallback,
   RequestUrlModeOptions,
   RequestMethodQueryOptions,
-  RequestUrlModeType,
-  WidgetDataDefineRequestMethod,
   WidgetInstance,
   WidgetRenderContext,
   WidgetDataDefine,
-  DATA_EMPTY_NAME_FLAG,
-  ActionButtonConfig,
-  DesignerEditorEvalFunction
+  DATA_EMPTY_NAME_FLAG
 } from '../../../../designer-editor.type'
 import {
   COLUMN_ACTION_PROP,
@@ -365,12 +367,8 @@ import EasyTableSearchFieldArrayValueInput from './EasyTableSearchFieldArrayValu
 import ActionButtonArrayValueInput from '../../../../components/ActionButtonArrayValueInput.vue'
 import EasyTableBodyColumnArrayValueInput from './EasyTableBodyColumnArrayValueInput.vue'
 import { generateVid } from '../../../../../common/utils'
-import {
-  buildTableDataDefines,
-  calcDatetimeColumnWidth,
-  DEFAULT_DATETIME_FORMAT,
-  getTableDataId
-} from '../utils'
+import { buildTableDataDefines, getTableDataId } from '../utils'
+import { calcDatetimeColumnWidth, DEFAULT_DATETIME_FORMAT } from './utils'
 import { useWidgetDefine } from '../../../index'
 import {
   createSlotItem,
@@ -381,49 +379,14 @@ import {
 import { isActionColumn, isIndexColumn } from '../../../../../querier-table/querier-table.utils'
 import { cloneDeep } from 'lodash-es'
 import SearchFieldConfigDialog from './SearchFieldConfigDialog.vue'
-import { EasyTableSearchFieldProps } from './EasyTableSearchFieldValueInput.vue'
-
-export interface EasyTableFormModel {
-  analyzeApiDesc?: string
-  analyzeApiName?: string
-  analyzeApiCode?: string
-  requestUrlMode?: RequestUrlModeType
-  requestUrl?: string
-  requestMethod?: WidgetDataDefineRequestMethod
-  itemProcessFunction?: DesignerEditorEvalFunction
-  searchs?: EasyTableSearchFieldProps[]
-  enableSearchActionSlot?: boolean
-  searchActions?: ActionButtonConfig[]
-  enableOperationActionSlot?: boolean
-  operationActions?: ActionButtonConfig[]
-  enableSearch?: boolean
-  enablePagination?: boolean
-  enableTableHeaderSlot?: boolean
-  enableTableBodySlot?: boolean
-  enableTableBodyCardSlot?: boolean
-  enableTableFooterSlot?: boolean
-  showIndexColumn?: boolean
-  showRowAction?: boolean
-  columns?: QuerierTableBodyColumnProps[]
-  expandRowActions?: boolean
-  foldRowActions?: boolean
-  autoFoldNum?: number
-  rowActions?: ActionButtonConfig[]
-  height?: number
-  selectable?: boolean
-  minSelectCount?: number
-  maxSelectCount?: number
-  appendSelectMode?: boolean
-  itemSelectableFunction?: DesignerEditorEvalFunction
-  loadOnInit?: boolean
-  defaultParamsFunction?: DesignerEditorEvalFunction
-}
+import ColumnConfigDialog from './ColumnConfigDialog.vue'
+import { EasyTableFormModel } from './types'
 
 export interface EasyTableConfigDialogArgs {
   parentWidget?: WidgetInstance
-  parentContext?: WidgetRenderContext
+  parentRenderContext?: WidgetRenderContext
   widget: WidgetInstance
-  widgetContext: WidgetRenderContext
+  widgetRenderContext: WidgetRenderContext
 }
 
 const props = defineProps<{ editor: DesignerEditor }>()
@@ -741,6 +704,14 @@ const openSearchFieldConfigDialog = (args) => {
 }
 
 provide('openSearchFieldConfigDialog', openSearchFieldConfigDialog)
+
+const columnConfigDialogRef = ref<InstanceType<typeof ColumnConfigDialog>>()
+
+const openColumnConfigDialog = (args) => {
+  columnConfigDialogRef.value?.open(args)
+}
+
+provide('openColumnConfigDialog', openColumnConfigDialog)
 </script>
 
 <style scoped lang="scss"></style>

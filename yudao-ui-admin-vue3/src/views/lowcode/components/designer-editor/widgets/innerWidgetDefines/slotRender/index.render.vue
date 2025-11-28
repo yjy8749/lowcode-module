@@ -4,7 +4,7 @@
     :class="{ slot: !isPreviewMode && isEmpty(widgetList) }"
     :data-slot="`右键添加子组件或拖拽组件到此处`"
     item-key="_vid"
-    :group="{ name: 'designer-editor', put: widgetContext.options?.putable }"
+    :group="{ name: 'designer-editor', put: widgetRenderContext.options?.putable }"
     :readonly="isPreviewMode"
     :model-value="widgetList"
     @change="onDragChange"
@@ -15,7 +15,7 @@
       <WidgetItem
         :editor="editor"
         :parent-widget="widget"
-        :parent-context="widgetContext"
+        :parent-render-context="widgetRenderContext"
         :widget="element"
         :widget-index="index"
       />
@@ -39,7 +39,7 @@ const widgetList = computed(() => props.widget.slotChildren)
 const { onDragChange, onDragStart, onDragEnd } = useDraggableContainer(
   props.editor,
   props.widget,
-  props.widgetContext
+  props.widgetRenderContext
 )
 </script>
 <style scoped lang="scss">

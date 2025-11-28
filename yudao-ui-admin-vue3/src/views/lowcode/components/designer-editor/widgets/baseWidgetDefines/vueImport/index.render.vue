@@ -4,7 +4,15 @@
     v-if="isEmpty(importName)"
     class="w-full h-full flex justify-center items-center gap-2 p-1 bg-[--el-color-info]"
   >
-    <TextLabel class="!c-#fff" placement="top" label="可通过 路径 导入 VUE 组件" />
+    <TextLabel
+      class="!c-#fff"
+      placement="top"
+      label="导入Vue组件"
+      helps="可指定组件路径导入 VUE 组件，动态渲染"
+    />
+    <div class="flex-1">
+      <el-text class="!c-#fff"> 绑定数据： {{ scope || '未导入' }}</el-text>
+    </div>
   </div>
   <div v-else v-loading="importLoading">
     <component v-if="isEmpty(importError)" :is="importComponet" :key="widget._vid" :scope="scope" />

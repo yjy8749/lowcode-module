@@ -1,5 +1,4 @@
 // index.tsx
-import { generateVid } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { CssSymbols, WidgetDefine } from '../../../designer-editor.type'
 import {
@@ -11,7 +10,6 @@ import {
 } from '../../../designer-editor.props'
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '视频Video',
   icon: 'ep:video-play',
   render: (args) => () => {

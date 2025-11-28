@@ -2,10 +2,10 @@
 <template>
   <div :class="{ 'hidden-el-upload-list': isHiddenFileList }">
     <UploadFile
+      auto-upload
       :file-type="uploadFileAttrs.fileType"
       :file-size="uploadFileAttrs.fileSize"
       :limit="uploadFileAttrs.limit"
-      :auto-upload="uploadFileAttrs.autoUpload"
       :drag="uploadFileAttrs.drag"
       :is-show-tip="uploadFileAttrs.isShowTip"
       :directory="uploadFileAttrs.directory"
@@ -15,23 +15,30 @@
   </div>
 </template>
 <script lang="ts" setup>
+import { isArray } from '@/utils/is'
 import { useWidget, type WidgetRenderProps } from '../../hooks'
 
 const props = defineProps<WidgetRenderProps>()
 
 const { usePropAndEvent, usePropValue, toEvalFunction, useEventBind } = useWidget(props)
 
-const uploadFileAttrs = computed(() => usePropAndEvent({ omit: ['hiddenFileList'] }))
+const uploadFileAttrs = computed(() =>
+  usePropAndEvent({ omit: ['hiddenFileList', 'autoJoin', 'upload-success'] })
+)
 
 const isHiddenFileList = computed(() => usePropValue('hiddenFileList'))
 
 const onUploadSuccessHandler = computed(() => toEvalFunction(useEventBind('upload-success')))
 
-const valueVModel = ref([])
+const valueVModel = ref<any>([])
 
 const onUpdateValueVModel = async (vals: string | string[]) => {
   try {
-    await onUploadSuccessHandler.value?.(vals)
+    let val = uploadFileAttrs.value.limit > 1 ? vals : vals?.[0]
+    if (vals && usePropValue('autoJoin') && isArray(vals)) {
+      val = vals?.join(',')
+    }
+    await onUploadSuccessHandler.value?.(val)
   } finally {
     valueVModel.value = []
   }

@@ -10,11 +10,11 @@ const videoRef = ref<InstanceType<typeof Video>>()
 
 const props = defineProps<WidgetRenderProps>()
 
-const { usePropAndEvent, context } = useWidget(props)
+const { usePropAndEvent, exposeContext } = useWidget(props)
 
 const videoAttrs = computed(() => usePropAndEvent())
 
-context({
-  audioRef: () => videoRef.value
+exposeContext({
+  videoRef: () => videoRef.value
 })
 </script>

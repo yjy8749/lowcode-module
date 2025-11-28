@@ -4,7 +4,7 @@ import { isEmpty } from '@/utils/is'
 import {
   defaultLifecycleEvents,
   useSelectedWidget,
-  useSelectedWidgetContext,
+  useSelectedWidgetRenderContext,
   useSelectedWidgetDefine
 } from '../../../../designer-editor.utils'
 import WidgetEventItem from '../../../WidgetEventItem.vue'
@@ -23,7 +23,7 @@ export default defineComponent({
   setup(props) {
     const widgetDef = computed(() => useSelectedWidgetDefine(props.editor))
     const widget = computed(() => useSelectedWidget(props.editor))
-    const context = computed(() => useSelectedWidgetContext(props.editor))
+    const widgetRenderContext = computed(() => useSelectedWidgetRenderContext(props.editor))
 
     const events = computed(() => defaultLifecycleEvents())
 
@@ -40,7 +40,7 @@ export default defineComponent({
               editor={props.editor}
               widget={widget.value}
               widgetDefine={widgetDef.value}
-              context={context.value}
+              widgetRenderContext={widgetRenderContext.value}
               event={event}
               eventBind={widget.value?.eventsBind?.[event.key]}
             />

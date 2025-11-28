@@ -1,4 +1,3 @@
-import { generateVid } from '../../../../common/utils'
 import Render from './index.render.vue'
 import {
   CssSymbols,
@@ -26,19 +25,15 @@ const ElFormLabelPositionOptions = [
 ]
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '表单容器',
   icon: 'ep:finished',
   tips: '表单元素部分属性变更后需刷新组件后生效',
-  disableInMenu(action, _, ctx) {
-    return (
-      action == 'add' &&
-      !isNullOrUnDef(
-        ctx?.seekParent?.({
-          _moduleName: 'containerWidgetDefines',
-          _key: 'form'
-        }).seekWidget
-      )
+  disableInMenu(_, __, ctx) {
+    return !isNullOrUnDef(
+      ctx?.seekParent?.({
+        _moduleName: 'containerWidgetDefines',
+        _key: 'form'
+      }).seekWidget
     )
   },
   render: (args) => () => {

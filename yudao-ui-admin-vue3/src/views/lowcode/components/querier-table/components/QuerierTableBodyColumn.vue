@@ -18,7 +18,7 @@ import {
   isIndexColumn,
   parseUrlToRouteParams
 } from '../querier-table.utils'
-import { isEmpty } from '@/utils/is'
+import { isEmpty, isNullOrUnDef } from '@/utils/is'
 import QuerierTableBodyRowActions from './QuerierTableBodyRowActions.vue'
 import { ActionButtonProps } from '../../common/ActionButton.vue'
 
@@ -46,9 +46,9 @@ const getProcessedData = (row) => {
     results.forEach((item) => {
       list.push(...`${item}`.split(props.splitChar!))
     })
-    return list
+    return list.filter((e) => !isNullOrUnDef(e))
   }
-  return results
+  return results.filter((e) => !isNullOrUnDef(e))
 }
 
 const defaultSlotHandlerMap = {
@@ -110,6 +110,11 @@ const defaultSlotHandlerMap = {
         src: toPatternFn(item, row)
       })
     )
+  },
+  amount: ({ data, row, toPatternFn }) => {
+    return data.map((item) =>
+      h('span', { class: 'overflow-hidden text-ellipsis' }, toPatternFn(item, row))
+    )
   }
 }
 
@@ -136,8 +141,8 @@ const getDefaultSlot = (): any => {
     const dataPattern = !isEmpty(props.dataPattern) ? props.dataPattern : '${data}'
     const toPatternFn = eval(`(function(data, row) { return \`${dataPattern}\` })`)
 
-    let handler = defaultSlotHandlerMap[props.columnType ?? '']
-    handler ??= defaultSlotHandlerMap['default']
+    const handler =
+      defaultSlotHandlerMap[props.columnType ?? ''] ?? defaultSlotHandlerMap['default']
 
     return ({ scope }) => {
       const { row } = scope

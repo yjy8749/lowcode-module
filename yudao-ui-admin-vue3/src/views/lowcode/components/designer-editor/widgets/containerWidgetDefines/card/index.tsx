@@ -1,11 +1,9 @@
-import { generateVid } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { LayoutJustifyOptions, WidgetDefine } from '../../../designer-editor.type'
 import { createSlotItem, createWidgetInstanceDefault } from '../../../designer-editor.utils'
 import { eventDefine, inputDefine, radioButtonDefine } from '../../../designer-editor.props'
 
 const widget: WidgetDefine = {
-  _vid: generateVid(),
   label: '卡片容器',
   icon: 'ep:postcard',
   render: (args) => () => {

@@ -78,7 +78,7 @@ import { useDesignerStore } from './designer-editor.store'
 import {
   executeEvalFunction,
   readEditorDataValue,
-  useRootContext,
+  useRootRenderContext,
   useSelectedWidget,
   useWidgetTree
 } from './designer-editor.utils'
@@ -304,7 +304,7 @@ const onRootContextMenu = (e: MouseEvent) => {
     showContextMenu(
       e,
       useWidgetMenus(editor.value, {
-        widgetContext: useRootContext(editor.value),
+        widgetRenderContext: useRootRenderContext(editor.value),
         inject: {
           openWidgetTreeDrawer,
           openWidgetPrdDrawer,

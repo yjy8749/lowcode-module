@@ -4,8 +4,8 @@
       <el-col v-bind="colAttrs">
         <WidgetItem
           :editor="editor"
-          :parentWidget="widget"
-          :parentContext="widgetContext"
+          :parent-widget="widget"
+          :parent-render-context="widgetRenderContext"
           :widget="defaultSlotWidget"
           :options="widgetItemOptions"
         />

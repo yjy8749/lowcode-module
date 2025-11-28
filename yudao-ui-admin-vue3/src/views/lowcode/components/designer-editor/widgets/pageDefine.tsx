@@ -69,10 +69,10 @@ const pageDefine: WidgetDefine = {
         {
           key: 'onPageClose',
           label: '编辑器关闭处理',
-          helps: '主动关闭编辑器触发函数,reject不关闭'
+          helps: '主动关闭编辑器触发函数,resolve返回结果触发 close 事件, reject不关闭'
         },
         {
-          defaultFunction: '/** 异步返回结果 */\n' + "return promise.resolve('返回结果')"
+          defaultFunction: '/** 异步返回结果 */\n' + "return Promise.resolve('返回结果')"
         }
       )
     )

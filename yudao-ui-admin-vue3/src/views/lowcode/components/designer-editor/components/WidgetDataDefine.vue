@@ -54,7 +54,7 @@ import WidgetDataDefineCard from './WidgetDataDefineCard.vue'
 export interface WidgetDataDefineProps {
   editor: DesignerEditor
   widget: WidgetInstance
-  context: WidgetRenderContext
+  widgetRenderContext: WidgetRenderContext
   widgetDefine: WidgetDefine
   widgetTree: WidgetInstance[]
 }
@@ -83,9 +83,9 @@ const dataDefineExecutor = useDataDefineExecutor(props.editor)
 const doOpenDefineForm = async (dataDefine?: WidgetDataDefine, isCopy?: boolean) => {
   doSubmitDefineForm(
     await openDataDefineForm({
-      title: '数据模型定义',
+      title: '数据定义',
       widget: props.widget,
-      context: props.context,
+      widgetRenderContext: props.widgetRenderContext,
       widgetDefine: props.widgetDefine,
       widgetTree: props.widgetTree,
       dataDefine,
