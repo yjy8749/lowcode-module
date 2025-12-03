@@ -1,6 +1,6 @@
 <!-- index.render.vue -->
 <template>
-  <ContentWrap class="easyTree h-1/1">
+  <ContentWrap class="treeView h-1/1">
     <div class="flex gap-1">
       <el-input class="mb-20px" clearable placeholder="搜索" v-model="searchValue">
         <template #prefix>
@@ -114,7 +114,7 @@ if (!isPreviewMode.value) {
   )
 }
 
-onBeforeMount(async () => {
+onMounted(async () => {
   if (!treeAttrs.value.lazy) {
     list.value = await loadDataFunction.value?.()
   }
@@ -174,11 +174,11 @@ const onNodeClick = async (row: any) => {
 }
 
 exposeContext({
-  refresh
+  refresh: () => refresh()
 })
 </script>
 <style lang="scss" scoped>
-.easyTree {
+.treeView {
   :deep(.el-tree-node__content) {
     height: auto;
     min-height: var(--el-tree-node-content-height);

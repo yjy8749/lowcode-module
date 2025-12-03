@@ -1,5 +1,5 @@
 <template>
-  <el-alert type="success" show-icon>
+  <el-alert class="!mb-2" :type="type ?? 'success'" show-icon>
     <template #title>
       <div @click.stop="goToUrl">
         {{ title ? '【' + (title ?? '') + '】' : '' }}{{ content ?? '' }}

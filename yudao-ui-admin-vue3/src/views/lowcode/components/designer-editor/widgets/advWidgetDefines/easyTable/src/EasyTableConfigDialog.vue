@@ -127,46 +127,7 @@
               <EasyTableBodyColumnArrayValueInput v-model="formModel.columns" />
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane lazy label="查询按钮配置" name="searchActions">
-            <div class="flex justify-between">
-              <div class="flex gap-8">
-                <el-form-item label="开启查询区动态插槽">
-                  <el-switch size="small" v-model="formModel.enableSearchActionSlot" />
-                </el-form-item>
-              </div>
-              <div class="flex gap-8">
-                <el-form-item>
-                  <el-button type="primary" link size="small" @click="addExportAction">
-                    添加导出按钮
-                  </el-button>
-                </el-form-item>
-              </div>
-            </div>
-            <el-form-item label-position="top" prop="searchActions">
-              <ActionButtonArrayValueInput
-                v-if="dialogArgs?.widget"
-                :editor="editor"
-                :widget="dialogArgs.widget"
-                v-model="formModel.searchActions"
-              />
-            </el-form-item>
-          </el-tab-pane>
-          <el-tab-pane lazy label="操作按钮配置" name="operationActions">
-            <div class="flex gap-8">
-              <el-form-item label="开启操作区动态插槽">
-                <el-switch size="small" v-model="formModel.enableOperationActionSlot" />
-              </el-form-item>
-            </div>
-            <el-form-item label-position="top" prop="operationActions">
-              <ActionButtonArrayValueInput
-                v-if="dialogArgs?.widget"
-                :editor="editor"
-                :widget="dialogArgs.widget"
-                v-model="formModel.operationActions"
-              />
-            </el-form-item>
-          </el-tab-pane>
-          <el-tab-pane lazy label="操作配置" name="rowActions" v-if="formModel.showRowAction">
+          <el-tab-pane lazy label="行操作配置" name="rowActions" v-if="formModel.showRowAction">
             <div class="flex gap-8">
               <el-form-item>
                 <template #label>
@@ -220,6 +181,45 @@
                 :widget="dialogArgs.widget"
                 :helps="`变量:${highlightTextHtml('$args[1]')}, 为 el-table 插槽 ${highlightTextHtml('scope')} 属性`"
                 v-model="formModel.rowActions"
+              />
+            </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane lazy label="查询按钮配置" name="searchActions">
+            <div class="flex justify-between">
+              <div class="flex gap-8">
+                <el-form-item label="开启查询区动态插槽">
+                  <el-switch size="small" v-model="formModel.enableSearchActionSlot" />
+                </el-form-item>
+              </div>
+              <div class="flex gap-8">
+                <el-form-item>
+                  <el-button type="primary" link size="small" @click="addExportAction">
+                    添加导出按钮
+                  </el-button>
+                </el-form-item>
+              </div>
+            </div>
+            <el-form-item label-position="top" prop="searchActions">
+              <ActionButtonArrayValueInput
+                v-if="dialogArgs?.widget"
+                :editor="editor"
+                :widget="dialogArgs.widget"
+                v-model="formModel.searchActions"
+              />
+            </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane lazy label="操作按钮配置" name="operationActions">
+            <div class="flex gap-8">
+              <el-form-item label="开启操作区动态插槽">
+                <el-switch size="small" v-model="formModel.enableOperationActionSlot" />
+              </el-form-item>
+            </div>
+            <el-form-item label-position="top" prop="operationActions">
+              <ActionButtonArrayValueInput
+                v-if="dialogArgs?.widget"
+                :editor="editor"
+                :widget="dialogArgs.widget"
+                v-model="formModel.operationActions"
               />
             </el-form-item>
           </el-tab-pane>
@@ -282,7 +282,7 @@
                 :height="100"
                 :editor="editor"
                 :widget="dialogArgs!.widget"
-                :helps="`${highlightTextHtml('args[0]')} 为列表数据`"
+                :helps="`${highlightTextHtml('$args[0]')} 为列表数据`"
                 default-function="return true"
                 v-model="formModel.itemSelectableFunction"
               />
@@ -302,7 +302,9 @@
                 :editor="editor"
                 :widget="dialogArgs!.widget"
                 :helps="`返回 ${highlightTextHtml('[{ name, symbol, value}]')} 查询参数数组`"
-                default-function="return []"
+                :default-function="
+                  '/** 返回 { name, symbol, value } 数组 */\n' + 'return Promise.resolve([])'
+                "
                 v-model="formModel.defaultParamsFunction"
               />
             </el-form-item>
@@ -313,10 +315,13 @@
                 :height="100"
                 :editor="editor"
                 :widget="dialogArgs!.widget"
-                :helps="`${highlightTextHtml('args[0]')} 为列表数据`"
+                :helps="`${highlightTextHtml('$args[0]')} 为列表数据`"
                 default-function="return args[0]"
                 v-model="formModel.itemProcessFunction"
               />
+            </el-form-item>
+            <el-form-item label="帮助文本配置" label-position="top" prop="help">
+              <EasyTableHelpsInput v-model="formModel.helps" />
             </el-form-item>
           </el-tab-pane>
         </el-tabs>
@@ -345,7 +350,11 @@ import EvalFunctionValueInput from '../../../../components/EvalFunctionValueInpu
 import { ref } from 'vue'
 import { isEmpty, isNullOrUnDef } from '@/utils/is'
 import TextLabel from '../../../../../common/TextLabel.vue'
-import { highlightTextHtml } from '../../../../../common/utils'
+import {
+  DATA_ROOT_ITEM_FLAG,
+  DATA_EMPTY_NAME_FLAG,
+  highlightTextHtml
+} from '../../../../../common/utils'
 import {
   DesignerEditor,
   PromiseCallback,
@@ -353,8 +362,7 @@ import {
   RequestMethodQueryOptions,
   WidgetInstance,
   WidgetRenderContext,
-  WidgetDataDefine,
-  DATA_EMPTY_NAME_FLAG
+  WidgetDataDefine
 } from '../../../../designer-editor.type'
 import {
   COLUMN_ACTION_PROP,
@@ -553,7 +561,7 @@ const regenSlots = async (): Promise<WidgetInstance[]> => {
                 refDataType: 'const',
                 refWidgetId: widget._vid
               },
-              refPropKey: '#'
+              refPropKey: DATA_ROOT_ITEM_FLAG
             }
           ]
         }

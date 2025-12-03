@@ -1,18 +1,18 @@
 // index.tsx
-import { highlightTextHtml } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { WidgetDefine } from '../../../designer-editor.type'
 import {
+  evalFunctionDefine,
   eventDefine,
   inputDefine,
-  switchDefine,
-  evalFunctionDefine,
-  inputNumberDefine
+  inputNumberDefine,
+  switchDefine
 } from '../../../designer-editor.props'
 import { formItemAdvDefine, formItemBaseDefine } from '../../hooks/useFormItemWidget'
+import { highlightTextHtml } from '../../../../common/utils'
 
 const widget: WidgetDefine = {
-  label: '树形选择TreeSelect',
+  label: '选择器Select',
   icon: 'ep:edit',
   render: (args) => () => {
     return <Render {...args} />
@@ -40,32 +40,18 @@ const widget: WidgetDefine = {
       label: '最多可选择项目数',
       isShow: ({ widget }) => widget.props.multiple
     }),
-
-    switchDefine({ key: 'defaultExpandAll', label: '是否默认展开所有节点' }),
-    switchDefine({ key: 'showCheckbox', label: '是否显示复选框' }),
-    switchDefine({
-      key: 'checkStrictly',
-      label: '是否父子不互相关联选择',
-      isShow: ({ widget }) => widget.props.showCheckbox
+    switchDefine({ key: 'filterable', label: '是否支持筛选' }),
+    switchDefine({ key: 'remote', label: '是否远程加载' }),
+    inputDefine({
+      key: 'dictType',
+      label: '字典类型',
+      isShow: ({ widget }) => !widget.props.remote
     }),
-    switchDefine({ key: 'lazy', label: '是否懒加载' }),
     evalFunctionDefine(
-      { key: 'loadData', label: '数据加载函数' },
+      { key: 'remoteMethod', label: '选项加载函数', isShow: ({ widget }) => widget.props.remote },
       {
-        helps: `懒加载情况下 ${highlightTextHtml('$args[0]')} 为 node 数据，返回树形节点数组 ${highlightTextHtml('{ id, name, parentId }')}`,
-        defaultFunction: '/** 返回 { id, name, parentId } 数组 */\n' + 'return Promise.resolve([])'
-      }
-    ),
-    evalFunctionDefine(
-      {
-        key: 'loadCacheData',
-        label: '缓存数据加载函数',
-        isShow: ({ widget }) => widget.props.lazy,
-        helps: '懒加载时加载缓存数据,用于回显'
-      },
-      {
-        helps: `${highlightTextHtml('$args[0]')} 为表单 属性值，返回树形节点数组 ${highlightTextHtml('{ id, name, parentId }')}`,
-        defaultFunction: '/** 返回 { id, name, parentId } 数组 */\n' + 'return Promise.resolve([])'
+        helps: `可筛选时 ${highlightTextHtml('$args[0]')} 为查询值，返回字典类型数组 ${highlightTextHtml('{ label, value }')}`,
+        defaultFunction: '/** 返回 { label, value } 数组 */\n' + 'return Promise.resolve([])'
       }
     ),
     ...formItemBaseDefine(),

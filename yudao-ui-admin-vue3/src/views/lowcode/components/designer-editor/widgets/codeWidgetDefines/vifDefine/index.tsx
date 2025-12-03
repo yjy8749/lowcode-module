@@ -6,16 +6,12 @@ import { propBindDefine } from '../../../designer-editor.props'
 const widget: WidgetDefine = {
   label: '条件v-if',
   icon: 'svg-icon:lowcode-icon-vif',
-  tips: '根据条件判断是否显示',
+  tips: '根据条件判断是否显示，即使条件为 `false` 设计模式下仍显示',
   render: (args) => () => {
     return <Render {...args} />
   },
-  baseDesignerProps: [
-    propBindDefine({
-      key: 'showConditionValue',
-      label: '显示条件',
-      bindType: ['boolean']
-    })
+  advDesignerProps: [
+    propBindDefine({ key: 'vifValue', label: '显示条件值', bindType: ['boolean'] })
   ],
   create(editor, define) {
     const instance = createWidgetInstanceDefault(editor, define)

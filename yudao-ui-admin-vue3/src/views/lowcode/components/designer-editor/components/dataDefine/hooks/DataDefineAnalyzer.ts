@@ -2,9 +2,6 @@ import { generateRandomStr } from '@/utils'
 import { generateVid, jsonStringify, readValueByJsonPath } from '../../../../common/utils'
 import { isArray, isNullOrUnDef, isEmpty, isObject } from '@/utils/is'
 import {
-  DATA_EMPTY_NAME_FLAG,
-  DATA_ROOT_ITEM_FLAG,
-  DATA_VALUE_ITEM_FLAG,
   DesignerEditor,
   WidgetDataDefine,
   WidgetDataDefinePropDefine,
@@ -19,6 +16,11 @@ import {
   useDataDefine
 } from '../../../designer-editor.utils'
 import { useDataDefineExecutor } from './dataExecutor'
+import {
+  DATA_EMPTY_NAME_FLAG,
+  DATA_ROOT_ITEM_FLAG,
+  DATA_VALUE_ITEM_FLAG
+} from '../../../../common/utils'
 
 const EXTRACT_VALUE_TYPE_MAP = {
   '[object String]': 'string',

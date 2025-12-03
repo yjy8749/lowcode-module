@@ -98,13 +98,13 @@
         </el-form-item>
         <el-form-item label="加载函数" prop="remoteMethod" v-else>
           <EvalFunctionValueInput
-            name="数据加载函数"
+            name="选项加载函数"
             type="simple-function"
             :height="100"
             :editor="editor"
             :widget="widget"
-            :helps="`可筛选时 ${highlightTextHtml('args[0]')} 为查询值\n返回字典类型数据数组 ${highlightTextHtml('{ label, value }')}`"
-            :default-function="'/** 返回数据 */\n' + 'return Promise.resolve([])'"
+            :helps="`可筛选时 ${highlightTextHtml('$args[0]')} 为查询值，返回字典类型数组 ${highlightTextHtml('{ label, value }')}`"
+            :default-function="returnDictDefaultFunction"
             v-model="formModel.remoteMethod"
           />
         </el-form-item>
@@ -155,8 +155,8 @@
             :height="100"
             :editor="editor"
             :widget="widget"
-            :helps="`返回树节点数据数组 ${highlightTextHtml('{ id, parentId, name }')}, 懒加载情况下 ${highlightTextHtml('$args[0]')} 为 node 数据`"
-            :default-function="'/** 返回数据 */\n' + 'return Promise.resolve([])'"
+            :helps="`返回树节点数组 ${highlightTextHtml('{ id, parentId, name }')}, 懒加载情况下 ${highlightTextHtml('$args[0]')} 为 node 数据`"
+            :default-function="returnTreeDefaultFunction"
             v-model="formModel.load"
           />
         </el-form-item>
@@ -167,8 +167,8 @@
             :height="100"
             :editor="editor"
             :widget="widget"
-            :helps="`返回树节点数据数组 ${highlightTextHtml('{ id, parentId, name }')}, 可筛选时 ${highlightTextHtml('args[0]')} 为查询值`"
-            :default-function="'/** 返回数据 */\n' + 'return Promise.resolve([])'"
+            :helps="`返回树节点数组 ${highlightTextHtml('{ id, parentId, name }')}, 可筛选时 ${highlightTextHtml('$args[0]')} 为查询值`"
+            :default-function="returnTreeDefaultFunction"
             v-model="formModel.filterMethod"
           />
         </el-form-item>
@@ -192,8 +192,8 @@
             :height="100"
             :editor="editor"
             :widget="widget"
-            :helps="`可筛选时 ${highlightTextHtml('args[0]')} 为查询值\n返回字典类型数据数组 ${highlightTextHtml('{ label, value }')}`"
-            :default-function="'/** 返回数据 */\n' + 'return Promise.resolve([])'"
+            :helps="`可筛选时 ${highlightTextHtml('$args[0]')} 为查询值\n返回字典类型数组 ${highlightTextHtml('{ label, value }')}`"
+            :default-function="returnDictDefaultFunction"
             v-model="formModel.remoteMethod"
           />
         </el-form-item>
@@ -278,7 +278,7 @@
             :height="100"
             :editor="editor"
             :widget="widget"
-            :helps="`${highlightTextHtml('args[0]')} 为要判断的日期Date对象, 范围选择时为[开始, 结束]日期数组`"
+            :helps="`${highlightTextHtml('$args[0]')} 为要判断的日期Date对象, 范围选择时为[开始, 结束]日期数组`"
             :default-function="'/** 返回数据 */\n' + 'return false'"
             v-model="formModel.disabledDate"
           />
@@ -311,6 +311,89 @@
           </div>
         </el-form-item>
       </template>
+      <!-- autocomplete -->
+      <el-form-item
+        v-else-if="formModel.inputType == 'autocomplete'"
+        label="输入建议函数"
+        prop="fetchSuggestions"
+      >
+        <EvalFunctionValueInput
+          name="获取输入建议的函数"
+          type="simple-function"
+          :height="100"
+          :editor="editor"
+          :widget="widget"
+          :helps="`${highlightTextHtml('$args[0]')} 为查询值\n返回建议数组 ${highlightTextHtml('{  value }')}`"
+          :default-function="'/** 返回 { value } 数组 */\n' + 'return Promise.resolve([])'"
+          v-model="formModel.fetchSuggestions"
+        />
+      </el-form-item>
+      <!-- cascader 配置 -->
+      <template v-else-if="formModel.inputType == 'cascader'">
+        <el-form-item label="开关控制">
+          <div class="flex gap-8">
+            <el-form-item label="多选" label-width="40px" prop="multiple">
+              <el-switch size="small" v-model="formModel.multiple" />
+            </el-form-item>
+            <el-form-item label="可筛选" label-width="54px" prop="filterable">
+              <el-switch size="small" v-model="formModel.filterable" />
+            </el-form-item>
+            <el-form-item label="父子不联动" label-width="82px" prop="checkStrictly">
+              <el-switch size="small" v-model="formModel.checkStrictly" />
+            </el-form-item>
+            <el-form-item label="懒加载" label-width="54px" prop="lazy">
+              <el-switch size="small" v-model="formModel.lazy" />
+            </el-form-item>
+            <el-form-item label="显示全部路径" label-width="110px" prop="lazy">
+              <el-switch size="small" v-model="formModel.showAllLevels" />
+            </el-form-item>
+          </div>
+        </el-form-item>
+        <el-form-item label="折叠配置" v-if="formModel.multiple">
+          <div class="flex gap-8">
+            <el-form-item label="折叠标签" prop="collapseTags" label-width="68px">
+              <el-switch size="small" v-model="formModel.collapseTags" />
+            </el-form-item>
+            <el-form-item prop="maxCollapseTags" v-if="formModel.collapseTags">
+              <div class="flex gap-2">
+                <el-text>超出 </el-text>
+                <el-input-number
+                  v-bind="inputNumberProps"
+                  placeholder="1"
+                  v-model="formModel.maxCollapseTags"
+                />
+                <el-text>条自动折叠 </el-text>
+              </div>
+            </el-form-item>
+          </div>
+        </el-form-item>
+        <el-form-item label="加载函数" prop="load">
+          <EvalFunctionValueInput
+            name="数据加载函数"
+            type="simple-function"
+            :height="100"
+            :editor="editor"
+            :widget="widget"
+            :helps="`返回选项数组 ${highlightTextHtml('{ value, label, leaf, children }')}, 懒加载情况下 ${highlightTextHtml('$args[0]')} 为 node 数据`"
+            :default-function="
+              '/** 返回 { value, label, leaf, children } 数组 */\n' + 'return Promise.resolve([])'
+            "
+            v-model="formModel.load"
+          />
+        </el-form-item>
+        <el-form-item label="搜索函数" prop="filterMethod" v-if="formModel.filterable">
+          <EvalFunctionValueInput
+            name="数据搜索函数"
+            type="simple-function"
+            :height="100"
+            :editor="editor"
+            :widget="widget"
+            :helps="`返回选项数组 ${highlightTextHtml('{ value, label,leaf, children }')}, 可筛选时 ${highlightTextHtml('$args[0]')} 为查询值`"
+            :default-function="returnTreeDefaultFunction"
+            v-model="formModel.filterMethod"
+          />
+        </el-form-item>
+      </template>
     </el-form>
     <template #footer>
       <el-button type="primary" @click="doConfirm">确 定</el-button>
@@ -329,6 +412,12 @@ import { LOWCODE_DICT_TYPE } from '../../../../../common/dict'
 import { EasyTableSearchFieldProps, SearchFieldInputTypeOptions } from './types'
 import { ElForm } from 'element-plus'
 import TextLabel from '../../../../../common/TextLabel.vue'
+
+const returnDictDefaultFunction =
+  '/** 返回 { label, value } 数组 */\n' + 'return Promise.resolve([])'
+
+const returnTreeDefaultFunction =
+  '/** 返回 { id, parentId, name } 数组 */\n' + 'return Promise.resolve([])'
 
 const inputNumberProps: any = {
   placeholder: '不限',

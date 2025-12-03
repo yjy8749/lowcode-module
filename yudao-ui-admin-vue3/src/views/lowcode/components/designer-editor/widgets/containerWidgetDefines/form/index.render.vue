@@ -66,12 +66,12 @@ exposeContext({
   }
 })
 
-const bindData = computed(() => usePropValue('data'))
+const data = computed(() => usePropValue('data'))
 
 watch(
-  () => bindData.value,
+  () => data.value,
   () => {
-    updateFormModel(bindData.value)
+    updateFormModel(data.value)
     formRef.value?.resetFields()
   },
   { immediate: true }

@@ -2,6 +2,10 @@ import { generateRandomStr } from '@/utils'
 import { isNullOrUnDef, isObject, isEmpty, is, isFunction } from '@/utils/is'
 import { useClipboard } from '@vueuse/core'
 
+export const DATA_ROOT_ITEM_FLAG = '#'
+export const DATA_EMPTY_NAME_FLAG = '-'
+export const DATA_VALUE_ITEM_FLAG = '='
+
 /**
  * json字符串格式化, 自定义序列化函数 处理正则
  */
@@ -39,7 +43,11 @@ export const readValueByJsonPath = (json?: any, jsonPath?: string): any | undefi
     return json
   }
   const parts = jsonPath!.split('.')
-  if (parts[0] == '#') {
+  if (
+    parts[0] == DATA_ROOT_ITEM_FLAG ||
+    parts[0] == DATA_VALUE_ITEM_FLAG ||
+    parts[0] == DATA_EMPTY_NAME_FLAG
+  ) {
     return readValueByJsonPath(json, parts.slice(1).join('.'))
   }
   if (parts.length == 1) {
@@ -136,4 +144,30 @@ export function parseFormatNumValue(val?: string): number {
 
 export function isPromise<T = any>(val: any): val is Promise<T> {
   return is(val, 'Promise') && isFunction(val.then) && isFunction(val.catch)
+}
+
+/**
+ * 替换或删除选项数组中的项
+ * @param options 原始选项数组，每项应包含 label 和 value
+ * @param replaceMap 替换/删除映射：
+ *   - 若 replaceMap[value] 为对象，则合并替换（{ ...item, ...replacement }）
+ *   - 若 replaceMap[value] 为 null / false，则删除该项
+ * @returns 新的选项数组
+ */
+export function transformOptions<T extends { label: string; value: string }>(
+  options: T[],
+  replaceMap: Record<string, Partial<T> | null | false>
+): T[] {
+  return options
+    .map((item) => {
+      const action = replaceMap[item.value]
+      if (action === null || action === false) {
+        return null // 标记为删除
+      }
+      if (action !== undefined) {
+        return { ...item, ...action } as T
+      }
+      return item
+    })
+    .filter((item): item is T => item !== null)
 }

@@ -39,8 +39,7 @@ const widget: WidgetDefine = {
         }
       ],
       {
-        _cancelable: true,
-        _chunkSize: 3
+        _cancelable: true
       }
     )
   ],

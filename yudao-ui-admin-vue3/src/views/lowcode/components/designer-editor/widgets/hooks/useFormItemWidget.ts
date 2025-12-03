@@ -19,59 +19,37 @@ const LabelControlOptions = [
 
 export function formItemBaseDefine() {
   return [
-    formatInputNumberDefine(
-      {
-        key: 'labelWidth',
-        label: '标签宽度'
-      },
-      { symbol: CssSymbols }
-    ),
-    radioButtonDefine(
-      {
-        key: 'labelControl',
-        label: '标签控制'
-      },
-      LabelControlOptions,
-      {
-        _cancelable: true
-      }
-    ),
-    inputDefine({
-      key: 'placeholder',
-      label: '占位文本'
+    formatInputNumberDefine({ key: 'labelWidth', label: '标签宽度' }, { symbol: CssSymbols }),
+    radioButtonDefine({ key: 'labelControl', label: '标签控制' }, LabelControlOptions, {
+      _cancelable: true
     }),
-    switchDefine({
-      key: 'required',
-      label: '是否必填'
-    }),
+    switchDefine({ key: 'required', label: '是否必填' }),
     inputDefine({
       key: 'requiredErrorMsg',
       label: '必填错误提示',
       isShow: ({ widget }) => widget.props.required
     }),
-    inputDefine({
-      key: 'helps',
-      label: '帮助文本'
-    }),
-    switchDefine({
-      key: 'helpsAlwaysShow',
-      label: '帮助文本是否一直显示'
-    })
+    inputDefine({ key: 'helps', label: '帮助文本' }),
+    switchDefine({ key: 'helpsAlwaysShow', label: '帮助文本是否一直显示' })
   ]
 }
 
 export function formItemAdvDefine() {
   return [
-    inputDefine({
-      key: 'label',
-      label: '标签文本',
-      defaultValue: '标签名称'
+    switchDefine({
+      key: 'readonly',
+      label: '是否只读',
+      bindable: true,
+      helps: '若 readonly 时与禁用样式不同可通过 readonly 插槽传入组件，默认样式与禁用相同'
     }),
-    inputDefine({
-      key: 'prop',
-      label: '绑定属性',
-      helps: '校验规则要生效必须绑定属性'
+    switchDefine({
+      key: 'disabled',
+      label: '是否禁用',
+      bindable: true,
+      helps: '禁用组件，不可交互。'
     }),
+    inputDefine({ key: 'label', label: '标签文本', defaultValue: '标签名称' }),
+    inputDefine({ key: 'prop', label: '绑定属性', helps: '校验规则要生效必须绑定属性' }),
     evalFunctionDefine(
       { key: 'propReadFun', label: '自定义读取函数' },
       {
@@ -89,10 +67,7 @@ export function formItemAdvDefine() {
         defaultFunction: '/** 返回写入表单的数据 */\n' + 'return Promise.resolve($args[0])'
       }
     ),
-    switchDefine({
-      key: 'isCustomValid',
-      label: '是否自定义校验规则'
-    }),
+    switchDefine({ key: 'isCustomValid', label: '是否自定义校验规则' }),
     evalFunctionDefine(
       {
         key: 'customValidFun',
@@ -109,7 +84,7 @@ export function formItemAdvDefine() {
 
 const formItemInputExcludeKeys = [...formItemBaseDefine(), ...formItemAdvDefine()]
   .map((e) => e.key)
-  .filter((e) => e != 'placeholder')
+  .filter((e) => e != 'readonly' && e != 'disabled')
 
 export function useFormItemWidget(props: ReturnType<typeof useWidget>) {
   const {
@@ -121,8 +96,6 @@ export function useFormItemWidget(props: ReturnType<typeof useWidget>) {
     exposeContext: superExposeContext,
     useExposeContext
   } = props
-
-  const propLabel = computed(() => usePropValue('label'))
 
   const propKey = computed(() => usePropValue('prop'))
 
@@ -137,17 +110,20 @@ export function useFormItemWidget(props: ReturnType<typeof useWidget>) {
       'label',
       'labelWidth',
       'helps',
-      'helpsAlwaysShow'
+      'helpsAlwaysShow',
+      'readonly'
     )
-    const isHideLabel =
-      args.labelControl != 'show' &&
-      (args.labelControl == 'hide' || formContext.value?.isHideLabel())
+    let isHideLabel = false
+    if (args.labelControl == 'hide' || formContext.value?.isHideLabel()) {
+      isHideLabel = true
+    }
     return {
       prop: args.prop,
       label: isHideLabel ? undefined : args.label,
       labelWidth: args.labelWidth,
       helps: args.helps,
-      helpsAlwaysShow: args.helpsAlwaysShow
+      helpsAlwaysShow: args.helpsAlwaysShow,
+      readonly: args.readonly || formContext.value?.isReadonly()
     }
   }
 
@@ -157,8 +133,10 @@ export function useFormItemWidget(props: ReturnType<typeof useWidget>) {
       omit: [...(args?.omit ?? []), ...formItemInputExcludeKeys]
     })
     attrs.readonly = attrs.readonly || formContext.value?.isReadonly()
-    attrs.disabled = attrs.disabled || formContext.value?.isDisabled()
-    attrs.placeholder = isEmpty(attrs.placeholder) ? `请输入${propLabel.value}` : attrs.placeholder
+    attrs.disabled = attrs.readonly || attrs.disabled || formContext.value?.isDisabled()
+    if (isEmpty(attrs.placeholder)) {
+      attrs.placeholder = `请输入${usePropValue('label')}`
+    }
     return attrs
   }
 
@@ -211,7 +189,9 @@ export function useFormItemWidget(props: ReturnType<typeof useWidget>) {
     form,
     formContext,
     useFormItemAttrs,
+    formItemAttrs: computed(() => useFormItemAttrs()),
     useFormInputAttrs,
+    formInputAttrs: computed(() => useFormInputAttrs()),
     valueModel,
     exposeContext
   }

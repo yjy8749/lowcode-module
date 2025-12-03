@@ -7,16 +7,13 @@ import { MaterialFileDataVO } from '@/api/lowcode/materialfiledata'
 import { Emitter } from 'mitt'
 import { UseWidgetMenusArgs } from './designer-editor.menu'
 import { ButtonType, ComponentSize } from 'element-plus'
+import { jsonStringify } from '../common/utils'
 
 export const FILE_SOURCE_DESIGNER = 2
 
 export const DESIGNER_DATA_TYPE_MAIN = 0
 
 export const PAGE_DEFINE_NO = '__page__'
-
-export const DATA_ROOT_ITEM_FLAG = '#'
-export const DATA_EMPTY_NAME_FLAG = '-'
-export const DATA_VALUE_ITEM_FLAG = '='
 
 export const DEFAULT_EVAL_FUNCTION_DEALY = 200
 
@@ -1031,5 +1028,34 @@ export const RequestMethodModifyOptions = [
   {
     value: 'patch',
     label: 'PATCH'
+  }
+]
+
+export const CommonTextPattern = [
+  {
+    label: '手机号',
+    value: jsonStringify({ pattern: '^1\\d{10}$', message: '请输入正确的手机号码' })
+  },
+  {
+    label: '邮箱',
+    value: jsonStringify({
+      pattern: '^([A-Za-z0-9_\\-\\.])+\\@([A-Za-z0-9_\\-\\.])+\\.([A-Za-z]{2,4})$',
+      message: '请输入正确的邮箱'
+    })
+  },
+  {
+    label: '身份证号',
+    value: jsonStringify({
+      pattern:
+        '^[1-9]\\d{5}(18|19|([23]\\d))\\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\\d{3}[0-9Xx]$',
+      message: '请输入正确的身份证号'
+    })
+  },
+  {
+    label: 'URL连接',
+    value: jsonStringify({
+      pattern: '^((https?|ftp|file):\\/\\/)?([\\da-z\\.-]+)\\.([a-z\\.]{2,6})([\\/\\w\\.-]*)*\\/?$',
+      message: '请输入正确的URL连接'
+    })
   }
 ]

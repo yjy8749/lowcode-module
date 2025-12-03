@@ -18,10 +18,10 @@ const widget: WidgetDefine = {
   render: (args) => () => {
     return <Render {...args} />
   },
-  baseDesignerProps: [
+  advDesignerProps: [
     propBindDefine({
       key: 'data',
-      label: '绑定数据',
+      label: '绑定循环数据',
       bindType: ['any[]'],
       onSaveBind(editor, widget, propKey, propValue) {
         if (isNullOrUnDef(propValue)) {

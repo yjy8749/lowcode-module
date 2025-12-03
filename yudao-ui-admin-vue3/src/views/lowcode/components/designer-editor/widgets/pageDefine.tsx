@@ -15,7 +15,8 @@ import {
   inputDefine,
   selectDefine,
   switchDefine,
-  textDefine
+  textDefine,
+  radioButtonDefine
 } from '../designer-editor.props'
 import { createWidgetInstanceDefault, readEditorDataValue } from '../designer-editor.utils'
 import { writeEditorDataValueCmd } from '../designer-editor.cmd'
@@ -43,6 +44,39 @@ const pageDefine: WidgetDefine = {
     _withFileValue(textDefine({ key: 'fileId', label: '文件ID' })),
     _withFileValue(textDefine({ key: 'version', label: '文件数据版本' })),
     _withPageValue(colorPickerDefine({ key: 'pageBgColor', label: '页面背景色' })),
+    radioButtonDefine(
+      {
+        key: 'designPageWidthType',
+        label: '页面宽度类型',
+        onSave(editor, widget, __, propValue) {
+          if (propValue == 'h5') {
+            propValue = '375px'
+          } else if (propValue == 'dialog') {
+            propValue = '40%'
+          }
+          editor.executeCmd(
+            writeEditorDataValueCmd(editor, {
+              key: 'designPageWidth',
+              value: propValue
+            })
+          )
+          widget.props.designPageWidth = propValue
+        }
+      },
+      [
+        {
+          label: 'H5',
+          value: 'h5'
+        },
+        {
+          label: 'Dialog',
+          value: 'dialog'
+        }
+      ],
+      {
+        _cancelable: true
+      }
+    ),
     _withPageValue(
       formatInputNumberDefine(
         {

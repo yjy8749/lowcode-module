@@ -1,7 +1,7 @@
 <template>
   <el-row v-bind="rowAttrs">
     <el-col v-bind="colAttrs">
-      <DesignerPreview v-if="refreshFlag" v-bind="editorAttrs" />
+      <DesignerPreview v-bind="editorAttrs" />
     </el-col>
   </el-row>
 </template>
@@ -12,22 +12,15 @@ import DesignerPreview from '../../../index.preview.vue'
 
 const props = defineProps<WidgetRenderProps>()
 
-const { usePropAndEvent, exposeContext } = useWidget(props)
+const { usePropAndEvent, exposeContext, refresh } = useWidget(props)
 
 const rowAttrs = computed(() => usePropAndEvent({ only: ['justify'] }))
 
 const colAttrs = computed(() => useElColPropAttrs(props.widget))
 
-const editorAttrs = computed(() => usePropAndEvent({ only: ['fileId', 'version'] }))
-
-const refreshFlag = ref(true)
+const editorAttrs = computed(() => usePropAndEvent({ only: ['fileId', 'version', 'params'] }))
 
 exposeContext({
-  refresh() {
-    refreshFlag.value = false
-    nextTick(() => {
-      refreshFlag.value = true
-    })
-  }
+  refresh: () => refresh()
 })
 </script>

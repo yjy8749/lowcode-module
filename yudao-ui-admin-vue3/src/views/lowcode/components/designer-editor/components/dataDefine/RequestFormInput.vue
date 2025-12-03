@@ -17,8 +17,8 @@
 </template>
 <script lang="ts" setup>
 import { WidgetDataDefineRequestFormData } from '../../designer-editor.type'
-import MultiValueInput from '../propInput/MultiValueInput.vue'
 import ArrayValueInput from '../../../common/ArrayValueInput.vue'
+import MultiValueInput from '../../../common/MultiValueInput.vue'
 import { computedVModel } from '../../../common/hooks'
 
 export interface RequestFormInputProps {

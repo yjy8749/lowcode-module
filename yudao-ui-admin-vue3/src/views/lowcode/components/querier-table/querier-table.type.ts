@@ -33,6 +33,7 @@ export interface QueryDomainParams {
 }
 
 export interface QuerierTableHelpTextProps {
+  type?: 'primary' | 'success' | 'warning' | 'info' | 'error'
   title?: string
   content?: string
   url?: string
@@ -98,7 +99,7 @@ export interface QuerierTableSearchFieldProps {
   checkStrictly?: boolean
   accordion?: boolean
   lazy?: boolean
-  load?: (node?: any, resolve?: Function, reject?: Function) => Promise<any[]>
+  load?: (node?: any) => Promise<any[]>
   filterMethod?: (query?: string) => Promise<any[]>
   activeValue?: string
   inactiveValue?: string
@@ -127,6 +128,8 @@ export interface QuerierTableSearchFieldProps {
   minNumber?: number
   maxNumber?: number
   precision?: number
+  fetchSuggestions?: (queryString: string) => Promise<any[]>
+  showAllLevels?: boolean
 }
 
 export interface QuerierTableBodyProps {
@@ -149,9 +152,9 @@ export interface QuerierTableBodyProps {
 }
 
 export interface QuerierTableSearchProps {
-  searchBtnSpan?: number
   searchs?: QuerierTableSearchFieldProps[]
   searchActions?: ActionButtonProps[]
+  searchActionsSpan?: number
   disableSetting?: boolean
 }
 

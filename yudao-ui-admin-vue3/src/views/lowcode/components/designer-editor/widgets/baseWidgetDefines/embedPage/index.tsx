@@ -1,11 +1,11 @@
 import Render from './index.render.vue'
 import { LayoutJustifyOptions, WidgetDefine } from '../../../designer-editor.type'
-import { inputDefine, radioButtonDefine } from '../../../designer-editor.props'
+import { inputDefine, propBindDefine, radioButtonDefine } from '../../../designer-editor.props'
 import { writePropValueCmd } from '../../../designer-editor.cmd'
 import { ElColPropDefines } from '../../hooks'
 
 const widget: WidgetDefine = {
-  label: '页面容器',
+  label: '嵌入页面',
   icon: 'svg-icon:lowcode-icon-page',
   render: (args) => () => {
     return <Render {...args} />
@@ -33,7 +33,12 @@ const widget: WidgetDefine = {
   ],
   advDesignerProps: [
     inputDefine({ key: 'fileId', label: '文件ID', bindable: true }),
-    inputDefine({ key: 'version', label: '文件版本', bindable: true })
+    inputDefine({ key: 'version', label: '文件版本', bindable: true }),
+    propBindDefine({
+      key: 'params',
+      label: '绑定数据',
+      helps: '绑定数据, 组件内部可用过页面 Params获取该数据'
+    })
   ],
   saveProps(editor, widget, propKey, propValue) {
     editor.executeCmd({

@@ -79,7 +79,7 @@ export type QuerierTableSearchEmits = {
   openSetting: []
 }
 
-const props = defineProps<QuerierTableSearchProps>()
+const props = withDefaults(defineProps<QuerierTableSearchProps>(), { searchActionsSpan: 6 })
 
 const emits = defineEmits<QuerierTableSearchEmits>()
 
@@ -97,7 +97,7 @@ const isShowAllFields = ref(false)
 
 const btnColSpan = computed(() => {
   const val = showSearchFields.value.map((e) => e.span ?? 6).reduce((p, c) => p + c, 0) % 24
-  return Math.max(val == 0 ? 24 : 24 - val, props.searchBtnSpan ?? 6)
+  return Math.max(val == 0 ? 24 : 24 - val, props.searchActionsSpan)
 })
 const toggleShowAllFields = () => {
   isShowAllFields.value = !isShowAllFields.value

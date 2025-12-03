@@ -17,6 +17,7 @@
       :class="{ focus: isWidgetSelected, hidden: widget._hidden }"
       @click="onItemClick"
       @contextmenu="openContextMenu"
+      v-loading="refreshing"
     >
       <el-text v-if="!isEmpty(widgetDef.tips)" type="warning" tag="mark">
         {{ widgetDef.tips }}
@@ -72,6 +73,8 @@ const props = defineProps<WidgetItemProps>()
 
 const refreshFlag = ref(true)
 
+const refreshing = ref(false)
+
 const store = props.editor.getStore()
 
 const { isPreviewMode, isDesignMode } = store
@@ -97,8 +100,12 @@ const onLabelClick = () => {
 
 const doRefresh = () => {
   refreshFlag.value = false
+  refreshing.value = true
   nextTick(() => {
     refreshFlag.value = true
+    setTimeout(() => {
+      refreshing.value = false
+    }, 300)
   })
 }
 

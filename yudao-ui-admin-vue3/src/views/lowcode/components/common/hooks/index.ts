@@ -27,3 +27,21 @@ export function computedVModel<T, S = T>(options: WritableComputedOptions<T, S>)
     triggerChange
   }
 }
+
+export function useScopeLoading() {
+  const loading = ref(false)
+
+  const callWithLoading = async (fn: () => Promise<any>) => {
+    try {
+      loading.value = true
+      await fn()
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return {
+    loading,
+    callWithLoading
+  }
+}

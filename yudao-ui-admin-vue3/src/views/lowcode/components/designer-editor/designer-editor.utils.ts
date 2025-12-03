@@ -16,8 +16,6 @@ import {
   WidgetPropDefine,
   WidgetPropDefineBind,
   WidgetPropDefineBindType,
-  DATA_EMPTY_NAME_FLAG,
-  DATA_VALUE_ITEM_FLAG,
   WidgetDataDefineRequestHeaders,
   WidgetDataDefineRequestFormData,
   WidgetItemOptions,
@@ -38,7 +36,14 @@ import { cloneDeep } from 'lodash-es'
 import { isArray, isEmpty, isFunction, isString, isNullOrUnDef } from '@/utils/is'
 import { jsonParse } from '@/utils'
 import { useWidgetDefine } from './widgets'
-import { readValueByJsonPath, joinKeys, generateVid, copyValue } from '../common/utils'
+import {
+  DATA_EMPTY_NAME_FLAG,
+  DATA_VALUE_ITEM_FLAG,
+  readValueByJsonPath,
+  joinKeys,
+  generateVid,
+  copyValue
+} from '../common/utils'
 import { useDebounceFn, useThrottleFn } from '@vueuse/core'
 import {
   edgeInsetsDefine,

@@ -11,6 +11,7 @@
         :searchs="searchs"
         :searchActions="searchActions"
         :disableSetting="!!slots.tableBodySlot"
+        :searchActionsSpan="searchActionsSpan"
         @search="() => doSearch({ pageParams: { pageNo: 1 } })"
         @open-setting="() => openSetting()"
       >
@@ -138,6 +139,8 @@ export type QuerierTableEmits = {
 }
 
 const props = withDefaults(defineProps<QuerierTableProps>(), {
+  enableSearch: true,
+  enablePagination: true,
   defaultPageSize: 10,
   loadOnInit: true
 })
@@ -198,8 +201,12 @@ const rowKeyColumns = computed(() => props.columns?.filter((col) => col.rowKey) 
 
 const getRowKey = (row?: any): string | undefined => {
   if (!isNullOrUnDef(row)) {
-    const rowKeys = rowKeyColumns.value.map((col) => row[getTableBodyColumnProp(col)])
-    return !isEmpty(rowKeys) ? joinKeys(rowKeys) : (row.id ?? row.__key__)
+    if (props.rowKey) {
+      return props.rowKey(row)
+    } else {
+      const rowKeys = rowKeyColumns.value.map((col) => row[getTableBodyColumnProp(col)])
+      return !isEmpty(rowKeys) ? joinKeys(rowKeys) : (row.id ?? row.__key__)
+    }
   }
 }
 

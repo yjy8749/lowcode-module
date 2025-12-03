@@ -1,14 +1,14 @@
 <!-- index.render.vue -->
 <template>
   <ElFormItemWrapper v-bind="formItemAttrs">
-    <el-input v-bind="formInputAttrs" v-model.trim="valueModel">
+    <el-input-tag v-bind="formInputAttrs" :collapse-tags-tooltip="true" v-model="valueModel">
       <template v-if="prefixIcon" #prefix>
         <Icon :icon="prefixIcon" />
       </template>
       <template v-if="suffixIcon" #suffix>
         <Icon :icon="suffixIcon" />
       </template>
-    </el-input>
+    </el-input-tag>
   </ElFormItemWrapper>
 </template>
 <script lang="ts" setup>

@@ -2,15 +2,20 @@
 <template>
   <ElFormItemWrapper v-bind="formItemAttrs">
     <el-tree-select
+      v-bind="formInputAttrs"
       value-key="id"
       node-key="id"
       :data="treeData"
       :cache-data="treeCacheData"
       :load="loadLazy"
       :props="defaultProps"
-      v-bind="formInputAttrs"
+      :collapse-tags-tooltip="true"
       v-model="valueModel"
-    />
+    >
+      <template v-if="prefixIcon" #prefix>
+        <Icon :icon="prefixIcon" />
+      </template>
+    </el-tree-select>
   </ElFormItemWrapper>
 </template>
 <script lang="ts" setup>
@@ -21,12 +26,14 @@ import { defaultProps, handleTree } from '@/utils/tree'
 
 const props = defineProps<WidgetRenderProps>()
 
-const { useFormItemAttrs, useFormInputAttrs, usePropValue, valueModel, toEvalFunction } =
+const { formItemAttrs, valueModel, useFormInputAttrs, usePropValue, toEvalFunction } =
   useFormItemWidget(useWidget(props))
 
-const formItemAttrs = computed(() => useFormItemAttrs())
+const formInputAttrs = computed(() =>
+  useFormInputAttrs({ omit: ['prefixIcon', 'loadData', 'loadCacheData'] })
+)
 
-const formInputAttrs = computed(() => useFormInputAttrs({ omit: ['loadData', 'loadCacheData'] }))
+const prefixIcon = computed(() => usePropValue('prefixIcon'))
 
 const list = ref<any[]>([])
 
@@ -57,7 +64,7 @@ watch(
   { immediate: true }
 )
 
-onBeforeMount(async () => {
+onMounted(async () => {
   if (!formInputAttrs.value.lazy) {
     list.value = await loadDataFunction.value?.()
   }

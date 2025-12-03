@@ -7,7 +7,6 @@ const widget: WidgetDefine = {
   render: (args) => () => {
     return <Render {...args} />
   },
-  disableInner: true,
-  disableOuter: true
+  disableInner: true
 }
 export default widget

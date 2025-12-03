@@ -250,7 +250,7 @@ const extractVIfPermisValue = (list?: WidgetInstance[]) => {
         extractForItemValue(results, e.props.operationActions)
         extractForItemValue(results, e.props.rowActions)
       }
-      if (isWidgetInstanceOf(e, { _moduleName: 'advWidgetDefines', _key: 'easyTree' })) {
+      if (isWidgetInstanceOf(e, { _moduleName: 'baseWidgetDefines', _key: 'treeView' })) {
         //单独处理EasyTree
         extractForItemValue(results, e.props.createButton)
         extractForItemValue(results, e.props.menuButtons)

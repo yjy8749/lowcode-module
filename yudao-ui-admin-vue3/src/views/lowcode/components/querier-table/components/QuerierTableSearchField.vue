@@ -30,6 +30,7 @@
         :key="opt.label"
         :label="opt.label"
         :value="opt.value"
+        :disabled="opt.disabled"
       />
       <template #loading>
         <Icon icon="ep:loading" class="animate-spin animate-duration-3000" />
@@ -131,15 +132,44 @@
         @change="onNumberRangeChange"
       />
     </div>
+    <el-autocomplete
+      v-else-if="inputType === 'autocomplete'"
+      clearable
+      :placeholder="placeholder"
+      :fetch-suggestions="fetchSuggestionsLoad"
+      v-model.trim="valueVModel"
+      @clear="onFieldClear"
+    />
+    <el-cascader
+      v-else-if="inputType === 'cascader'"
+      clearable
+      :collapse-tags="collapseTags"
+      :collapse-tags-tooltip="collapseTags"
+      :max-collapse-tags="maxCollapseTags"
+      :placeholder="placeholder"
+      :props="cascaderProps"
+      :show-all-levels="showAllLevels"
+      :filterable="filterable"
+      :before-filter="cascaderBeforeFilter"
+      :options="cascaderOptions"
+      v-model="valueVModel"
+      @clear="onFieldClear"
+      @blur="cascaderOnBlur"
+    >
+      <template v-if="loading" #prefix>
+        <Icon icon="ep:loading" class="animate-spin animate-duration-3000" />
+      </template>
+    </el-cascader>
   </el-form-item>
 </template>
 <script lang="ts" setup>
 import { isNullOrUnDef, isEmpty } from '@/utils/is'
-import { computedVModel } from '../../common/hooks'
+import { computedVModel, useScopeLoading } from '../../common/hooks'
 import TextLabel from '../../common/TextLabel.vue'
 import { ALL_OPTIONS_VALUE, QuerierTableSearchFieldProps } from '../querier-table.type'
 import { getStrDictOptions } from '@/utils/dict'
 import { defaultProps, handleTree } from '@/utils/tree'
+import { useDebounceFn } from '@vueuse/core'
 
 const ALL_OPTION_ITEM = { label: '全部', value: ALL_OPTIONS_VALUE }
 
@@ -180,16 +210,8 @@ const { valueVModel } = computedVModel({
 
 const placeholder = computed(() => props.placeholder ?? `按${props.label}搜索`)
 
-const loading = ref(false)
-
-const callWithLoading = async (fn: () => Promise<any>) => {
-  try {
-    loading.value = true
-    await fn()
-  } finally {
-    loading.value = false
-  }
-}
+// 组件 loading
+const { loading, callWithLoading } = useScopeLoading()
 
 // select
 
@@ -235,7 +257,7 @@ const treeDataLoad = async () => {
 const treeDataFilterMethod = (query?: string) => {
   callWithLoading(async () => {
     treeDataList.value = []
-    nextTick(async () => {
+    await nextTick(async () => {
       if (isEmpty(query)) {
         treeDataList.value = (await props.load?.()) ?? []
       } else {
@@ -321,6 +343,72 @@ const onNumberRangeChange = () => {
   valueVModel.value = [minNumberValue.value, maxNumberValue.value]
 }
 
+// autocomplete
+
+const fetchSuggestionsLoad = (queryString: string, callback: Function) => {
+  if (props.fetchSuggestions) {
+    props
+      .fetchSuggestions(queryString)
+      .then((resp) => {
+        callback(resp)
+      })
+      .catch(() => {
+        callback([])
+      })
+  } else {
+    callback([])
+  }
+}
+
+// cascader
+
+const cascaderProps = computed(() => {
+  return {
+    multiple: props.multiple,
+    checkStrictly: props.checkStrictly,
+    lazy: props.lazy,
+    lazyLoad: cascaderOptionsLazyLoad
+  }
+})
+
+const cascaderOptions = ref<any[]>([])
+
+const cascaderOptionsLoad = async () => {
+  cascaderOptions.value = []
+  await callWithLoading(async () => {
+    if (props.load) {
+      cascaderOptions.value.push(...(await props.load()))
+    }
+  })
+}
+
+const cascaderOptionsLazyLoad = (node, callback) => {
+  callWithLoading(async () => {
+    callback((await props.load?.(node)) ?? [])
+  })
+}
+
+const cascaderFilterMethod = useDebounceFn(async (query?: string) => {
+  await callWithLoading(async () => {
+    cascaderOptions.value = []
+    await nextTick(async () => {
+      cascaderOptions.value = (await props.filterMethod?.(query)) ?? []
+    })
+  })
+})
+const cascaderBeforeFilter = (query?: string) => {
+  cascaderFilterMethod(query)
+  return false
+}
+
+const cascaderOnBlur = () => {
+  if (!props.lazy) {
+    cascaderOptionsLoad()
+  } else {
+    cascaderOptions.value = []
+  }
+}
+
 onMounted(async () => {
   if (props.inputType == 'select') {
     if (props.remote) {
@@ -341,6 +429,10 @@ onMounted(async () => {
       radioCheckboxRemoteLoad()
     } else {
       radioCheckboxDictLoad()
+    }
+  } else if (props.inputType == 'cascader') {
+    if (!props.lazy) {
+      cascaderOptionsLoad()
     }
   }
 })

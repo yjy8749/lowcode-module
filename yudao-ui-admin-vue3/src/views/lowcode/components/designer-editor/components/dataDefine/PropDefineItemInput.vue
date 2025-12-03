@@ -79,9 +79,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { generateVid } from '../../../common/utils'
+import { DATA_EMPTY_NAME_FLAG, DATA_VALUE_ITEM_FLAG, generateVid } from '../../../common/utils'
 import { computedVModel } from '../../../common/hooks'
-import { DATA_VALUE_ITEM_FLAG, WidgetDataDefinePropDefine } from '../../designer-editor.type'
+import { WidgetDataDefinePropDefine } from '../../designer-editor.type'
 import DataPropDefineInput from './DataPropDefineInput.vue'
 
 const valueItemFlag = DATA_VALUE_ITEM_FLAG
@@ -175,7 +175,9 @@ const onTypeChange = () => {
 
 const onItemTypeChange = () => {
   if (valueVModel.value.itemType == 'array') {
-    valueVModel.value.itemDefines = [{ _vid: generateVid(), name: '-', type: 'array' }]
+    valueVModel.value.itemDefines = [
+      { _vid: generateVid(), name: DATA_EMPTY_NAME_FLAG, type: 'array' }
+    ]
   } else {
     valueVModel.value.itemDefines = undefined
   }

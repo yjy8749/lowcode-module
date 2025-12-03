@@ -1,14 +1,18 @@
 <!-- index.render.vue -->
 <template>
   <ElFormItemWrapper v-bind="formItemAttrs">
-    <el-input v-bind="formInputAttrs" v-model.trim="valueModel">
+    <el-autocomplete
+      v-bind="formInputAttrs"
+      :fetch-suggestions="fetchSuggestionsLoad"
+      v-model.trim="valueModel"
+    >
       <template v-if="prefixIcon" #prefix>
         <Icon :icon="prefixIcon" />
       </template>
       <template v-if="suffixIcon" #suffix>
         <Icon :icon="suffixIcon" />
       </template>
-    </el-input>
+    </el-autocomplete>
   </ElFormItemWrapper>
 </template>
 <script lang="ts" setup>
@@ -18,13 +22,29 @@ import { useFormItemWidget } from '../../hooks/useFormItemWidget'
 
 const props = defineProps<WidgetRenderProps>()
 
-const { formItemAttrs, valueModel, useFormInputAttrs, usePropValue } = useFormItemWidget(
-  useWidget(props)
-)
+const { formItemAttrs, valueModel, useFormInputAttrs, usePropValue, toEvalFunction } =
+  useFormItemWidget(useWidget(props))
 
 const formInputAttrs = computed(() => useFormInputAttrs({ omit: ['prefixIcon', 'suffixIcon'] }))
 
 const prefixIcon = computed(() => usePropValue('prefixIcon'))
 
 const suffixIcon = computed(() => usePropValue('suffixIcon'))
+
+const fetchSuggestions = computed(() => toEvalFunction(usePropValue('fetchSuggestions')))
+
+const fetchSuggestionsLoad = (queryString: string, callback: Function) => {
+  if (fetchSuggestions.value) {
+    fetchSuggestions
+      .value(queryString)
+      .then((resp) => {
+        callback(resp)
+      })
+      .catch(() => {
+        callback([])
+      })
+  } else {
+    callback([])
+  }
+}
 </script>

@@ -3,14 +3,44 @@ import { useDataDefineExecutor } from '../../components/dataDefine/hooks'
 import { DesignerEditor, EvalFnContext, WidgetInstance } from '../../designer-editor.type'
 import { buildConstVid, wrapEvalFunction } from '../../designer-editor.utils'
 import { useWidget } from './useWidget'
-import { textFormItemValidRules } from '../formWidgetDefines/utils'
-
 export function isFormWidget(widget: WidgetInstance): boolean {
   return widget._moduleName == 'formWidgetDefines'
 }
 
 export function getFormModelDataId(widget: WidgetInstance): string {
   return buildConstVid(widget, 'formModel')
+}
+
+export function isInputType(widget: WidgetInstance, _key: string): boolean {
+  return isFormWidget(widget) && _key == widget._key
+}
+
+export function customItemValidRules(widget: WidgetInstance): any[] {
+  const rules: any[] = []
+
+  // 自定义组件验证规则
+  if (isInputType(widget, 'input') || isInputType(widget, 'autocomplete')) {
+    const { props } = widget
+    if (!isNullOrUnDef(props.minlength) && props.minlength > 0) {
+      rules.push({
+        min: props.minlength,
+        message: `不能少于${props.minlength}个字`,
+        trigger: 'change'
+      })
+    }
+    if (!isNullOrUnDef(props.maxlength) && props.maxlength > 0) {
+      rules.push({
+        max: props.maxlength,
+        message: `不能多于${props.maxlength}个字`,
+        trigger: 'change'
+      })
+    }
+    if (!isNullOrUnDef(props.textPattern)) {
+      rules.push(JSON.parse(props.textPattern))
+    }
+  }
+
+  return rules
 }
 
 // 构建表单校验规则
@@ -31,7 +61,7 @@ function buildItemRules(
     }
   }
   //添加文本组件校验规则
-  rules.push(...textFormItemValidRules(widget))
+  rules.push(...customItemValidRules(widget))
   //添加自定义校验规则
   if (props.isCustomValid && !isEmpty(props.customValidFun?.evalFunction)) {
     const evalFn = wrapEvalFunction(editor, props.customValidFun, evalFnContext)

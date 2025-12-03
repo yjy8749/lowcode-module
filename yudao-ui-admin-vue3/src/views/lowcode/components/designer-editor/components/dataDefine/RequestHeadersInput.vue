@@ -18,7 +18,7 @@
 <script lang="ts" setup>
 import { WidgetDataDefineRequestHeaders } from '../../designer-editor.type'
 import ArrayValueInput from '../../../common/ArrayValueInput.vue'
-import MultiValueInput from '../propInput/MultiValueInput.vue'
+import MultiValueInput from '../../../common/MultiValueInput.vue'
 import { computedVModel } from '../../../common/hooks'
 
 export interface RequestHeadersInputProps {

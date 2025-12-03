@@ -1,18 +1,20 @@
 <template>
   <div class="w-full flex justify-between gap-1">
-    <el-input
-      v-for="propKey in keys"
-      :key="propKey"
-      :placeholder="placeholderFn(propKey)"
-      :clearable="clearable"
-      v-model="valueVModel[propKey]"
-      @change="triggerUpdate"
-    />
+    <template v-for="propKey in keys" :key="propKey">
+      <slot v-if="slots[propKey]" :name="propKey"></slot>
+      <el-input
+        v-else
+        :placeholder="placeholderFn(propKey)"
+        :clearable="clearable"
+        v-model="valueVModel[propKey]"
+        @change="triggerUpdate"
+      />
+    </template>
   </div>
 </template>
 <script lang="ts" setup>
 import { isArray, isFunction } from '@/utils/is'
-import { computedVModel } from '../../../common/hooks'
+import { computedVModel } from './hooks'
 
 export interface MultiValueInputProps {
   keys: string[]
@@ -25,6 +27,8 @@ export type MultiValueInputEmits = {
   'update:modelValue': [val?: object]
   change: [val?: object]
 }
+
+const slots = useSlots()
 
 const props = withDefaults(defineProps<MultiValueInputProps>(), {
   modelValue: () => ({})

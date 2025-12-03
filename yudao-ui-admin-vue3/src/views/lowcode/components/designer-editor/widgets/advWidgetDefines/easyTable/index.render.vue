@@ -44,6 +44,7 @@ const {
 const tableAttrs = computed(() => {
   return {
     ...usePropObject(
+      'helps',
       'columns',
       'height',
       'enableSearch',
@@ -65,7 +66,8 @@ const tableAttrs = computed(() => {
         remoteMethod: toEvalFunction(e.remoteMethod),
         load: toEvalFunction(e.load),
         filterMethod: toEvalFunction(e.filterMethod),
-        disabledDate: toEvalFunction(e.disabledDate)
+        disabledDate: toEvalFunction(e.disabledDate),
+        fetchSuggestions: toEvalFunction(e.fetchSuggestions)
       }
     }),
     searchActions: toActionButtonProps(usePropValue('searchActions')),
@@ -110,7 +112,7 @@ const onTableDataChange = (data: any[]) => {
   tableDataValue.value = data
 }
 
-const loadData = async (params) => {
+const loadData = async (data: any) => {
   return await requestDataDefine(
     props.editor,
     createDataDefine({
@@ -122,13 +124,13 @@ const loadData = async (params) => {
       isShowSuccessMsg: false
     }),
     {
-      requestBody: params
+      requestBody: data
     }
   )
 }
 
 exposeContext({
-  refresh,
+  refresh: () => refresh(),
   tableRef: () => tableRef.value,
   isSelectable: () => tableAttrs.value.selectable
 })

@@ -43,6 +43,17 @@ const setupDataResults = () => {
 }
 
 watch(
+  () => editor.getPageParams(),
+  () => {
+    const dataDefine = dataDefines.value?.find((d) => d._vid == getPageParamsDataId(props.widget))
+    if (!isNullOrUnDef(dataDefine)) {
+      const { value } = useDataDefineExecutor(editor, { dataDefine })
+      value.value = editor.getPageParams() ?? {}
+    }
+  }
+)
+
+watch(
   () => dataDefines.value,
   () => setupDataResults(),
   { immediate: true }

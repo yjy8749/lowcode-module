@@ -26,7 +26,7 @@ import { checkPermi } from '@/utils/permission'
 import { computedAsync } from '@vueuse/core'
 import { getForItemDataId } from '../codeWidgetDefines/vforDefine/utils'
 import { ActionButtonProps } from '../../../common/ActionButton.vue'
-import { isPromise } from '../../../common/utils'
+import { DATA_ROOT_ITEM_FLAG, isPromise } from '../../../common/utils'
 
 export type WidgetRenderProps = WidgetRenderPropsType
 
@@ -107,7 +107,7 @@ export function useWidget(props: WidgetRenderProps) {
               refDataId: getForItemDataId(vforWidget),
               refWidgetId: vforWidget._vid
             },
-            refPropKey: '#'
+            refPropKey: DATA_ROOT_ITEM_FLAG
           }
         ]
       })

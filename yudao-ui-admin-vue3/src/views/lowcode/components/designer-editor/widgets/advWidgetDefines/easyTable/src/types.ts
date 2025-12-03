@@ -1,5 +1,6 @@
 import {
   QuerierTableBodyColumnProps,
+  QuerierTableHelpTextProps,
   QuerierTableSearchFieldProps
 } from '../../../../../querier-table/querier-table.type'
 import {
@@ -43,6 +44,7 @@ export interface EasyTableFormModel {
   itemSelectableFunction?: DesignerEditorEvalFunction
   loadOnInit?: boolean
   defaultParamsFunction?: DesignerEditorEvalFunction
+  helps?: QuerierTableHelpTextProps[]
 }
 
 export type EasyTableSearchFieldProps = {
@@ -50,7 +52,11 @@ export type EasyTableSearchFieldProps = {
   load?: DesignerEditorEvalFunction
   filterMethod?: DesignerEditorEvalFunction
   disabledDate?: DesignerEditorEvalFunction
-} & Omit<QuerierTableSearchFieldProps, 'remoteMethod' | 'load' | 'filterMethod' | 'disabledDate'>
+  fetchSuggestions?: DesignerEditorEvalFunction
+} & Omit<
+  QuerierTableSearchFieldProps,
+  'remoteMethod' | 'load' | 'filterMethod' | 'disabledDate' | 'fetchSuggestions'
+>
 
 export type EasyTableBodyColumnProps = QuerierTableBodyColumnProps
 
@@ -84,8 +90,16 @@ export const SearchFieldInputTypeOptions = [
     value: 'date-picker'
   },
   {
-    label: 'NumberRange 数字范围输入',
+    label: '数字范围输入',
     value: 'number-range'
+  },
+  {
+    label: '自动补全输入框',
+    value: 'autocomplete'
+  },
+  {
+    label: 'Cascader 级联选择',
+    value: 'cascader'
   }
 ]
 

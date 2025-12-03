@@ -31,8 +31,6 @@
 <script lang="ts" setup>
 import { isNullOrUnDef } from '@/utils/is'
 import {
-  DATA_ROOT_ITEM_FLAG,
-  DATA_EMPTY_NAME_FLAG,
   WidgetDataDefinePropDefine,
   WidgetDataDefinePropType,
   WidgetPropDefineBindBind,
@@ -41,6 +39,7 @@ import {
 } from '../../designer-editor.type'
 import { useDataDefine } from '../../designer-editor.utils'
 import { computedVModel } from '../../../common/hooks'
+import { DATA_ROOT_ITEM_FLAG, DATA_EMPTY_NAME_FLAG } from '../../../common/utils'
 
 export interface DataRefBindBaseInputProps {
   editor: DesignerEditor
@@ -103,7 +102,7 @@ const { valueVModel, triggerUpdate } = computedVModel({
 })
 
 const onBindChange = () => {
-  valueVModel.value.refPropKey = '#'
+  valueVModel.value.refPropKey = DATA_ROOT_ITEM_FLAG
   triggerUpdate()
 }
 </script>

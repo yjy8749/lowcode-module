@@ -2,6 +2,7 @@
 import Render from './index.render.vue'
 import { CommonTextPattern, WidgetDefine } from '../../../designer-editor.type'
 import {
+  evalFunctionDefine,
   eventDefine,
   inputDefine,
   inputNumberDefine,
@@ -9,9 +10,10 @@ import {
   switchDefine
 } from '../../../designer-editor.props'
 import { formItemAdvDefine, formItemBaseDefine } from '../../hooks/useFormItemWidget'
+import { highlightTextHtml } from '../../../../common/utils'
 
 const widget: WidgetDefine = {
-  label: '输入框Input',
+  label: '自动补全输入框',
   icon: 'ep:edit',
   render: (args) => () => {
     return <Render {...args} />
@@ -24,6 +26,13 @@ const widget: WidgetDefine = {
     inputNumberDefine({ key: 'minlength', label: '最小长度' }, { min: 0 }),
     inputNumberDefine({ key: 'maxlength', label: '最大长度' }, { min: 0 }),
     selectDefine({ key: 'textPattern', label: '文本格式' }, CommonTextPattern),
+    evalFunctionDefine(
+      { key: 'fetchSuggestions', label: '输入建议函数' },
+      {
+        helps: `${highlightTextHtml('$args[0]')} 为查询值\n返回建议数组 ${highlightTextHtml('{  value }')}`,
+        defaultFunction: '/** 返回 { value } 数组 */\n' + 'return Promise.resolve([])'
+      }
+    ),
     switchDefine({ key: 'autofocus', label: '是否自动获取焦点' }),
     ...formItemBaseDefine(),
     inputDefine({ key: 'placeholder', label: '输入提示文本' }),

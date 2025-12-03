@@ -8,6 +8,7 @@ import {
   selectDefine,
   switchDefine
 } from '../../../designer-editor.props'
+import { transformOptions } from '../../../../common/utils'
 
 const widget: WidgetDefine = {
   label: '提示Alert',
@@ -18,7 +19,7 @@ const widget: WidgetDefine = {
   baseDesignerProps: [
     selectDefine(
       { key: 'type', label: '提示类型' },
-      ElCommonTypeOptions.map((e) => (e.value == 'danger' ? { label: '错误', value: 'error' } : e))
+      transformOptions(ElCommonTypeOptions, { danger: { label: '错误', value: 'error' } })
     ),
     switchDefine({ key: 'center', label: '文字是否居中' }),
     switchDefine({ key: 'closable', label: '是否可以关闭', defaultValue: false }),

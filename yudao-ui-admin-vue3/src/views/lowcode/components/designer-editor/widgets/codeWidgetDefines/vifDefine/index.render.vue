@@ -22,7 +22,5 @@ const { usePropValue, isPreviewMode, useDefaultSlot } = useWidget(props)
 
 const defaultSlotWidget = computed(() => useDefaultSlot())
 
-const showConditionValue = computed(() => usePropValue('showConditionValue'))
-
-const isShow = computed(() => showConditionValue.value ?? !isPreviewMode.value)
+const isShow = computed(() => (isPreviewMode.value ? usePropValue('vifValue') : true))
 </script>
