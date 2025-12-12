@@ -64,6 +64,6 @@
 > 如果你觉得本项目对你有帮助，欢迎请作者喝杯咖啡 ☕️ 表示鼓励！
 
 <div style="display: flex;justify-content: space-between;">
-    <img src="/wechat_pay_code.jpg" width="300" />
-    <img src="/alipay_pay_code.png" width="300"/>
+    <img src="https://www.yangjiayong.com/wechat_pay_code.jpg" width="300" />
+    <img src="https://www.yangjiayong.com/alipay_pay_code.png" width="300"/>
 </div>
