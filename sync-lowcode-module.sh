@@ -64,16 +64,16 @@ echo "   - 结果目录: lowcode-module/yudao-ui-admin-vue3"
 cd lowcode-ruoyi-vue-pro 
 git remote add origin2 git@github.com:yjy8749/lowcode-ruoyi-vue-pro.git
 git push origin2
-git git remote remove origin2
+git remote remove origin2
 cd ..
 
 cd lowcode-yudao-ui-admin-vue3
 git remote add origin2 git@github.com:yjy8749/lowcode-yudao-ui-admin-vue3.git
 git push origin2
-git git remote remove origin2
+git remote remove origin2
 cd ..
 
 cd lowcode-module
 git remote add origin2 git@github.com:yjy8749/lowcode-module.git
 git push origin2
-git git remote remove origin2
+git remote remove origin2
