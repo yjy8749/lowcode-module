@@ -83,16 +83,13 @@ export default defineComponent({
         evalFunctionDefine(
           {
             key: WIDGET_VIF_FUNCTION_KEY,
-            label: '是否渲染并显示(v-if)',
+            label: '是否显示(v-if)',
             bindable: true,
             onSave: saveWidgetValue
           },
           {
             type: 'simple-function',
-            defaultFunction:
-              '/** 支持同步或异步返回结果 */\n' +
-              '/** return Promise.resolve(true) */\n' +
-              'return true'
+            defaultFunction: '/** 同步或异步返回 */\n' + 'return true'
           }
         )
       ].map((define) => {

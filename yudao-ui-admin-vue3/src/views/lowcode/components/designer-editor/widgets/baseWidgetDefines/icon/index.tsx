@@ -15,7 +15,10 @@ const widget: WidgetDefine = {
     return <Render {...args} />
   },
   baseDesignerProps: [
-    inputDefine({ key: 'icon', label: '图标名称', defaultValue: 'ep:warning-filled' }),
+    inputDefine(
+      { key: 'icon', label: '图标名称', defaultValue: 'ep:warning-filled' },
+      { _iconInput: true }
+    ),
     colorPickerDefine({ key: 'color', label: '图标颜色' }),
     inputNumberDefine({ key: 'size', label: '图标尺寸' })
   ],

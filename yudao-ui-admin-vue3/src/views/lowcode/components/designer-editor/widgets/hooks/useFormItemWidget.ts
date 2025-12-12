@@ -6,10 +6,9 @@ import {
   radioButtonDefine,
   switchDefine
 } from '../../designer-editor.props'
-import { isNullOrUnDef, isEmpty } from '@/utils/is'
-import { computedAsync } from '@vueuse/core'
+import { isEmpty, isObject } from '@/utils/is'
 import { CssSymbols } from '../../designer-editor.type'
-import { highlightTextHtml } from '../../../common/utils'
+import { highlightTextHtml, isPromise } from '../../../common/utils'
 
 const LabelControlOptions = [
   { label: '隐藏标签', value: 'hide' },
@@ -30,7 +29,18 @@ export function formItemBaseDefine() {
       isShow: ({ widget }) => widget.props.required
     }),
     inputDefine({ key: 'helps', label: '帮助文本' }),
-    switchDefine({ key: 'helpsAlwaysShow', label: '帮助文本是否一直显示' })
+    switchDefine({ key: 'helpsAlwaysShow', label: '帮助文本是否一直显示' }),
+    evalFunctionDefine(
+      {
+        key: 'defaultValue',
+        label: '默认值加载函数',
+        helps: `表单默认值设置，也可通过表单数据设置`
+      },
+      {
+        type: 'simple-function',
+        defaultFunction: '/** 同步或异步返回默认值 */\n' + 'return 默认值'
+      }
+    )
   ]
 }
 
@@ -51,20 +61,27 @@ export function formItemAdvDefine() {
     inputDefine({ key: 'label', label: '标签文本', defaultValue: '标签名称' }),
     inputDefine({ key: 'prop', label: '绑定属性', helps: '校验规则要生效必须绑定属性' }),
     evalFunctionDefine(
-      { key: 'propReadFun', label: '自定义读取函数' },
       {
-        helps: `${highlightTextHtml('$args[0]')} 为表单 属性值`,
-        defaultFunction: '/** 返回读取表单的数据 */\n' + 'return Promise.resolve($args[0])'
+        key: 'propReadFun',
+        label: '自定义读取函数',
+        helps: `用于 ${highlightTextHtml('valueModel')} 返回普通对象会失去响应式`
+      },
+      {
+        type: 'simple-function',
+        helps: `用于数据转换，${highlightTextHtml('$args[0]')} 为表单绑定属性值, ${highlightTextHtml('$args[1]')} 为表单数据`,
+        defaultFunction: '/** 同步返回结果 */\n' + 'return $args[0]'
       }
     ),
     evalFunctionDefine(
       {
         key: 'propWriteFun',
-        label: '自定义写入函数'
+        label: '自定义写入函数',
+        helps: `对于 ${highlightTextHtml('valueModel')} 要触发需始终整体赋值`
       },
       {
-        helps: `${highlightTextHtml('$args[0]')} 为写入 属性值`,
-        defaultFunction: '/** 返回写入表单的数据 */\n' + 'return Promise.resolve($args[0])'
+        type: 'simple-function',
+        helps: `用于数据转换，${highlightTextHtml('$args[0]')} 为写入属性值, ${highlightTextHtml('$args[1]')} 为表单数据`,
+        defaultFunction: '/** 同步返回结果 */\n' + 'return $args[0]'
       }
     ),
     switchDefine({ key: 'isCustomValid', label: '是否自定义校验规则' }),
@@ -75,8 +92,9 @@ export function formItemAdvDefine() {
         isShow: ({ widget }) => widget.props.isCustomValid
       },
       {
-        helps: `${highlightTextHtml('$args[0]')} 为属性值,${highlightTextHtml('$args[1]')} 为表单数据`,
-        defaultFunction: '/** 返回校验结果不通过返回错误信息 */\n' + 'return Promise.resolve()'
+        type: 'simple-function',
+        helps: `${highlightTextHtml('$args[0]')} 为表单绑定属性值, ${highlightTextHtml('$args[1]')} 为表单数据`,
+        defaultFunction: '/** 同步或异步返回校验结果 */\n' + 'return Promise.resolve()'
       }
     )
   ]
@@ -144,25 +162,31 @@ export function useFormItemWidget(props: ReturnType<typeof useWidget>) {
 
   const propWriteFun = computed(() => toEvalFunction(usePropValue('propWriteFun')))
 
-  const valueModelAsync = computedAsync(() => {
-    const formModel = formContext.value?.formModel()
-    const val = formModel.value?.[propKey.value]
-    return !isNullOrUnDef(propReadFun.value) ? propReadFun.value(val) : val
-  })
-
   const valueModel = computed({
     get() {
-      return valueModelAsync.value
+      const formModel = formContext.value?.formModel()
+      const val = formModel.value?.[propKey.value]
+      const readVal = propReadFun.value?.(val, formModel.value)
+      if (isPromise(readVal)) {
+        throw new Error('propReadFun 必须为同步函数')
+      }
+      return readVal ?? val
     },
     set(val?: any) {
       if (formContext.value) {
         const formModel = formContext.value.formModel()
-        if (!isNullOrUnDef(propWriteFun.value)) {
-          propWriteFun.value(val).then((result) => {
-            formModel.value[propKey.value] = result
-          })
+        const writeVal = propWriteFun.value?.(val, formModel.value)
+        if (isPromise(writeVal)) {
+          throw new Error('propWriteFun 必须为同步函数')
+        }
+        if (writeVal && isObject(writeVal)) {
+          for (const key in writeVal) {
+            if (Object.hasOwn(writeVal, key)) {
+              formModel.value[key] = writeVal[key]
+            }
+          }
         } else {
-          formModel.value[propKey.value] = val
+          formModel.value[propKey.value] = writeVal ?? val
         }
       }
     }
@@ -188,6 +212,7 @@ export function useFormItemWidget(props: ReturnType<typeof useWidget>) {
     ...props,
     form,
     formContext,
+    useFormModel: () => formContext.value?.formModel(),
     useFormItemAttrs,
     formItemAttrs: computed(() => useFormItemAttrs()),
     useFormInputAttrs,

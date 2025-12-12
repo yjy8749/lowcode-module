@@ -1,5 +1,4 @@
 // index.tsx
-import { highlightTextHtml } from '../../../../common/utils'
 import Render from './index.render.vue'
 import { WidgetDefine } from '../../../designer-editor.type'
 import {
@@ -8,10 +7,11 @@ import {
   inputNumberDefine,
   switchDefine
 } from '../../../designer-editor.props'
+import { formItemAdvDefine, formItemBaseDefine } from '../../hooks/useFormItemWidget'
 
 const widget: WidgetDefine = {
-  label: '上传Button',
-  icon: 'ep:upload-filled',
+  label: '文件上传',
+  icon: 'ep:edit',
   render: (args) => () => {
     return <Render {...args} />
   },
@@ -19,23 +19,12 @@ const widget: WidgetDefine = {
     inputDefine({ key: 'fileType', label: '文件类型', isArray: true }),
     inputNumberDefine({ key: 'fileSize', label: '大小限制(MB)' }),
     inputNumberDefine({ key: 'limit', label: '数量限制', defaultValue: 1 }),
-    switchDefine({
-      key: 'autoJoin',
-      label: '是否逗号拼接',
-      isShow: ({ widget }) => (widget.props.limit ?? 1) > 1
-    }),
     switchDefine({ key: 'drag', label: '是否拖拽上传' }),
     switchDefine({ key: 'isShowTip', label: '是否显示提示', defaultValue: true }),
-    switchDefine({ key: 'hiddenFileList', label: '是否隐藏文件列表' }),
-    inputDefine({ key: 'directory', label: '上传目录' })
+    inputDefine({ key: 'directory', label: '上传目录' }),
+    ...formItemBaseDefine()
   ],
-  advDesignerProps: [],
-  events: [
-    eventDefine('upload-success', {
-      type: 'simple-function',
-      label: '上传成功',
-      fnHelps: `${highlightTextHtml('$args[0]')}, 为文件上传成功后地址, 数量限制大于1时为数组`
-    })
-  ]
+  advDesignerProps: formItemAdvDefine(),
+  events: [eventDefine('change', { label: '值改变' })]
 }
 export default widget

@@ -11,16 +11,16 @@ import {
 import { formItemAdvDefine, formItemBaseDefine } from '../../hooks/useFormItemWidget'
 
 const widget: WidgetDefine = {
-  label: '数字输入InputNumber',
+  label: 'Input Number 数字输入框',
   icon: 'ep:edit',
   render: (args) => () => {
     return <Render {...args} />
   },
   baseDesignerProps: [
-    inputDefine({ key: 'decreaseIcon', label: '减少图标' }),
-    inputDefine({ key: 'increaseIcon', label: '增加图标' }),
-    inputDefine({ key: 'prefixIcon', label: '前缀图标' }),
-    inputDefine({ key: 'suffixIcon', label: '后缀图标' }),
+    inputDefine({ key: 'decreaseIcon', label: '减少图标' }, { _iconInput: true }),
+    inputDefine({ key: 'increaseIcon', label: '增加图标' }, { _iconInput: true }),
+    inputDefine({ key: 'prefixIcon', label: '前缀图标' }, { _iconInput: true }),
+    inputDefine({ key: 'suffixIcon', label: '后缀图标' }, { _iconInput: true }),
     inputNumberDefine({ key: 'min', label: '最小值', defaultValue: 0 }),
     inputNumberDefine({ key: 'max', label: '最大值' }),
     inputNumberDefine({ key: 'step', label: '步长', defaultValue: 1 }),
@@ -49,9 +49,8 @@ const widget: WidgetDefine = {
       { _cancelable: true }
     ),
     switchDefine({ key: 'fullWidth', label: '是否宽度自适应' }),
-    ...formItemBaseDefine(),
     inputDefine({ key: 'placeholder', label: '输入提示文本' }),
-    inputDefine({ key: 'defaultValue', label: '默认值' })
+    ...formItemBaseDefine()
   ],
   advDesignerProps: formItemAdvDefine(),
   events: [eventDefine('change', { label: '值改变' })]

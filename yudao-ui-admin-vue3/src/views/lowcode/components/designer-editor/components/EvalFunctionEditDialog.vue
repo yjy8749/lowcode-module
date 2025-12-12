@@ -8,6 +8,7 @@
       :type="dialogArgs.type"
       :helps="dialogArgs.helps"
       :default-function="dialogArgs.defaultFunction"
+      :set-default-function="true"
       v-model="evalFunctionValue"
     />
     <template #footer>
@@ -57,9 +58,6 @@ const doConfirm = async () => {
 const open = async (args: EvalFunctionEditDialogArgs) => {
   dialogArgs.value = args
   evalFunctionValue.value = { ...args.value }
-  if (isEmpty(args.value?.evalFunction)) {
-    evalFunctionValue.value.evalFunction = ''
-  }
   dialogVisible.value = true
 }
 

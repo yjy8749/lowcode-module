@@ -1,7 +1,11 @@
 <!-- index.render.vue -->
 <template>
   <ElFormItemWrapper v-bind="formItemAttrs">
-    <el-input v-bind="formInputAttrs" v-model.trim="valueModel">
+    <el-input
+      v-bind="formInputAttrs"
+      :show-password="formInputAttrs.type == 'password'"
+      v-model.trim="valueModel"
+    >
       <template v-if="prefixIcon" #prefix>
         <Icon :icon="prefixIcon" />
       </template>
@@ -22,7 +26,14 @@ const { formItemAttrs, valueModel, useFormInputAttrs, usePropValue } = useFormIt
   useWidget(props)
 )
 
-const formInputAttrs = computed(() => useFormInputAttrs({ omit: ['prefixIcon', 'suffixIcon'] }))
+const formInputAttrs = computed(() => {
+  const attrs = useFormInputAttrs({ omit: ['prefixIcon', 'suffixIcon'] })
+  return {
+    ...attrs,
+    rows: attrs.autosize ? undefined : attrs.rows,
+    autosize: attrs.autosize ? { minRows: attrs.minRows, maxRows: attrs.maxRows } : undefined
+  }
+})
 
 const prefixIcon = computed(() => usePropValue('prefixIcon'))
 

@@ -1,4 +1,5 @@
 import { useFormItem } from 'element-plus'
+import { isFunction } from 'min-dash'
 import { WritableComputedOptions, computed } from 'vue'
 
 export function computedVModel<T, S = T>(options: WritableComputedOptions<T, S>) {
@@ -29,19 +30,45 @@ export function computedVModel<T, S = T>(options: WritableComputedOptions<T, S>)
 }
 
 export function useScopeLoading() {
-  const loading = ref(false)
-
-  const callWithLoading = async (fn: () => Promise<any>) => {
+  const loadings = ref<Record<string, number>>({})
+  const callWithLoading = async (
+    key: string | (() => Promise<any>),
+    fn?: (() => Promise<any>) | boolean | (() => boolean),
+    ignore?: boolean | (() => boolean)
+  ) => {
+    if (isFunction(key)) {
+      ignore = fn as boolean | (() => boolean)
+      fn = key
+      key = 'default'
+    }
+    if (ignore && isFunction(ignore)) {
+      ignore = ignore()
+    }
+    if (ignore) {
+      await (fn as () => Promise<any>)?.()
+      return
+    }
+    if (loadings.value[key] === undefined) {
+      loadings.value[key] = 0
+    }
+    loadings.value[key]++
     try {
-      loading.value = true
-      await fn()
+      await (fn as () => Promise<any>)?.()
     } finally {
-      loading.value = false
+      loadings.value[key]--
+      if (loadings.value[key] <= 0) {
+        loadings.value[key] = 0
+      }
     }
   }
 
+  const isLoading = (key?: string) => loadings.value[key ?? 'default'] > 0
+
+  const loading = computed(() => isLoading())
+
   return {
     loading,
+    isLoading,
     callWithLoading
   }
 }

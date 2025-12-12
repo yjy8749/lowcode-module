@@ -49,13 +49,25 @@ export interface EasyTableFormModel {
 
 export type EasyTableSearchFieldProps = {
   remoteMethod?: DesignerEditorEvalFunction
-  load?: DesignerEditorEvalFunction
+  loadData?: DesignerEditorEvalFunction
   filterMethod?: DesignerEditorEvalFunction
   disabledDate?: DesignerEditorEvalFunction
+  shortcuts?: DesignerEditorEvalFunction
   fetchSuggestions?: DesignerEditorEvalFunction
+  lazyLoad?: DesignerEditorEvalFunction
+  activeValue?: DesignerEditorEvalFunction
+  inactiveValue?: DesignerEditorEvalFunction
 } & Omit<
   QuerierTableSearchFieldProps,
-  'remoteMethod' | 'load' | 'filterMethod' | 'disabledDate' | 'fetchSuggestions'
+  | 'remoteMethod'
+  | 'loadData'
+  | 'filterMethod'
+  | 'disabledDate'
+  | 'shortcuts'
+  | 'fetchSuggestions'
+  | 'lazyLoad'
+  | 'activeValue'
+  | 'inactiveValue'
 >
 
 export type EasyTableBodyColumnProps = QuerierTableBodyColumnProps
@@ -90,7 +102,7 @@ export const SearchFieldInputTypeOptions = [
     value: 'date-picker'
   },
   {
-    label: '数字范围输入',
+    label: 'NumberRange 数字范围',
     value: 'number-range'
   },
   {

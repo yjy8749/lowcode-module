@@ -66,7 +66,7 @@
       :editor="editor"
       :widget="widget"
       :helps="helps"
-      :defaultFunction="`return true`"
+      :defaultFunction="'/** 同步或异步返回 */\n' + 'return true'"
       v-model="vIfFunValueVModel"
     />
     <EvalFunctionValueInput

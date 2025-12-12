@@ -3,7 +3,7 @@
   <ElFormItemWrapper v-bind="formItemAttrs">
     <el-input-number
       v-bind="formInputAttrs"
-      :class="{ '!w-full': isFullWidth }"
+      :class="{ '!w-full': fullWidth }"
       :disabled-scientific="true"
       :value-on-clear="formInputAttrs.defaultValue"
       v-model="valueModel"
@@ -41,8 +41,12 @@ const formInputAttrs = computed(() =>
 )
 
 const decreaseIcon = computed(() => usePropValue('decreaseIcon'))
+
 const increaseIcon = computed(() => usePropValue('increaseIcon'))
+
 const prefixIcon = computed(() => usePropValue('prefixIcon'))
+
 const suffixIcon = computed(() => usePropValue('suffixIcon'))
-const isFullWidth = computed(() => usePropValue('fullWidth'))
+
+const fullWidth = computed(() => usePropValue('fullWidth'))
 </script>

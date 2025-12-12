@@ -5,12 +5,12 @@
     </template>
     <slot v-if="$attrs.readonly && slots.readonly" name="readonly"></slot>
     <slot v-else></slot>
-    <span
+    <div
       v-if="!isEmpty($attrs.helps) && $attrs.helpsAlwaysShow"
-      class="text-12px mt-4px line-height-12px c-[--el-text-color-placeholder]"
+      class="w-full text-12px mt-1 line-height-12px c-[--el-text-color-placeholder]"
     >
       {{ $attrs.helps }}
-    </span>
+    </div>
   </el-form-item>
 </template>
 

@@ -20,6 +20,7 @@ import {
 } from '../designer-editor.props'
 import { createWidgetInstanceDefault, readEditorDataValue } from '../designer-editor.utils'
 import { writeEditorDataValueCmd } from '../designer-editor.cmd'
+import { highlightTextHtml } from '../../common/utils'
 
 function _withFileValue(define: WidgetPropDefine) {
   define.defaultValue = (editor) => editor.getStore().state.value.materialFileData?.[define.key]
@@ -103,10 +104,10 @@ const pageDefine: WidgetDefine = {
         {
           key: 'onPageClose',
           label: '编辑器关闭处理',
-          helps: '主动关闭编辑器触发函数,resolve返回结果触发 close 事件, reject不关闭'
+          helps: `可执行函数调用${highlightTextHtml('$close')}触发,可用于返回结果`
         },
         {
-          defaultFunction: '/** 异步返回结果 */\n' + "return Promise.resolve('返回结果')"
+          defaultFunction: '/** 异步返回 */\n' + "return Promise.resolve('结果')"
         }
       )
     )

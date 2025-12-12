@@ -15,7 +15,7 @@
       clearable
       :multiple="multiple"
       :collapse-tags="collapseTags"
-      :collapse-tags-tooltip="collapseTags"
+      :collapse-tags-tooltip="true"
       :max-collapse-tags="maxCollapseTags"
       :placeholder="placeholder"
       :filterable="filterable"
@@ -25,6 +25,9 @@
       v-model="valueVModel"
       @clear="onFieldClear"
     >
+      <template v-if="isLoading('prefix')" #prefix>
+        <Icon icon="ep:loading" class="animate-spin animate-duration-3000" />
+      </template>
       <el-option
         v-for="opt in selectOptions"
         :key="opt.label"
@@ -32,9 +35,6 @@
         :value="opt.value"
         :disabled="opt.disabled"
       />
-      <template #loading>
-        <Icon icon="ep:loading" class="animate-spin animate-duration-3000" />
-      </template>
     </el-select>
     <el-tree-select
       v-else-if="inputType === 'tree-select'"
@@ -43,22 +43,22 @@
       node-key="id"
       :multiple="multiple"
       :collapse-tags="collapseTags"
-      :collapse-tags-tooltip="collapseTags"
+      :collapse-tags-tooltip="true"
       :max-collapse-tags="maxCollapseTags"
       :placeholder="placeholder"
       :check-strictly="checkStrictly"
       :lazy="lazy"
+      :accordion="accordion"
+      :filterable="filterable"
       :props="defaultProps"
       :data="treeDataOptions"
       :load="treeDataLazyLoad"
-      :filterable="filterable"
       :filter-method="treeDataFilterMethod"
-      :accordion="accordion"
       :loading="loading"
       v-model="valueVModel"
       @clear="onFieldClear"
     >
-      <template #loading>
+      <template v-if="isLoading('prefix')" #prefix>
         <Icon icon="ep:loading" class="animate-spin animate-duration-3000" />
       </template>
     </el-tree-select>
@@ -66,14 +66,35 @@
       <template v-if="loading">
         <Icon icon="ep:loading" class="animate-spin animate-duration-3000" />
       </template>
+      <template v-else-if="isEmpty(radioCheckboxOptions)">
+        <div class="text-12px c-[--el-color-danger]">未配置选项</div>
+      </template>
+      <template v-else-if="props.showAsButton">
+        <el-radio-button
+          v-for="opt in radioCheckboxOptions"
+          :key="opt.label"
+          :value="opt.value"
+          :disabled="opt.disabled"
+          @click.stop.prevent="() => onRadioOptionClick(opt)"
+        >
+          <div class="flex items-center gap-1">
+            <Icon v-if="opt.icon" :icon="opt.icon" />
+            <span v-if="!props.onlyIcon">{{ opt.label }}</span>
+          </div>
+        </el-radio-button>
+      </template>
       <template v-else>
         <el-radio
           v-for="opt in radioCheckboxOptions"
           :key="opt.label"
           :value="opt.value"
-          @click="(e) => onRadioOptionClick(e, opt)"
+          :disabled="opt.disabled"
+          @click.stop.prevent="() => onRadioOptionClick(opt)"
         >
-          {{ opt.label }}
+          <div class="flex items-center gap-1">
+            <Icon v-if="opt.icon" :icon="opt.icon" />
+            <span v-if="!props.onlyIcon">{{ opt.label }}</span>
+          </div>
         </el-radio>
       </template>
     </el-radio-group>
@@ -81,30 +102,71 @@
       <template v-if="loading">
         <Icon icon="ep:loading" class="animate-spin animate-duration-3000" />
       </template>
+      <template v-else-if="isEmpty(radioCheckboxOptions)">
+        <div class="text-12px c-[--el-color-danger]">未配置选项</div>
+      </template>
+      <template v-else-if="props.showAsButton">
+        <el-checkbox-button
+          v-for="opt in radioCheckboxOptions"
+          :key="opt.label"
+          :value="opt.value"
+          :disabled="opt.disabled"
+          @click.stop.prevent="() => onRadioOptionClick(opt)"
+        >
+          <div class="flex items-center gap-1">
+            <Icon v-if="opt.icon" :icon="opt.icon" />
+            <span v-if="!props.onlyIcon">{{ opt.label }}</span>
+          </div>
+        </el-checkbox-button>
+      </template>
       <template v-else>
-        <el-checkbox v-for="opt in radioCheckboxOptions" :key="opt.label" :value="opt.value">
-          {{ opt.label }}
+        <el-checkbox
+          v-for="opt in radioCheckboxOptions"
+          :key="opt.label"
+          :value="opt.value"
+          :disabled="opt.disabled"
+          @click.stop.prevent="() => onRadioOptionClick(opt)"
+        >
+          <div class="flex items-center gap-1">
+            <Icon v-if="opt.icon" :icon="opt.icon" />
+            <span v-if="!props.onlyIcon">{{ opt.label }}</span>
+          </div>
         </el-checkbox>
       </template>
     </el-checkbox-group>
     <el-switch
       v-else-if="inputType === 'switch'"
+      :loading="loading"
+      :width="width"
+      :active-value="activeValue"
+      :inactive-value="inactiveValue"
+      :active-text="activeText"
+      :inactive-text="inactiveText"
       v-model="valueVModel"
-      :active-value="activeValue ?? true"
-      :inactive-value="inactiveValue ?? false"
-    />
+    >
+      <template v-if="activeIcon" #active-action>
+        <Icon :icon="activeIcon" />
+      </template>
+      <template v-if="inactiveIcon" #inactive-action>
+        <Icon :icon="inactiveIcon" />
+      </template>
+    </el-switch>
     <el-date-picker
       v-else-if="inputType === 'date-picker'"
+      class="!w-full"
       clearable
       editable
       :placeholder="placeholder"
-      :type="datePickerType"
+      :type="type"
       :format="format"
       :value-format="valueFormat"
-      :rangeSeparator="rangeSeparator"
+      :default-time="datePickerDefaultTime"
       :start-placeholder="startPlaceholder"
       :end-placeholder="endPlaceholder"
+      :rangeSeparator="rangeSeparator"
+      :shortcuts="datePickerShortcuts"
       :disabled-date="datePickerDisabledDate"
+      :prefix-icon="datePickerPrefixIcon"
       v-model="valueVModel"
       @clear="onFieldClear"
       @calendar-change="onDatePickerCalendarChange"
@@ -142,36 +204,54 @@
     />
     <el-cascader
       v-else-if="inputType === 'cascader'"
+      class="!w-full"
       clearable
       :collapse-tags="collapseTags"
-      :collapse-tags-tooltip="collapseTags"
+      :collapse-tags-tooltip="true"
       :max-collapse-tags="maxCollapseTags"
       :placeholder="placeholder"
-      :props="cascaderProps"
       :show-all-levels="showAllLevels"
       :filterable="filterable"
+      :props="cascaderProps"
       :before-filter="cascaderBeforeFilter"
       :options="cascaderOptions"
       v-model="valueVModel"
       @clear="onFieldClear"
-      @blur="cascaderOnBlur"
+      @visible-change="onCascaderVisibleChange"
     >
-      <template v-if="loading" #prefix>
+      <template v-if="isLoading('prefix')" #prefix>
+        <Icon icon="ep:loading" class="animate-spin animate-duration-3000" />
+      </template>
+      <template v-if="loading" #empty>
         <Icon icon="ep:loading" class="animate-spin animate-duration-3000" />
       </template>
     </el-cascader>
   </el-form-item>
 </template>
 <script lang="ts" setup>
-import { isNullOrUnDef, isEmpty } from '@/utils/is'
+import { isNullOrUnDef, isEmpty, isFunction } from '@/utils/is'
 import { computedVModel, useScopeLoading } from '../../common/hooks'
 import TextLabel from '../../common/TextLabel.vue'
 import { ALL_OPTIONS_VALUE, QuerierTableSearchFieldProps } from '../querier-table.type'
 import { getStrDictOptions } from '@/utils/dict'
 import { defaultProps, handleTree } from '@/utils/tree'
 import { useDebounceFn } from '@vueuse/core'
+import Icon from '@/components/Icon/src/Icon.vue'
 
 const ALL_OPTION_ITEM = { label: '全部', value: ALL_OPTIONS_VALUE }
+
+const isType = (...types: string[]) => {
+  return types.includes(props.type ?? '')
+}
+
+const refreshFlag = ref(true)
+
+const refresh = () => {
+  refreshFlag.value = false
+  nextTick(() => {
+    refreshFlag.value = true
+  })
+}
 
 export type QuerierTableSearchFieldEmits = {
   'update:modelValue': [val?: any]
@@ -192,17 +272,6 @@ const { valueVModel } = computedVModel({
     return props.modelValue
   },
   set(val) {
-    if (props.datePickerType == 'date' && props.valueFormat == 'YYYY-MM-DD') {
-      if (props.symbolType == 'LT' || props.symbolType == 'LE') {
-        val = `${val} 23:59:59`
-      } else if (props.symbolType == 'GT' || props.symbolType == 'GE') {
-        val = `${val} 00:00:00`
-      }
-    } else if (props.datePickerType == 'daterange' && props.valueFormat == 'YYYY-MM-DD') {
-      if (val && val.length == 2) {
-        val = [`${val[0]} 00:00:00`, `${val[1]} 23:59:59`]
-      }
-    }
     emits('update:modelValue', val)
     emits('change', val)
   }
@@ -211,37 +280,35 @@ const { valueVModel } = computedVModel({
 const placeholder = computed(() => props.placeholder ?? `按${props.label}搜索`)
 
 // 组件 loading
-const { loading, callWithLoading } = useScopeLoading()
+const { loading, isLoading, callWithLoading } = useScopeLoading()
 
 // select
 
 const selectOptions = ref<any[]>([ALL_OPTION_ITEM])
 
-const selectDictLoad = () => {
+const selectDictLoad = async () => {
   if (!isNullOrUnDef(props.dictType)) {
-    selectOptions.value = [ALL_OPTION_ITEM]
-    selectOptions.value.push(...getStrDictOptions(props.dictType))
+    selectOptions.value = [ALL_OPTION_ITEM, ...getStrDictOptions(props.dictType)]
   }
 }
 
 const selectRemoteLoad = async (query?: string) => {
   await callWithLoading(async () => {
-    selectOptions.value = [ALL_OPTION_ITEM]
     if (props.remoteMethod) {
-      selectOptions.value.push(...(await props.remoteMethod(query)))
+      selectOptions.value = [ALL_OPTION_ITEM, ...(await props.remoteMethod(query))]
     }
   })
 }
 
 // tree-select
 
-const treeDataList = ref<any[]>([])
+const treeDataList = ref<any[]>()
 
-const treeDataOptions = computed(() => handleTree(treeDataList.value))
+const treeDataOptions = computed(() => handleTree(treeDataList.value ?? []))
 
 const treeDataLazyLoad = async (node, resolve, reject) => {
   try {
-    resolve((await props.load?.(node)) ?? [])
+    resolve((await props.loadData?.(node)) ?? [])
   } catch (e) {
     console.error(e)
     reject()
@@ -250,20 +317,17 @@ const treeDataLazyLoad = async (node, resolve, reject) => {
 
 const treeDataLoad = async () => {
   await callWithLoading(async () => {
-    treeDataList.value = (await props.load?.()) ?? []
+    treeDataList.value = (await props.loadData?.({ level: 0 })) ?? []
   })
 }
 
 const treeDataFilterMethod = (query?: string) => {
   callWithLoading(async () => {
-    treeDataList.value = []
-    await nextTick(async () => {
-      if (isEmpty(query)) {
-        treeDataList.value = (await props.load?.()) ?? []
-      } else {
-        treeDataList.value = (await props.filterMethod?.(query)) ?? []
-      }
-    })
+    if (isEmpty(query)) {
+      await treeDataLoad()
+    } else {
+      treeDataList.value = (await props.filterMethod?.(query)) ?? []
+    }
   })
 }
 
@@ -271,71 +335,131 @@ const treeDataFilterMethod = (query?: string) => {
 
 const radioCheckboxOptions = ref<any[]>([])
 
-const radioCheckboxDictLoad = () => {
+const radioCheckboxDictLoad = async () => {
   if (!isNullOrUnDef(props.dictType)) {
-    radioCheckboxOptions.value = []
-    radioCheckboxOptions.value.push(...getStrDictOptions(props.dictType))
+    radioCheckboxOptions.value = getStrDictOptions(props.dictType)
   }
 }
 
 const radioCheckboxRemoteLoad = async (query?: string) => {
   await callWithLoading(async () => {
-    radioCheckboxOptions.value = []
     if (props.remoteMethod) {
-      radioCheckboxOptions.value.push(...(await props.remoteMethod(query)))
+      radioCheckboxOptions.value = await props.remoteMethod(query)
     }
   })
 }
 
-const onRadioOptionClick = (e: MouseEvent, item: any) => {
-  e.preventDefault()
-  if (valueVModel.value == item.value) {
-    valueVModel.value = undefined
-  } else {
-    valueVModel.value = item.value
+const onRadioOptionClick = (item: any) => {
+  if (!item.disabled) {
+    if (props.inputType == 'radio') {
+      valueVModel.value = valueVModel.value == item.value ? undefined : item.value
+    } else if (props.inputType == 'checkbox') {
+      if (valueVModel.value?.some((e) => e == item.value)) {
+        valueVModel.value = valueVModel.value.filter((e) => e != item.value)
+      } else {
+        valueVModel.value = [...(valueVModel.value ?? []), item.value]
+      }
+    }
   }
+}
+
+// switch
+
+const activeValue = ref(true)
+
+const inactiveValue = ref(false)
+
+const switchValueLoad = async () => {
+  await callWithLoading(async () => {
+    if (props.activeValue) {
+      if (isFunction(props.activeValue)) {
+        activeValue.value = await props.activeValue()
+      } else {
+        activeValue.value = props.activeValue
+      }
+    }
+    if (props.inactiveValue) {
+      if (isFunction(props.inactiveValue)) {
+        inactiveValue.value = await props.inactiveValue()
+      } else {
+        inactiveValue.value = props.inactiveValue
+      }
+    }
+  })
 }
 
 // date-picker
 
-const isRangeDatePicker = computed(() => {
-  return ['daterange', 'datetimerange', 'monthrange', 'yearrange'].includes(
-    props.datePickerType ?? ''
-  )
+const datePickerPrefixIcon = computed(() => {
+  if (isLoading('prefix')) {
+    return h(Icon, { icon: 'ep:loading', class: 'animate-spin animate-duration-3000' })
+  }
 })
 
-const datePickerChoiceDate = ref<any>()
+const setTimeToDate = (timeStr, baseDate = new Date()) => {
+  if (isEmpty(timeStr)) {
+    timeStr = '00:00:00'
+  }
+  const [hours, minutes, seconds] = timeStr.split(':').map(Number)
+  const d = new Date(baseDate)
+  d.setHours(hours, minutes, seconds, 0)
+  return d
+}
+
+const datePickerDefaultTime = computed<any>(() => {
+  if (isType('date', 'datetime', 'daterange', 'datetimerange')) {
+    if (isType('daterange', 'datetimerange')) {
+      return [setTimeToDate(props.startDefaultTime), setTimeToDate(props.endDefaultTime)]
+    } else {
+      return setTimeToDate(props.defaultTime)
+    }
+  }
+})
+
+const firstDatePickerChoiceDate = ref<any>()
 
 const onDatePickerCalendarChange = (dates) => {
-  if (dates && dates[0]) {
-    datePickerChoiceDate.value = dates[0].getTime()
-  } else {
-    datePickerChoiceDate.value = undefined
-  }
+  firstDatePickerChoiceDate.value = dates?.[0]?.getTime()
 }
 const datePickerDisabledDate = (date: Date) => {
   const time = date.getTime()
-  const now = Date.now() - 24 * 3600 * 1000
-  if (!isNullOrUnDef(props.beforeMinDays) && time < now - props.beforeMinDays * 24 * 3600 * 1000) {
-    return true
-  }
-  if (!isNullOrUnDef(props.afterMaxDays) && time > now + props.afterMaxDays * 24 * 3600 * 1000) {
-    return true
-  }
-  if (isRangeDatePicker.value && !isNullOrUnDef(props.maxDaysRange)) {
-    if (datePickerChoiceDate.value) {
-      const range = props.maxDaysRange * 24 * 3600 * 1000
-      const minTime = datePickerChoiceDate.value - range
-      const maxTime = datePickerChoiceDate.value + range
-      return time < minTime || time > maxTime
+  const now = Date.now()
+  if (isType('date', 'datetime', 'dates', 'daterange', 'datetimerange')) {
+    if (
+      !isNullOrUnDef(props.beforeMinDays) &&
+      time < now - props.beforeMinDays * 24 * 3600 * 1000
+    ) {
+      return true
     }
-    return props.disabledDate?.(date)
+    if (!isNullOrUnDef(props.afterMaxDays) && time > now + props.afterMaxDays * 24 * 3600 * 1000) {
+      return true
+    }
+    if (!isNullOrUnDef(props.maxDaysRange) && isType('daterange', 'datetimerange')) {
+      if (firstDatePickerChoiceDate.value) {
+        const range = props.maxDaysRange * 24 * 3600 * 1000
+        const minTime = firstDatePickerChoiceDate.value - range
+        const maxTime = firstDatePickerChoiceDate.value + range
+        if (time < minTime || time > maxTime) {
+          return true
+        }
+      }
+    }
   }
   return props.disabledDate?.(date)
 }
 
-// number-range
+const datePickerShortcuts = ref<any[]>()
 
+const datePickerShortcutsLoad = async () => {
+  if (props.shortcuts && isFunction(props.shortcuts)) {
+    await callWithLoading(async () => {
+      datePickerShortcuts.value = await props.shortcuts?.()
+      refresh()
+    })
+  }
+}
+
+// number-range
 const minNumberValue = ref<number | undefined>()
 const maxNumberValue = ref<number | undefined>()
 
@@ -344,26 +468,14 @@ const onNumberRangeChange = () => {
 }
 
 // autocomplete
-
-const fetchSuggestionsLoad = (queryString: string, callback: Function) => {
-  if (props.fetchSuggestions) {
-    props
-      .fetchSuggestions(queryString)
-      .then((resp) => {
-        callback(resp)
-      })
-      .catch(() => {
-        callback([])
-      })
-  } else {
-    callback([])
-  }
+const fetchSuggestionsLoad = async (query: string) => {
+  return (await props.fetchSuggestions?.(query)) ?? []
 }
 
 // cascader
-
 const cascaderProps = computed(() => {
   return {
+    emitPath: props.emitPath,
     multiple: props.multiple,
     checkStrictly: props.checkStrictly,
     lazy: props.lazy,
@@ -373,19 +485,28 @@ const cascaderProps = computed(() => {
 
 const cascaderOptions = ref<any[]>([])
 
+const isCascaderVisible = ref(false)
+
+const onCascaderVisibleChange = (val: boolean) => {
+  isCascaderVisible.value = val
+}
+
 const cascaderOptionsLoad = async () => {
-  cascaderOptions.value = []
   await callWithLoading(async () => {
-    if (props.load) {
-      cascaderOptions.value.push(...(await props.load()))
+    if (props.loadData) {
+      cascaderOptions.value = await props.loadData()
     }
   })
 }
 
-const cascaderOptionsLazyLoad = (node, callback) => {
-  callWithLoading(async () => {
-    callback((await props.load?.(node)) ?? [])
-  })
+const cascaderOptionsLazyLoad = async (node, resolve) => {
+  await callWithLoading(
+    'prefix',
+    async () => {
+      resolve((await props.loadData?.(node)) ?? [])
+    },
+    isCascaderVisible.value
+  )
 }
 
 const cascaderFilterMethod = useDebounceFn(async (query?: string) => {
@@ -401,39 +522,33 @@ const cascaderBeforeFilter = (query?: string) => {
   return false
 }
 
-const cascaderOnBlur = () => {
-  if (!props.lazy) {
-    cascaderOptionsLoad()
-  } else {
-    cascaderOptions.value = []
-  }
-}
-
-onMounted(async () => {
-  if (props.inputType == 'select') {
-    if (props.remote) {
-      if (!props.filterable) {
-        selectRemoteLoad()
+onMounted(() => {
+  callWithLoading('prefix', async () => {
+    if (props.inputType == 'select') {
+      if (props.remote) {
+        await selectRemoteLoad()
+      } else {
+        await selectDictLoad()
       }
-    } else {
-      selectDictLoad()
-    }
-  } else if (props.inputType == 'tree-select') {
-    if (!props.lazy) {
-      if (!props.filterable) {
-        treeDataLoad()
+    } else if (props.inputType == 'tree-select') {
+      if (!props.lazy) {
+        await treeDataLoad()
+      }
+    } else if (props.inputType == 'radio' || props.inputType == 'checkbox') {
+      if (props.remote) {
+        await radioCheckboxRemoteLoad()
+      } else {
+        await radioCheckboxDictLoad()
+      }
+    } else if (props.inputType == 'switch') {
+      await switchValueLoad()
+    } else if (props.inputType == 'date-picker') {
+      await datePickerShortcutsLoad()
+    } else if (props.inputType == 'cascader') {
+      if (!props.lazy) {
+        await cascaderOptionsLoad()
       }
     }
-  } else if (props.inputType == 'radio' || props.inputType == 'checkbox') {
-    if (props.remote) {
-      radioCheckboxRemoteLoad()
-    } else {
-      radioCheckboxDictLoad()
-    }
-  } else if (props.inputType == 'cascader') {
-    if (!props.lazy) {
-      cascaderOptionsLoad()
-    }
-  }
+  })
 })
 </script>

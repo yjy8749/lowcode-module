@@ -102,7 +102,9 @@ export function linkDefine(
 
 export function inputDefine(
   define: WidgetPropDefine,
-  props?: ExtractProps<InstanceType<typeof ElInput>>
+  props?: ExtractProps<InstanceType<typeof ElInput>> & {
+    _iconInput?: boolean
+  }
 ): WidgetPropDefine {
   return {
     type: 'input',
@@ -116,7 +118,15 @@ export function inputDefine(
             placeholder={define.helps || define.label}
             vModel={modelValue.value}
             {...props}
-          />
+          >
+            {{
+              suffix: () => {
+                if (props?._iconInput && !isEmpty(modelValue.value)) {
+                  return <Icon icon={modelValue.value} />
+                }
+              }
+            }}
+          </ElInput>
         </>
       )
     }
@@ -898,6 +908,7 @@ export function aceInputDefine(
             editor={propRenderContext.editor}
             widget={propRenderContext.widget}
             name={define.label}
+            lang="json"
             {...props}
           />
         </>

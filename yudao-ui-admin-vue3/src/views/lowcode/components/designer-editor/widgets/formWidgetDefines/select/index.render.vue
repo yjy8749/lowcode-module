@@ -8,11 +8,13 @@
       :loading="loading"
       v-model="valueModel"
     >
-      <template v-if="prefixIcon" #prefix>
-        <Icon :icon="prefixIcon" />
-      </template>
-      <template #loading>
-        <Icon icon="ep:loading" class="animate-spin animate-duration-3000" />
+      <template v-if="isLoading('prefix') || prefixIcon" #prefix>
+        <Icon
+          icon="ep:loading"
+          class="animate-spin animate-duration-3000"
+          v-if="isLoading('prefix')"
+        />
+        <Icon v-else :icon="prefixIcon" />
       </template>
       <el-option
         v-for="opt in selectOptions"
@@ -34,12 +36,10 @@ import { useScopeLoading } from '../../../../common/hooks'
 
 const props = defineProps<WidgetRenderProps>()
 
+const { loading, isLoading, callWithLoading } = useScopeLoading()
+
 const { formItemAttrs, valueModel, useFormInputAttrs, usePropValue, toEvalFunction } =
   useFormItemWidget(useWidget(props))
-
-const { loading, callWithLoading } = useScopeLoading()
-
-const selectOptions = ref<any[]>([])
 
 const formInputAttrs = computed(() =>
   useFormInputAttrs({ omit: ['prefixIcon', 'dictType', 'remoteMethod'] })
@@ -48,31 +48,59 @@ const formInputAttrs = computed(() =>
 const prefixIcon = computed(() => usePropValue('prefixIcon'))
 
 const remoteMethod = computed(() => toEvalFunction(usePropValue('remoteMethod')))
-const selectDictLoad = () => {
-  const dictType = usePropValue('dictType')
-  if (!isNullOrUnDef(dictType)) {
-    selectOptions.value = []
-    selectOptions.value.push(...getStrDictOptions(dictType))
-  }
+
+const loadCacheData = computed(() => toEvalFunction(usePropValue('loadCacheData')))
+
+const selectOptions = ref<any[]>()
+const selectDictLoad = async () => {
+  await callWithLoading(async () => {
+    const dictType = usePropValue('dictType')
+    if (!isNullOrUnDef(dictType)) {
+      selectOptions.value = getStrDictOptions(dictType)
+    }
+  })
 }
 
 const selectRemoteLoad = async (query?: string) => {
   await callWithLoading(async () => {
-    selectOptions.value = []
     if (remoteMethod.value) {
-      selectOptions.value.push(...(await remoteMethod.value(query)))
+      selectOptions.value = await remoteMethod.value(query)
+    }
+  })
+}
+
+const selectCacheLoad = async () => {
+  await callWithLoading(async () => {
+    if (valueModel.value && loadCacheData.value) {
+      const vals = formInputAttrs.value.multiple ? valueModel.value : [valueModel.value]
+      const optionValues = new Set(selectOptions.value?.map((e) => e.value) ?? [])
+      if (vals.some((e) => !optionValues.has(e))) {
+        if (loadCacheData.value) {
+          selectOptions.value = await loadCacheData.value(valueModel.value)
+        }
+      }
     }
   })
 }
 
 onMounted(async () => {
-  if (formInputAttrs.value.remote) {
-    if (!formInputAttrs.value.filterable) {
-      selectRemoteLoad()
+  await callWithLoading('prefix', async () => {
+    if (formInputAttrs.value.remote) {
+      await selectRemoteLoad()
+    } else {
+      await selectDictLoad()
     }
-  } else {
-    selectDictLoad()
-  }
+  })
+
+  watch(
+    () => valueModel.value,
+    () => {
+      callWithLoading('prefix', async () => {
+        await selectCacheLoad()
+      })
+    },
+    { immediate: true }
+  )
 })
 </script>
 <style scoped lang="scss"></style>

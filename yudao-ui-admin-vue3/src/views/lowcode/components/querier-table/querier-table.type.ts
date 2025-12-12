@@ -99,37 +99,38 @@ export interface QuerierTableSearchFieldProps {
   checkStrictly?: boolean
   accordion?: boolean
   lazy?: boolean
-  load?: (node?: any) => Promise<any[]>
+  loadData?: (node?: any) => Promise<any[]>
   filterMethod?: (query?: string) => Promise<any[]>
-  activeValue?: string
-  inactiveValue?: string
-  datePickerType?:
-    | 'year'
-    | 'years'
-    | 'month'
-    | 'months'
-    | 'date'
-    | 'dates'
-    | 'datetime'
-    | 'week'
-    | 'datetimerange'
-    | 'daterange'
-    | 'monthrange'
-    | 'yearrange'
+  type?: string | any
   format?: string
   valueFormat?: string
-  rangeSeparator?: string
+  defaultTime?: string
+  startDefaultTime?: string
+  endDefaultTime?: string
   startPlaceholder?: string
+  rangeSeparator?: string
   endPlaceholder?: string
   beforeMinDays?: number
   afterMaxDays?: number
   maxDaysRange?: number
   disabledDate?: (data: Date | Date[]) => boolean
+  shortcuts?: () => any[] | Promise<any[]>
   minNumber?: number
   maxNumber?: number
   precision?: number
   fetchSuggestions?: (queryString: string) => Promise<any[]>
+  lazyLoad?: (node?: any) => Promise<any[]>
   showAllLevels?: boolean
+  emitPath?: boolean
+  onlyIcon?: boolean
+  showAsButton?: boolean
+  width?: string
+  activeIcon?: string
+  inactiveIcon?: string
+  activeText?: string
+  inactiveText?: string
+  activeValue?: any | (() => any) | (() => Promise<any>)
+  inactiveValue?: any | (() => any) | (() => Promise<any>)
 }
 
 export interface QuerierTableBodyProps {

@@ -25,7 +25,9 @@ const props = defineProps<WidgetRenderProps>()
 const { formItemAttrs, valueModel, useFormInputAttrs, usePropValue, toEvalFunction } =
   useFormItemWidget(useWidget(props))
 
-const formInputAttrs = computed(() => useFormInputAttrs({ omit: ['prefixIcon', 'suffixIcon'] }))
+const formInputAttrs = computed(() =>
+  useFormInputAttrs({ omit: ['prefixIcon', 'suffixIcon', 'fetchSuggestions'] })
+)
 
 const prefixIcon = computed(() => usePropValue('prefixIcon'))
 
@@ -33,18 +35,7 @@ const suffixIcon = computed(() => usePropValue('suffixIcon'))
 
 const fetchSuggestions = computed(() => toEvalFunction(usePropValue('fetchSuggestions')))
 
-const fetchSuggestionsLoad = (queryString: string, callback: Function) => {
-  if (fetchSuggestions.value) {
-    fetchSuggestions
-      .value(queryString)
-      .then((resp) => {
-        callback(resp)
-      })
-      .catch(() => {
-        callback([])
-      })
-  } else {
-    callback([])
-  }
+const fetchSuggestionsLoad = async (query: string) => {
+  return (await fetchSuggestions.value?.(query)) ?? []
 }
 </script>

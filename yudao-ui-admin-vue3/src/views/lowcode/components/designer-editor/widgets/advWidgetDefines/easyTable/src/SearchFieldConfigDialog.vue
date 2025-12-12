@@ -103,8 +103,9 @@
             :height="100"
             :editor="editor"
             :widget="widget"
-            :helps="`可筛选时 ${highlightTextHtml('$args[0]')} 为查询值，返回字典类型数组 ${highlightTextHtml('{ label, value }')}`"
+            :helps="`可筛选时 ${highlightTextHtml('$args[0]')} 为查询值，返回字典类型数组`"
             :default-function="returnDictDefaultFunction"
+            :set-default-function="true"
             v-model="formModel.remoteMethod"
           />
         </el-form-item>
@@ -148,18 +149,6 @@
             </el-form-item>
           </div>
         </el-form-item>
-        <el-form-item label="加载函数" prop="load">
-          <EvalFunctionValueInput
-            name="数据加载函数"
-            type="simple-function"
-            :height="100"
-            :editor="editor"
-            :widget="widget"
-            :helps="`返回树节点数组 ${highlightTextHtml('{ id, parentId, name }')}, 懒加载情况下 ${highlightTextHtml('$args[0]')} 为 node 数据`"
-            :default-function="returnTreeDefaultFunction"
-            v-model="formModel.load"
-          />
-        </el-form-item>
         <el-form-item label="搜索函数" prop="filterMethod" v-if="formModel.filterable">
           <EvalFunctionValueInput
             name="数据搜索函数"
@@ -167,9 +156,23 @@
             :height="100"
             :editor="editor"
             :widget="widget"
-            :helps="`返回树节点数组 ${highlightTextHtml('{ id, parentId, name }')}, 可筛选时 ${highlightTextHtml('$args[0]')} 为查询值`"
+            :helps="`可筛选时 ${highlightTextHtml('$args[0]')} 为查询值，返回树节点数组`"
             :default-function="returnTreeDefaultFunction"
+            :set-default-function="true"
             v-model="formModel.filterMethod"
+          />
+        </el-form-item>
+        <el-form-item label="加载函数" prop="loadData">
+          <EvalFunctionValueInput
+            name="数据加载函数"
+            type="simple-function"
+            :height="100"
+            :editor="editor"
+            :widget="widget"
+            :helps="`懒加载情况下 ${highlightTextHtml('$args[0]')} 为 node 数据，返回树节点数组`"
+            :default-function="returnTreeDefaultFunction"
+            :set-default-function="true"
+            v-model="formModel.loadData"
           />
         </el-form-item>
       </template>
@@ -179,6 +182,12 @@
           <div class="flex gap-8">
             <el-form-item label="远程加载" label-width="68px" prop="remote">
               <el-switch size="small" v-model="formModel.remote" />
+            </el-form-item>
+            <el-form-item label="仅显示图标" label-width="82px" prop="onlyIcon">
+              <el-switch size="small" v-model="formModel.onlyIcon" />
+            </el-form-item>
+            <el-form-item label="显示为按钮" label-width="82px" prop="showAsButton">
+              <el-switch size="small" v-model="formModel.showAsButton" />
             </el-form-item>
           </div>
         </el-form-item>
@@ -192,62 +201,132 @@
             :height="100"
             :editor="editor"
             :widget="widget"
-            :helps="`可筛选时 ${highlightTextHtml('$args[0]')} 为查询值\n返回字典类型数组 ${highlightTextHtml('{ label, value }')}`"
+            :helps="`可筛选时 ${highlightTextHtml('$args[0]')} 为查询值，返回字典数组`"
             :default-function="returnDictDefaultFunction"
+            :set-default-function="true"
             v-model="formModel.remoteMethod"
           />
         </el-form-item>
       </template>
       <!-- switch 配置 -->
       <template v-else-if="formModel.inputType == 'switch'">
-        <el-form-item label="开启时的值" prop="activeValue">
-          <el-input clearable placeholder="true" v-model="formModel.activeValue" />
+        <div class="flex">
+          <el-form-item class="flex-1" label="宽度" prop="width">
+            <FormatInputNumber class="!w-full" v-model="formModel.width" :symbol="CssSymbols" />
+          </el-form-item>
+          <el-form-item class="flex-1" label="激活图标" prop="activeIcon">
+            <el-input v-model="formModel.activeIcon">
+              <template #suffix>
+                <Icon :icon="formModel.activeIcon" />
+              </template>
+            </el-input>
+          </el-form-item>
+          <el-form-item class="flex-1" label="关闭图标" prop="inactiveIcon">
+            <el-input v-model="formModel.inactiveIcon">
+              <template #suffix>
+                <Icon :icon="formModel.inactiveIcon" />
+              </template>
+            </el-input>
+          </el-form-item>
+        </div>
+        <div class="flex">
+          <el-form-item class="flex-1" label="激活文字" prop="activeText">
+            <el-input v-model="formModel.activeText" />
+          </el-form-item>
+          <el-form-item class="flex-1" label="关闭文字" prop="inactiveText">
+            <el-input v-model="formModel.inactiveText" />
+          </el-form-item>
+          <div class="flex-1"></div>
+        </div>
+        <el-form-item label="激活状态值" prop="activeValue">
+          <EvalFunctionValueInput
+            name="激活状态值"
+            type="simple-function"
+            :height="100"
+            :editor="editor"
+            :widget="widget"
+            :default-function="'/** 同步或异步返回 */\n' + 'return true'"
+            v-model="formModel.activeValue"
+          />
         </el-form-item>
-        <el-form-item label="关闭时的值" prop="inactiveValue">
-          <el-input clearable placeholder="false" v-model="formModel.inactiveValue" />
+        <el-form-item label="关闭状态值" prop="inactiveValue">
+          <EvalFunctionValueInput
+            name="关闭状态值"
+            type="simple-function"
+            :height="100"
+            :editor="editor"
+            :widget="widget"
+            :default-function="'/** 同步或异步返回 */\n' + 'return false'"
+            v-model="formModel.inactiveValue"
+          />
         </el-form-item>
       </template>
       <!-- date-picker 配置 -->
       <template v-else-if="formModel.inputType == 'date-picker'">
-        <el-form-item label="选择器类型" prop="datePickerType">
-          <el-radio-group v-model="formModel.datePickerType" @change="onDatePickerTypeChange">
-            <el-radio v-for="opt in datePickerTypeOptions" :key="opt.label" :value="opt.value">
+        <el-form-item label="选择器类型" prop="type">
+          <el-radio-group v-model="formModel.type" @change="onDatePickerTypeChange">
+            <el-radio v-for="opt in ElDatePickerTypeOptions" :key="opt.label" :value="opt.value">
               {{ opt.label }}
             </el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="显示格式" prop="format">
-          <el-input clearable placeholder="输入框显示格式" v-model="formModel.format" />
-        </el-form-item>
-        <el-form-item label="后端值格式" prop="valueFormat">
-          <el-input disabled placeholder="后端数据值格式" v-model="formModel.valueFormat" />
-        </el-form-item>
-        <div class="flex justify-between" v-if="isRangeDatePicker">
-          <el-form-item label="范围分隔符" prop="rangeSeparator">
+        <div class="flex justify-between">
+          <el-form-item class="flex-1" label="显示格式" prop="format">
+            <el-input clearable placeholder="输入框显示格式" v-model="formModel.format" />
+          </el-form-item>
+          <el-form-item class="flex-1" prop="valueFormat">
+            <template #label>
+              <TextLabel label="数值格式" helps="时间戳格式使用 x" />
+            </template>
+            <el-input clearable placeholder="后端数据值格式" v-model="formModel.valueFormat" />
+          </el-form-item>
+        </div>
+        <div class="flex justify-between" v-if="isType('date', 'datetime')">
+          <el-form-item class="flex-1" label="默认时间" prop="defaultTime">
+            <el-input clearable placeholder="日期默认时间值" v-model="formModel.defaultTime" />
+          </el-form-item>
+          <div class="flex-1"></div>
+        </div>
+        <div class="flex justify-between" v-if="isType('daterange', 'datetimerange')">
+          <el-form-item class="flex-1" label="开始默认时间" prop="startDefaultTime">
             <el-input
               clearable
-              placeholder="选择范围时的分隔符"
-              v-model="formModel.rangeSeparator"
+              placeholder="开始日期默认时间值"
+              v-model="formModel.startDefaultTime"
             />
           </el-form-item>
+          <el-form-item class="flex-1" label="结束默认时间" prop="endDefaultTime">
+            <el-input
+              clearable
+              placeholder="结束日期默认时间值"
+              v-model="formModel.endDefaultTime"
+            />
+          </el-form-item>
+        </div>
+        <div
+          class="flex justify-between"
+          v-if="isType('daterange', 'datetimerange', 'monthrange', 'yearrange')"
+        >
           <el-form-item label="开始文本" prop="startPlaceholder">
             <el-input
               clearable
-              placeholder="开始日期的占位文本"
+              placeholder="开始日期占位文本"
               v-model="formModel.startPlaceholder"
             />
           </el-form-item>
           <el-form-item label="结束文本" prop="endPlaceholder">
-            <el-input
-              clearable
-              placeholder="结束日期的占位文本"
-              v-model="formModel.endPlaceholder"
-            />
+            <el-input clearable placeholder="结束日期占位文本" v-model="formModel.endPlaceholder" />
+          </el-form-item>
+          <el-form-item label="范围分隔符" prop="rangeSeparator">
+            <el-input clearable placeholder="范围选择分隔符" v-model="formModel.rangeSeparator" />
           </el-form-item>
         </div>
-        <el-form-item label="范围控制">
+        <el-form-item
+          label="范围控制"
+          v-if="isType('date', 'datetime', 'dates', 'daterange', 'datetimerange')"
+        >
           <div class="flex gap-2">
-            <el-text>从前 </el-text>
+            <el-text>选择从前 </el-text>
             <el-input-number
               class="!w-100px"
               v-bind="inputNumberProps"
@@ -259,28 +338,39 @@
               v-bind="inputNumberProps"
               v-model="formModel.afterMaxDays"
             />
-            <el-text>天为止 </el-text>
-            <template v-if="isRangeDatePicker">
-              <el-text>，选择不超过 </el-text>
+            <template v-if="isType('daterange', 'datetimerange')">
+              <el-text>天为止，不超过 </el-text>
               <el-input-number
                 class="!w-100px"
                 v-bind="inputNumberProps"
                 v-model="formModel.maxDaysRange"
               />
-              <el-text>天范围的日期 </el-text>
+              <el-text>天跨度的日期 </el-text>
             </template>
+            <el-text v-else>天为止的日期</el-text>
           </div>
         </el-form-item>
-        <el-form-item label="是否禁用函数" prop="disabledDate">
+        <el-form-item label="日期是否禁用" prop="disabledDate">
           <EvalFunctionValueInput
             name="判断日期是否被禁用的函数"
             type="simple-function"
             :height="100"
             :editor="editor"
             :widget="widget"
-            :helps="`${highlightTextHtml('$args[0]')} 为要判断的日期Date对象, 范围选择时为[开始, 结束]日期数组`"
-            :default-function="'/** 返回数据 */\n' + 'return false'"
+            :helps="`${highlightTextHtml('$args[0]')} 为要判断的日期Date对象, 范围选择时${highlightTextHtml('$args[0]')}为[开始, 结束]Date数组`"
+            :default-function="'/** 同步返回 */\n' + 'return false'"
             v-model="formModel.disabledDate"
+          />
+        </el-form-item>
+        <el-form-item label="获取快捷选项" prop="shortcuts">
+          <EvalFunctionValueInput
+            name="获取日期快捷选项函数"
+            type="simple-function"
+            :height="100"
+            :editor="editor"
+            :widget="widget"
+            :default-function="'/** 同步或异步返回 { text, value } 数组 */\n' + 'return []'"
+            v-model="formModel.shortcuts"
           />
         </el-form-item>
       </template>
@@ -288,7 +378,7 @@
       <template v-else-if="formModel.inputType == 'number-range'">
         <el-form-item label="数字控制">
           <div class="flex gap-2">
-            <el-text>在 </el-text>
+            <el-text>输入在 </el-text>
             <el-input-number
               class="!w-100px"
               v-bind="inputNumberProps"
@@ -323,15 +413,16 @@
           :height="100"
           :editor="editor"
           :widget="widget"
-          :helps="`${highlightTextHtml('$args[0]')} 为查询值\n返回建议数组 ${highlightTextHtml('{  value }')}`"
-          :default-function="'/** 返回 { value } 数组 */\n' + 'return Promise.resolve([])'"
+          :helps="`${highlightTextHtml('$args[0]')} 为查询值，返回建议数组`"
+          :default-function="'/** 异步返回 { value } 数组 */\n' + 'return Promise.resolve([])'"
+          :set-default-function="true"
           v-model="formModel.fetchSuggestions"
         />
       </el-form-item>
       <!-- cascader 配置 -->
       <template v-else-if="formModel.inputType == 'cascader'">
         <el-form-item label="开关控制">
-          <div class="flex gap-8">
+          <div class="w-full flex justify-between">
             <el-form-item label="多选" label-width="40px" prop="multiple">
               <el-switch size="small" v-model="formModel.multiple" />
             </el-form-item>
@@ -344,8 +435,11 @@
             <el-form-item label="懒加载" label-width="54px" prop="lazy">
               <el-switch size="small" v-model="formModel.lazy" />
             </el-form-item>
-            <el-form-item label="显示全部路径" label-width="110px" prop="lazy">
+            <el-form-item label="显示完整路径" label-width="110px" prop="showAllLevels">
               <el-switch size="small" v-model="formModel.showAllLevels" />
+            </el-form-item>
+            <el-form-item label="返回全部路径值" label-width="110px" prop="emitPath">
+              <el-switch size="small" v-model="formModel.emitPath" />
             </el-form-item>
           </div>
         </el-form-item>
@@ -367,20 +461,6 @@
             </el-form-item>
           </div>
         </el-form-item>
-        <el-form-item label="加载函数" prop="load">
-          <EvalFunctionValueInput
-            name="数据加载函数"
-            type="simple-function"
-            :height="100"
-            :editor="editor"
-            :widget="widget"
-            :helps="`返回选项数组 ${highlightTextHtml('{ value, label, leaf, children }')}, 懒加载情况下 ${highlightTextHtml('$args[0]')} 为 node 数据`"
-            :default-function="
-              '/** 返回 { value, label, leaf, children } 数组 */\n' + 'return Promise.resolve([])'
-            "
-            v-model="formModel.load"
-          />
-        </el-form-item>
         <el-form-item label="搜索函数" prop="filterMethod" v-if="formModel.filterable">
           <EvalFunctionValueInput
             name="数据搜索函数"
@@ -388,9 +468,28 @@
             :height="100"
             :editor="editor"
             :widget="widget"
-            :helps="`返回选项数组 ${highlightTextHtml('{ value, label,leaf, children }')}, 可筛选时 ${highlightTextHtml('$args[0]')} 为查询值`"
-            :default-function="returnTreeDefaultFunction"
+            :helps="`可筛选时 ${highlightTextHtml('$args[0]')} 为查询值，返回节点数组`"
+            :default-function="
+              '/** 异步返回 { value, label, disabled, leaf, children } 数组 */\n' +
+              'return Promise.resolve([])'
+            "
             v-model="formModel.filterMethod"
+          />
+        </el-form-item>
+        <el-form-item label="加载函数" prop="loadData">
+          <EvalFunctionValueInput
+            name="数据加载函数"
+            type="simple-function"
+            :height="100"
+            :editor="editor"
+            :widget="widget"
+            :helps="`懒加载情况下 ${highlightTextHtml('$args[0]')} 为 node 数据，返回节点数组`"
+            :default-function="
+              '/** 异步返回 { value, label, disabled, leaf, children } 数组 */\n' +
+              'return Promise.resolve([])'
+            "
+            :set-default-function="true"
+            v-model="formModel.loadData"
           />
         </el-form-item>
       </template>
@@ -404,7 +503,12 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { cloneDeep } from 'lodash-es'
-import { DesignerEditor, WidgetInstance } from '../../../../designer-editor.type'
+import {
+  DesignerEditor,
+  WidgetInstance,
+  CssSymbols,
+  ElDatePickerTypeOptions
+} from '../../../../designer-editor.type'
 import { highlightTextHtml } from '../../../../../common/utils'
 import EvalFunctionValueInput from '../../../../components/EvalFunctionValueInput.vue'
 import { getStrDictOptions } from '@/utils/dict'
@@ -412,12 +516,13 @@ import { LOWCODE_DICT_TYPE } from '../../../../../common/dict'
 import { EasyTableSearchFieldProps, SearchFieldInputTypeOptions } from './types'
 import { ElForm } from 'element-plus'
 import TextLabel from '../../../../../common/TextLabel.vue'
+import FormatInputNumber from '../../../../components/propInput/FormatInputNumber.vue'
 
 const returnDictDefaultFunction =
-  '/** 返回 { label, value } 数组 */\n' + 'return Promise.resolve([])'
+  '/** 异步返回 { label, value, disabled } 数组 */\n' + 'return Promise.resolve([])'
 
 const returnTreeDefaultFunction =
-  '/** 返回 { id, parentId, name } 数组 */\n' + 'return Promise.resolve([])'
+  '/** 异步返回 { id, parentId, name, disabled, leaf } 数组 */\n' + 'return Promise.resolve([])'
 
 const inputNumberProps: any = {
   placeholder: '不限',
@@ -426,19 +531,9 @@ const inputNumberProps: any = {
   precision: 0
 }
 
-const datePickerTypeOptions = [
-  { value: 'year', label: '单个年份', format: 'YYYY' },
-  { value: 'month', label: '单个月份', format: 'YYYY-MM' },
-  { value: 'date', label: '单个日期', format: 'YYYY-MM-DD' },
-  { value: 'datetime', label: '单个日期时间', format: 'YYYY-MM-DD HH:mm:ss' },
-  { value: 'years', label: '多个年份', format: 'YYYY' },
-  { value: 'months', label: '多个月份', format: 'YYYY-MM' },
-  { value: 'dates', label: '多个日期', format: 'YYYY-MM-DD' },
-  { value: 'daterange', label: '日期范围选择', format: 'YYYY-MM-DD' },
-  { value: 'datetimerange', label: '日期时间范围选择', format: 'YYYY-MM-DD HH:mm:ss' },
-  { value: 'monthrange', label: '月份范围选择', format: 'YYYY-MM' },
-  { value: 'yearrange', label: '年份范围选择', format: 'YYYY' }
-]
+function isType(...types: string[]) {
+  return types.includes(formModel.value.type ?? '')
+}
 
 export interface SearchFieldConfigDialogProps {
   editor: DesignerEditor
@@ -482,40 +577,46 @@ const onInputTypeChange = () => {
     span: formModel.value.span,
     placeholder: formModel.value.placeholder
   }
+  if (formModel.value.inputType == 'cascader') {
+    formModel.value.showAllLevels = true
+    formModel.value.emitPath = true
+  }
 }
 
-const isRangeDatePicker = computed(() => {
-  return ['daterange', 'datetimerange', 'monthrange', 'yearrange'].includes(
-    formModel.value.datePickerType ?? ''
-  )
-})
-
 const onDatePickerTypeChange = () => {
-  formModel.value.format = datePickerTypeOptions.find(
-    (e) => e.value == formModel.value.datePickerType
-  )?.format
+  const typeOpt = ElDatePickerTypeOptions.find((e) => e.value == formModel.value.type)
+  formModel.value.format = typeOpt?.format
   formModel.value.valueFormat = formModel.value.format
-  if (isRangeDatePicker.value) {
-    formModel.value.rangeSeparator = '至'
-    //根据类型不同设置， 开始和结束的占位符
-    if (formModel.value.datePickerType == 'daterange') {
-      formModel.value.startPlaceholder = '开始日期'
-      formModel.value.endPlaceholder = '结束日期'
-    } else if (formModel.value.datePickerType == 'datetimerange') {
-      formModel.value.startPlaceholder = '开始时间'
-      formModel.value.endPlaceholder = '结束时间'
-    } else if (formModel.value.datePickerType == 'monthrange') {
-      formModel.value.startPlaceholder = '开始月份'
-      formModel.value.endPlaceholder = '结束月份'
-    } else if (formModel.value.datePickerType == 'yearrange') {
-      formModel.value.startPlaceholder = '开始年份'
-      formModel.value.endPlaceholder = '结束年份'
-    }
+  let rangeSeparator = '至'
+  let startPlaceholder = ''
+  let endPlaceholder = ''
+  if (isType('daterange')) {
+    startPlaceholder = '开始日期'
+    endPlaceholder = '结束日期'
+  } else if (isType('datetimerange')) {
+    startPlaceholder = '开始时间'
+    endPlaceholder = '结束时间'
+  } else if (isType('monthrange')) {
+    startPlaceholder = '开始月份'
+    endPlaceholder = '结束月份'
+  } else if (isType('yearrange')) {
+    startPlaceholder = '开始年份'
+    endPlaceholder = '结束年份'
   } else {
-    formModel.value.rangeSeparator = undefined
-    formModel.value.startPlaceholder = undefined
-    formModel.value.endPlaceholder = undefined
+    rangeSeparator = ''
+    startPlaceholder = ''
+    endPlaceholder = ''
   }
+  if (isType('date', 'datetime')) {
+    formModel.value.defaultTime = '00:00:00'
+  }
+  if (isType('daterange', 'datetimerange')) {
+    formModel.value.startDefaultTime = '00:00:00'
+    formModel.value.endDefaultTime = '23:59:59'
+  }
+  formModel.value.rangeSeparator = rangeSeparator
+  formModel.value.startPlaceholder = startPlaceholder
+  formModel.value.endPlaceholder = endPlaceholder
 }
 
 const open = async (args: SearchFieldConfigDialogArgs) => {

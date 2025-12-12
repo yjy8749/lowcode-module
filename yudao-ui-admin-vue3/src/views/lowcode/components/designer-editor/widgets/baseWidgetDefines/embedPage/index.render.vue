@@ -15,9 +15,7 @@ const props = defineProps<WidgetRenderProps>()
 const { usePropAndEvent, exposeContext, refresh } = useWidget(props)
 
 const rowAttrs = computed(() => usePropAndEvent({ only: ['justify'] }))
-
 const colAttrs = computed(() => useElColPropAttrs(props.widget))
-
 const editorAttrs = computed(() => usePropAndEvent({ only: ['fileId', 'version', 'params'] }))
 
 exposeContext({

@@ -19,9 +19,9 @@ const widget: WidgetDefine = {
     return <Render {...args} />
   },
   baseDesignerProps: [
-    switchDefine({ key: 'clearable', label: '是否支持一键清空' }),
-    inputDefine({ key: 'prefixIcon', label: '前缀图标' }),
-    inputDefine({ key: 'suffixIcon', label: '后缀图标' }),
+    switchDefine({ key: 'clearable', label: '是否支持一键清空', defaultValue: true }),
+    inputDefine({ key: 'prefixIcon', label: '前缀图标' }, { _iconInput: true }),
+    inputDefine({ key: 'suffixIcon', label: '后缀图标' }, { _iconInput: true }),
     switchDefine({ key: 'showWordLimit', label: '是否显示统计字数', helps: '需配合最大长度使用' }),
     inputNumberDefine({ key: 'minlength', label: '最小长度' }, { min: 0 }),
     inputNumberDefine({ key: 'maxlength', label: '最大长度' }, { min: 0 }),
@@ -29,14 +29,13 @@ const widget: WidgetDefine = {
     evalFunctionDefine(
       { key: 'fetchSuggestions', label: '输入建议函数' },
       {
-        helps: `${highlightTextHtml('$args[0]')} 为查询值\n返回建议数组 ${highlightTextHtml('{  value }')}`,
-        defaultFunction: '/** 返回 { value } 数组 */\n' + 'return Promise.resolve([])'
+        helps: `${highlightTextHtml('$args[0]')} 为查询值，返回建议数组`,
+        defaultFunction: '/** 异步返回 { value } 数组 */\n' + 'return Promise.resolve([])'
       }
     ),
     switchDefine({ key: 'autofocus', label: '是否自动获取焦点' }),
-    ...formItemBaseDefine(),
     inputDefine({ key: 'placeholder', label: '输入提示文本' }),
-    inputDefine({ key: 'defaultValue', label: '默认值' })
+    ...formItemBaseDefine()
   ],
   advDesignerProps: formItemAdvDefine(),
   events: [eventDefine('change', { label: '值改变' })]

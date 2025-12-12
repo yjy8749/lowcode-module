@@ -1,7 +1,7 @@
 import { isNullOrUnDef, isEmpty } from '@/utils/is'
 import { useDataDefineExecutor } from '../../components/dataDefine/hooks'
 import { DesignerEditor, EvalFnContext, WidgetInstance } from '../../designer-editor.type'
-import { buildConstVid, wrapEvalFunction } from '../../designer-editor.utils'
+import { buildConstVid, executeEvalFunction, wrapEvalFunction } from '../../designer-editor.utils'
 import { useWidget } from './useWidget'
 export function isFormWidget(widget: WidgetInstance): boolean {
   return widget._moduleName == 'formWidgetDefines'
@@ -19,7 +19,11 @@ export function customItemValidRules(widget: WidgetInstance): any[] {
   const rules: any[] = []
 
   // 自定义组件验证规则
-  if (isInputType(widget, 'input') || isInputType(widget, 'autocomplete')) {
+  if (
+    isInputType(widget, 'input') ||
+    isInputType(widget, 'autocomplete') ||
+    isInputType(widget, 'mention')
+  ) {
     const { props } = widget
     if (!isNullOrUnDef(props.minlength) && props.minlength > 0) {
       rules.push({
@@ -44,12 +48,12 @@ export function customItemValidRules(widget: WidgetInstance): any[] {
 }
 
 // 构建表单校验规则
-function buildItemRules(
+async function buildItemRules(
   editor: DesignerEditor,
   formModel: ComputedRef<any>,
   evalFnContext: EvalFnContext,
   widget: WidgetInstance
-): any[] {
+): Promise<any[]> {
   const { props } = widget
   const rules: any[] = []
   //是否必填规则
@@ -96,38 +100,55 @@ export function useFormWidget(props: ReturnType<typeof useWidget>) {
   )
 
   const { value: formModel } = formModelExecutor.updateExecutor({ dataDefine: formModelDataDefine })
-
-  const readFromSlots = (widget: WidgetInstance, callback: (widget: WidgetInstance) => void) => {
-    widget.slots.forEach((child) => {
-      callback(child)
-    })
+  const readFromSlots = async (
+    widget: WidgetInstance,
+    callback: (widget: WidgetInstance) => Promise<void>
+  ) => {
+    for (const child of widget.slots) {
+      await callback(child)
+    }
   }
 
   formModel.value = JSON.parse(formModelDataDefine?.jsonData ?? '{}')
 
-  const readFormModelProp = (slotWidget: WidgetInstance) => {
-    slotWidget.slotChildren.forEach((child) => {
-      if (isFormWidget(child) && !isEmpty(child.props.prop)) {
-        if (!isNullOrUnDef(child.props.defaultValue)) {
-          formModel.value[child.props.prop] = child.props.defaultValue
+  const readFormModelProp = async (slotWidget: WidgetInstance) => {
+    for (const child of slotWidget.slotChildren) {
+      try {
+        if (
+          isFormWidget(child) &&
+          !isEmpty(child.props.prop) &&
+          !isEmpty(child.props.defaultValue?.evalFunction) &&
+          isNullOrUnDef(formModel.value[child.props.prop])
+        ) {
+          formModel.value[child.props.prop] = await executeEvalFunction(
+            editor,
+            child.props.defaultValue,
+            evalFnContext
+          )
         }
+      } catch (e) {
+        console.error(e)
       }
-      readFromSlots(child, readFormModelProp)
-    })
+      await readFromSlots(child, readFormModelProp)
+    }
   }
 
   readFromSlots(props.widget, readFormModelProp)
 
-  const readFormRules = (slotWidget: WidgetInstance) => {
-    slotWidget.slotChildren.forEach((child) => {
-      if (isFormWidget(child) && !isEmpty(child.props.prop)) {
-        const itemRules = buildItemRules(editor, formModel, evalFnContext, child)
-        if (!isEmpty(itemRules)) {
-          formRules.value[child.props.prop] = itemRules
+  const readFormRules = async (slotWidget: WidgetInstance) => {
+    for (const child of slotWidget.slotChildren) {
+      try {
+        if (isFormWidget(child) && !isEmpty(child.props.prop)) {
+          const itemRules = await buildItemRules(editor, formModel, evalFnContext, child)
+          if (!isEmpty(itemRules)) {
+            formRules.value[child.props.prop] = itemRules
+          }
         }
+      } catch (e) {
+        console.error(e)
       }
-      readFromSlots(child, readFormRules)
-    })
+      await readFromSlots(child, readFormRules)
+    }
   }
 
   readFromSlots(props.widget, readFormRules)

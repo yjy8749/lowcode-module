@@ -25,12 +25,13 @@ import { useElColPropAttrs, useWidget, type WidgetRenderProps } from '../../hook
 import WidgetItem from '../../../components/WidgetItem.vue'
 import { useFormWidget } from '../../hooks/useFormWidget'
 import { customWidgetOptions } from '../../../designer-editor.utils'
+import { ElForm } from 'element-plus'
 
 const widgetItemOptions = customWidgetOptions({ putable: true, selectable: true })
 
 const props = defineProps<WidgetRenderProps>()
 
-const formRef = ref()
+const formRef = ref<InstanceType<typeof ElForm>>()
 
 const {
   formModel,
@@ -61,7 +62,7 @@ exposeContext({
   isReadonly: () => usePropValue('readonly'),
   isDisabled: () => usePropValue('disabled'),
   getData: async () => {
-    await formRef.value.validate()
+    await formRef.value?.validate()
     return formModel.value
   }
 })

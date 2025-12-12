@@ -73,7 +73,7 @@ import {
   toggleDeffaultFunction
 } from '../designer-editor.utils'
 import { useDebounceFn } from '@vueuse/core'
-import { isNullOrUnDef } from '@/utils/is'
+import { isEmpty, isNullOrUnDef } from '@/utils/is'
 
 export interface EvalFunctionValueInputProps {
   editor: DesignerEditor
@@ -83,6 +83,7 @@ export interface EvalFunctionValueInputProps {
   height?: number
   helps?: string
   defaultFunction?: string
+  setDefaultFunction?: boolean
   modelValue?: DesignerEditorEvalFunction
 }
 
@@ -146,6 +147,15 @@ const actions = [
     }
   }
 ]
+
+onMounted(() => {
+  if (isEmpty(valueVModel.value?.evalFunction) && props.setDefaultFunction) {
+    valueVModel.value = {
+      ...valueVModel.value,
+      evalFunction: props.defaultFunction ?? ''
+    }
+  }
+})
 </script>
 <style lang="scss" scoped>
 .EvalFunctionValueInput {

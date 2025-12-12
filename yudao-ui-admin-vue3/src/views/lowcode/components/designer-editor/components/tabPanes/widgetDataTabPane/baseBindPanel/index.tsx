@@ -49,7 +49,7 @@ export default defineComponent({
       return [
         evalFunctionDefine({
           key: WIDGET_VIF_FUNCTION_KEY,
-          label: '是否渲染并显示(v-if)',
+          label: '是否显示(v-if)',
           bindable: true,
           bindType: ['boolean'],
           onSaveBind: saveWidgetBindValue

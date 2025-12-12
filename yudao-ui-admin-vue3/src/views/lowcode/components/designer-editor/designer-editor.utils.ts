@@ -2093,7 +2093,7 @@ export function evalFunctionBuiltInHelps(exts?: string[] | string) {
     `变量:${highlightTextHtml('$close(...args) => Promise<结果>')}, 触发页面关闭,获取结果`,
     `变量:${highlightTextHtml('$dialog({title, width, fileId, version, params}) => Promise<结果>')}, 触发弹框弹框关闭时返回结果`,
     `变量:${highlightTextHtml('$useExposeContext(_vid|_var) => Promise<上下文>')}, 获取组件暴露上下文, 默认获取当前组件的上下文`,
-    `变量:${highlightTextHtml('$data(_var|参数, 数据) => Promise<数据>')}, 根据数据变量获取数据或设置数据`,
+    `变量:${highlightTextHtml('$data(_var|参数, 数据, { partial }) => Promise<数据>')}, 根据数据变量获取数据或设置数据, 设置partial可部分更新`,
     `变量:${highlightTextHtml('$submit(_var|参数) => Promise<结果>')}, 触发提交数据`,
     `变量:${highlightTextHtml('$log(...args)')}, 打印日志, 显示数据`,
     `变量:${highlightTextHtml('$args')}, 函数参数数组, 示例:第一个参数$args[0]`,
@@ -2193,7 +2193,8 @@ export async function executeGetData(
   editor: DesignerEditor,
   key?: string | { _var?: string },
   args?: GetDataArgs & { refresh?: boolean },
-  data?: any
+  data?: any,
+  options?: { partial?: boolean }
 ): Promise<any> {
   const _var = isString(key) ? key : key?._var
   if (!isNullOrUnDef(_var)) {
@@ -2201,8 +2202,18 @@ export async function executeGetData(
     if (!isNullOrUnDef(dataDefine)) {
       const { value, isNotExecuted, getData } = useDataDefineExecutor(editor, { dataDefine })
       if (!isNullOrUnDef(data)) {
-        value.value = data
-        return data
+        if (options?.partial) {
+          const temp = { ...value.value }
+          for (const key in data) {
+            if (Object.hasOwn(data, key)) {
+              temp[key] = data[key]
+            }
+          }
+          value.value = temp
+        } else {
+          value.value = data
+        }
+        return value.value
       } else {
         return args?.refresh || isNotExecuted.value ? await getData(args) : value.value
       }
@@ -2266,11 +2277,11 @@ export function buildEvalFnContext(editor: DesignerEditor, defaultKey?: string):
       }
       return ctx
     },
-    $data: (arg1, data) => {
+    $data: (arg1, data, options) => {
       if (isString(arg1)) {
-        return executeGetData(editor, arg1, undefined, data)
+        return executeGetData(editor, arg1, undefined, data, options)
       } else {
-        return executeGetData(editor, arg1._var, arg1, data)
+        return executeGetData(editor, arg1._var, arg1, data, options)
       }
     },
     $submit: (arg1) => {

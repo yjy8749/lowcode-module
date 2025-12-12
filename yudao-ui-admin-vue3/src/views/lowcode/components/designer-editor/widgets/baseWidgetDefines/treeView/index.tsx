@@ -36,8 +36,9 @@ const widget: WidgetDefine = {
     evalFunctionDefine(
       { key: 'loadData', label: '数据加载函数' },
       {
-        helps: `懒加载情况下 ${highlightTextHtml('$args[0]')} 为 node 数据，返回树形节点数组 ${highlightTextHtml('{ id, name, parentId }')}`,
-        defaultFunction: '/** 返回 { id, name, parentId } 数组 */\n' + 'return Promise.resolve([])'
+        helps: `懒加载情况下 ${highlightTextHtml('$args[0]')} 为 node 数据，返回树节点数组`,
+        defaultFunction:
+          '/** 异步返回 { id, name, parentId, leaf } 数组 */\n' + 'return Promise.resolve([])'
       }
     ),
     actionButtonDefine({ key: 'createButton', label: '创建按钮' }),

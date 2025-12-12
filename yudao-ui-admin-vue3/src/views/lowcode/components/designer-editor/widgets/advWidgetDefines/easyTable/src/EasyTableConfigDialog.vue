@@ -283,7 +283,7 @@
                 :editor="editor"
                 :widget="dialogArgs!.widget"
                 :helps="`${highlightTextHtml('$args[0]')} 为列表数据`"
-                default-function="return true"
+                :default-function="'/** 同步返回 */\n' + 'return true'"
                 v-model="formModel.itemSelectableFunction"
               />
             </el-form-item>
@@ -301,9 +301,9 @@
                 :height="100"
                 :editor="editor"
                 :widget="dialogArgs!.widget"
-                :helps="`返回 ${highlightTextHtml('[{ name, symbol, value}]')} 查询参数数组`"
+                :helps="`返回 ${highlightTextHtml('[{ name, symbol, value}]')} 查询参数，作为默认筛选条件`"
                 :default-function="
-                  '/** 返回 { name, symbol, value } 数组 */\n' + 'return Promise.resolve([])'
+                  '/** 异步返回 { name, symbol, value } 数组 */\n' + 'return Promise.resolve([])'
                 "
                 v-model="formModel.defaultParamsFunction"
               />
@@ -315,8 +315,8 @@
                 :height="100"
                 :editor="editor"
                 :widget="dialogArgs!.widget"
-                :helps="`${highlightTextHtml('$args[0]')} 为列表数据`"
-                default-function="return args[0]"
+                :helps="`用于数据转换，${highlightTextHtml('$args[0]')} 为列表数据`"
+                :default-function="'/** 同步或异步返回 */\n' + 'return $args[0]'"
                 v-model="formModel.itemProcessFunction"
               />
             </el-form-item>
@@ -389,6 +389,7 @@ import { cloneDeep } from 'lodash-es'
 import SearchFieldConfigDialog from './SearchFieldConfigDialog.vue'
 import ColumnConfigDialog from './ColumnConfigDialog.vue'
 import { EasyTableFormModel } from './types'
+import EasyTableHelpsInput from './EasyTableHelpsInput.vue'
 
 export interface EasyTableConfigDialogArgs {
   parentWidget?: WidgetInstance

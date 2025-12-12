@@ -8,6 +8,7 @@ import { Emitter } from 'mitt'
 import { UseWidgetMenusArgs } from './designer-editor.menu'
 import { ButtonType, ComponentSize } from 'element-plus'
 import { jsonStringify } from '../common/utils'
+import { isEmpty } from '@/utils/is'
 
 export const FILE_SOURCE_DESIGNER = 2
 
@@ -545,7 +546,8 @@ export interface EvalFnContext {
   $useExposeContext: (arg1?: string) => Promise<Record<string, any> | undefined>
   $data: (
     arg1: string | (GetDataArgs & { _var: string; refresh?: boolean }),
-    data?: any
+    data?: any,
+    options?: any
   ) => Promise<any>
   $submit: (arg1?: string | (GetDataArgs & { _var: string })) => Promise<any>
   $log: (...args: any[]) => void
@@ -994,6 +996,19 @@ export const ElCommonTypeOptions = [
   { label: '默认', value: 'default' }
 ]
 
+export const ElCommonTagTypeOptions = [
+  { label: '成功', value: 'success' },
+  { label: '信息', value: 'info' },
+  { label: '警告', value: 'warning' },
+  { label: '危险', value: 'danger' }
+]
+
+export const ElCommonTagEffectOptions = [
+  { label: 'Light', value: 'light' },
+  { label: 'Dark', value: 'dark' },
+  { label: 'Plain', value: 'plain' }
+]
+
 export const CssSymbols = ['px', 'rem', '%']
 
 export const RequestUrlModeOptions = [
@@ -1058,4 +1073,19 @@ export const CommonTextPattern = [
       message: '请输入正确的URL连接'
     })
   }
+]
+
+export const ElDatePickerTypeOptions = [
+  { value: 'year', label: '单个年份', format: 'YYYY' },
+  { value: 'month', label: '单个月份', format: 'YYYY-MM' },
+  { value: 'week', label: '单个年周', format: 'YYYY年第ww周', valueFormat: 'YYYY-ww' },
+  { value: 'date', label: '单个日期', format: 'YYYY-MM-DD' },
+  { value: 'datetime', label: '单个日期和时间', format: 'YYYY-MM-DD HH:mm:ss' },
+  { value: 'years', label: '多个年份', format: 'YYYY' },
+  { value: 'months', label: '多个月份', format: 'YYYY-MM' },
+  { value: 'dates', label: '多个日期', format: 'YYYY-MM-DD' },
+  { value: 'daterange', label: '日期范围选择', format: 'YYYY-MM-DD' },
+  { value: 'datetimerange', label: '日期和时间范围选择', format: 'YYYY-MM-DD HH:mm:ss' },
+  { value: 'monthrange', label: '月份范围选择', format: 'YYYY-MM' },
+  { value: 'yearrange', label: '年份范围选择', format: 'YYYY' }
 ]

@@ -64,10 +64,12 @@ const tableAttrs = computed(() => {
       return {
         ...e,
         remoteMethod: toEvalFunction(e.remoteMethod),
-        load: toEvalFunction(e.load),
+        loadData: toEvalFunction(e.loadData),
         filterMethod: toEvalFunction(e.filterMethod),
         disabledDate: toEvalFunction(e.disabledDate),
-        fetchSuggestions: toEvalFunction(e.fetchSuggestions)
+        fetchSuggestions: toEvalFunction(e.fetchSuggestions),
+        activeValue: toEvalFunction(e.activeValue),
+        inactiveValue: toEvalFunction(e.inactiveValue)
       }
     }),
     searchActions: toActionButtonProps(usePropValue('searchActions')),

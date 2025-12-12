@@ -366,7 +366,13 @@ export function useWidgetAddMenu(
                 parentRenderContext: args?.widgetRenderContext,
                 defaultProps: args?.options
               })
-              editor.executeCmd(addWidgetCmd(editor, { toSlotId: putableParent?._vid, widget }))
+              editor.executeCmd(
+                addWidgetCmd(editor, {
+                  toSlotId: putableParent?._vid,
+                  toIndex: args?.widgetIndex ? args.widgetIndex + 1 : 0,
+                  widget
+                })
+              )
               editor.getStore().setSelected(widget)
             }
           }

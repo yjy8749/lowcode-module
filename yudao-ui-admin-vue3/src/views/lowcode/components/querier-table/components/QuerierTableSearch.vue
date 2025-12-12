@@ -14,7 +14,7 @@
         />
       </el-col>
       <el-col :span="btnColSpan">
-        <div class="flex gap-2">
+        <div class="flex gap-2 mb-2">
           <!-- 查询区按钮 -->
           <el-button
             v-if="!isEmpty(showSearchFields)"
