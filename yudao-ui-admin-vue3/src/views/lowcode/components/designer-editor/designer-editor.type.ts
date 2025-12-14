@@ -343,6 +343,7 @@ export interface DesignerEditor {
   rollbackCmd: (cmd: DesignerEditorCmd) => boolean
   getPageParams: () => Promise<any>
   getPageSlots: () => any
+  getMessage: () => any
   dialog: (options: any) => Promise<any>
   close: (...args: any[]) => Promise<any>
   inject: Record<string, Function>

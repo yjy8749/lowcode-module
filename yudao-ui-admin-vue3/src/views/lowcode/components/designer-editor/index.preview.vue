@@ -62,6 +62,8 @@ const store = useDesignerStore({
 const { state, isPreviewMode, isDesignMode, isLoading, isLoadError, isSaving, hasLoadingContext } =
   store
 
+const message = useMessage()
+
 const editor = computed((): DesignerEditor => {
   return {
     getStore: () => store,
@@ -70,6 +72,7 @@ const editor = computed((): DesignerEditor => {
     rollbackCmd: (cmd) => rollback(editor.value, cmd),
     getPageParams: () => props.params,
     getPageSlots: () => slots,
+    getMessage: () => message,
     dialog: (options) => openDesignerPageDialog(options),
     close: (...args) => doEditorClose(...args),
     inject: {

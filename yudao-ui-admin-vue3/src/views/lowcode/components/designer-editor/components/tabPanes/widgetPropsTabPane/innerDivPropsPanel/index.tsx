@@ -1,13 +1,13 @@
 import { ElForm } from 'element-plus'
 import { joinKeys } from '../../../../../common/utils'
 import {
-  buildCSSStyleDef,
   useSelectedWidget,
   useSelectedWidgetRenderContext,
   useSelectedWidgetDefine
 } from '../../../../designer-editor.utils'
 import WidgetPropItem from '../../../WidgetPropItem.vue'
 import { DesignerEditor } from '../../../../designer-editor.type'
+import { buildContainerStylePropsDef } from '../../../../designer-editor.props'
 
 export default defineComponent({
   label: '内容器样式',
@@ -29,7 +29,7 @@ export default defineComponent({
 
     const DynamicPropsList = () => {
       return [
-        ...buildCSSStyleDef('inner'),
+        ...buildContainerStylePropsDef('inner'),
         ...(widgetDef.value?.innerStyleDesignerProps ?? [])
       ].map((define) => {
         return (

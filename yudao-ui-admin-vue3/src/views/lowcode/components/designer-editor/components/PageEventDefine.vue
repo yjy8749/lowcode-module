@@ -23,7 +23,7 @@ import { isEmpty } from '@/utils/is'
 import { generateVForKey } from '../../common/utils'
 import ArrayValueInput from '../../common/ArrayValueInput.vue'
 import MultiValueInput from '../../common/MultiValueInput.vue'
-import { isEventKeyValid, readEditorDataValue } from '../designer-editor.utils'
+import { readEditorDataValue } from '../designer-editor.utils'
 import { DesignerEditor, DesignerEditorEventDefine } from '../designer-editor.type'
 import { writeEditorDataValueCmd } from '../designer-editor.cmd'
 import { computedVModel } from '../../common/hooks'
@@ -42,7 +42,7 @@ const isKeyValid = (vals: DesignerEditorEventDefine[]): string | undefined => {
   const seen = new Set()
   for (const item of vals) {
     if (!isEmpty(item.key)) {
-      if (!isEventKeyValid(item.key)) {
+      if (['onBeforeMount', 'onMounted', 'onBeforeUnmount', 'onUnmounted'].includes(item.key)) {
         return `事件Key${item.key}无效`
       }
       if (seen.has(item.key)) {

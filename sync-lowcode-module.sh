@@ -55,7 +55,7 @@ copy_source "$source1" "$target1"
 copy_source "$source2" "$target2"
 
 # 修复：复制后删除 lowcode-module 中的 target 目录
-find lowcode-module -type d -name 'target' -exec rm -rf {} \;
+find lowcode-module -type d -name 'target' -exec rm -rf {} + 2>/dev/null
 
 echo "✅ 低代码模块复制完成！路径结构已保留，重复项已过滤。"
 echo "   - 结果目录: lowcode-module/ruoyi-vue-pro"
@@ -63,17 +63,17 @@ echo "   - 结果目录: lowcode-module/yudao-ui-admin-vue3"
 
 cd lowcode-ruoyi-vue-pro 
 git remote add origin2 git@github.com:yjy8749/lowcode-ruoyi-vue-pro.git
-git push origin2
+git push origin2 --tags
 git remote remove origin2
 cd ..
 
 cd lowcode-yudao-ui-admin-vue3
 git remote add origin2 git@github.com:yjy8749/lowcode-yudao-ui-admin-vue3.git
-git push origin2
+git push origin2 --tags
 git remote remove origin2
 cd ..
 
 cd lowcode-module
 git remote add origin2 git@github.com:yjy8749/lowcode-module.git
-git push origin2
+git push origin2 --tags
 git remote remove origin2

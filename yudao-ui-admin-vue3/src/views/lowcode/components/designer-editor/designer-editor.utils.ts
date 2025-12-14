@@ -1,12 +1,7 @@
 import {
-  AlignItemsOptions,
   DesignerEditorCmd,
   WidgetRenderContext,
   DesignerEditorData,
-  DisplayOptions,
-  FlexDirectionOptions,
-  FlexWrapOptions,
-  JustifyContentOptions,
   SeekDataFunction,
   CheckDataDefineResult,
   SeekWidgetFunction,
@@ -28,7 +23,6 @@ import {
   EvalFnContext,
   DesignerEditor,
   PAGE_DEFINE_NO,
-  CssSymbols,
   GetDataArgs,
   SLOT_DEFAULT_KEY
 } from './designer-editor.type'
@@ -45,23 +39,16 @@ import {
   copyValue
 } from '../common/utils'
 import { useDebounceFn, useThrottleFn } from '@vueuse/core'
-import {
-  edgeInsetsDefine,
-  eventDefine,
-  formatInputNumberDefine,
-  inputDefine,
-  inputNumberDefine,
-  propBindDefine,
-  radioButtonDefine
-} from './designer-editor.props'
 import request from '@/config/axios'
 import { useMessage } from '@/hooks/web/useMessage'
 import { useDataDefineAnalyzer, useDataDefineExecutor } from './components/dataDefine/hooks'
-import { writePropValuesCmd, writeWidgetValueCmd } from './designer-editor.cmd'
+import { writeWidgetValueCmd } from './designer-editor.cmd'
 import { computed } from 'vue'
 import { highlightTextHtml } from '../common/utils'
 import download from '@/utils/download'
 import { requestOriginal } from '@/api/lowcode/utils'
+import { useI18n } from '@/hooks/web/useI18n'
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
 
 /** 参数是否为 DesignerEditor */
 export function isDesignerEditor(val?: any): val is DesignerEditor {
@@ -792,27 +779,6 @@ export function readPageEventBind(
     return eventsBind[eventKey]
   }
   return undefined
-}
-
-/** 属性定义转换为绑定定义 */
-export function convertPropDefineToBind(define: WidgetPropDefine): WidgetPropDefine {
-  if (!(define.bindable ?? false) || define.type === 'propBind') {
-    return define
-  }
-  return propBindDefine({
-    key: define.key,
-    label: define.label,
-    helps: define.helps,
-    isShow: define.isShow,
-    onSaveBind: define.onSaveBind,
-    bindType: define.bindType,
-    hideLabel: define.hideLabel,
-    isArray: define.isArray,
-    formItemProps: {
-      ...define.formItemProps,
-      labelPosition: 'left'
-    }
-  })
 }
 
 /** 默认检索父组件方法 */
@@ -1644,206 +1610,6 @@ export function unwrapCSSKey(type: string, propKey: string) {
 }
 
 /** 构建组件容器样式 */
-export function buildCSSStyleDef(type: string): WidgetPropDefine[] {
-  const _wrapKey = (propKey: string) => wrapCSSKey(type, propKey)
-
-  const _wrapCusKey = (propKey: string) => wrapCusCSSKey(type, propKey)
-
-  const isDisplayIs = (type: string) => {
-    return ({ widget }) => {
-      return !isNullOrUnDef(widget.props) && widget.props[_wrapKey('display')] == type
-    }
-  }
-
-  return [
-    radioButtonDefine(
-      {
-        key: _wrapKey('display'),
-        label: '布局方式(display)'
-      },
-      DisplayOptions,
-      {
-        _cancelable: true,
-        _chunkSize: 4
-      }
-    ),
-    // waterfall 布局参数
-    inputNumberDefine({
-      key: _wrapKey('column-count'),
-      label: '瀑布流列数(column-count)',
-      isShow: isDisplayIs('waterfall')
-    }),
-    formatInputNumberDefine(
-      {
-        key: _wrapKey('column-gap'),
-        label: '瀑布流列间距(column-gap)',
-        helps: '行间距需通过子元素 margin-bottom 设置',
-        isShow: isDisplayIs('waterfall')
-      },
-      {
-        symbol: ['px', 'rem']
-      }
-    ),
-    // grid 布局参数
-    inputNumberDefine({
-      key: _wrapCusKey('grid-template-columns-cnt'),
-      label: '每行列数',
-      helps: '网格布局每行列数,自动生成列模版',
-      isShow: isDisplayIs('grid'),
-      onSave: (editor, widget, propKey, propValue) => {
-        editor.executeCmd(
-          writePropValuesCmd(editor, {
-            widget: widget,
-            values: {
-              [propKey]: propValue,
-              [_wrapKey('grid-template-columns')]: `repeat(${propValue}, 1fr)`
-            }
-          })
-        )
-      }
-    }),
-    inputDefine({
-      key: _wrapKey('grid-template-columns'),
-      label: '列模版(grid-template-columns)',
-      isShow: isDisplayIs('grid')
-    }),
-    formatInputNumberDefine(
-      {
-        key: _wrapKey('grid-row-gap'),
-        label: '行间距(grid-row-gap)',
-        isShow: isDisplayIs('grid')
-      },
-      {
-        symbol: ['px', 'rem']
-      }
-    ),
-    formatInputNumberDefine(
-      {
-        key: _wrapKey('grid-column-gap'),
-        label: '列间距(grid-column-gap)',
-        isShow: isDisplayIs('grid')
-      },
-      {
-        symbol: ['px', 'rem']
-      }
-    ),
-    // flex 布局参数
-    radioButtonDefine(
-      {
-        key: _wrapKey('flex-direction'),
-        label: '排列方向(flex-direction)',
-        isShow: isDisplayIs('flex')
-      },
-      FlexDirectionOptions,
-      {
-        _cancelable: true
-      }
-    ),
-    radioButtonDefine(
-      {
-        key: _wrapKey('flex-wrap'),
-        label: '换行(flex-wrap)',
-        isShow: isDisplayIs('flex')
-      },
-      FlexWrapOptions,
-      {
-        _cancelable: true
-      }
-    ),
-    formatInputNumberDefine(
-      {
-        key: _wrapKey('gap'),
-        label: '间距(gap)',
-        isShow: isDisplayIs('flex')
-      },
-      {
-        symbol: ['px', 'rem']
-      }
-    ),
-    radioButtonDefine(
-      {
-        key: _wrapKey('justify-content'),
-        label: '主轴分布(justify-content)',
-        isShow: isDisplayIs('flex')
-      },
-      JustifyContentOptions,
-      {
-        _optionsOnlyIcon: true,
-        _cancelable: true,
-        _chunkSize: 3
-      }
-    ),
-    radioButtonDefine(
-      {
-        key: _wrapKey('align-items'),
-        label: '主轴排列(align-items)',
-        isShow: isDisplayIs('flex')
-      },
-      AlignItemsOptions,
-      {
-        _optionsOnlyIcon: true,
-        _cancelable: true,
-        _chunkSize: 3
-      }
-    ),
-    // 普通属性
-    inputNumberDefine({
-      key: _wrapKey('flex'),
-      label: '空间适配(flex)'
-    }),
-    formatInputNumberDefine(
-      {
-        key: _wrapKey('width'),
-        label: '宽度(width)'
-      },
-      {
-        symbol: CssSymbols
-      }
-    ),
-    formatInputNumberDefine(
-      {
-        key: _wrapKey('height'),
-        label: '高度(height)'
-      },
-      {
-        symbol: CssSymbols
-      }
-    ),
-    radioButtonDefine(
-      {
-        key: _wrapKey('overflow'),
-        label: '超出其容器边界时(overflow)'
-      },
-      [
-        { label: '隐藏', value: 'hidden' },
-        { label: '滚动', value: 'scroll' }
-      ],
-      {
-        _cancelable: true
-      }
-    ),
-    edgeInsetsDefine(
-      {
-        key: _wrapKey('padding'),
-        label: '内边距(padding)'
-      },
-      {
-        symbol: ['px', 'rem']
-      }
-    ),
-    edgeInsetsDefine(
-      {
-        key: _wrapKey('margin'),
-        label: '外边距(margin)'
-      },
-      {
-        symbol: ['px', 'rem']
-      }
-    )
-  ]
-}
-
-/** 构建组件容器样式 */
 export function buildCSSObj(
   type: 'inner' | 'outer',
   widget: WidgetInstance
@@ -2046,35 +1812,37 @@ export function requestDataDefineBatch(
   return Promise.all(requestPromiseAll)
 }
 
-/** 事件key是否有效 */
-export function isEventKeyValid(key?: string): boolean {
-  return !defaultLifecycleEvents()
-    .map((e) => e.key)
-    .includes(key ?? '')
+export function lifecycleEventDefine(
+  key: string,
+  args?: Partial<DesignerEditorEventDefine>
+): DesignerEditorEventDefine {
+  return {
+    type: args?.type,
+    key,
+    label: args?.label ?? key,
+    helps: args?.helps,
+    fnHelps: args?.fnHelps
+  }
 }
 
 /** 默认生命周期事件定义 */
 export function defaultLifecycleEvents(): DesignerEditorEventDefine[] {
   return [
-    eventDefine('onBeforeMount', {
+    lifecycleEventDefine('onBeforeMount', {
       type: 'simple-function',
-      label: '初始渲染前',
-      isLifecycle: true
+      label: '初始渲染前'
     }),
-    eventDefine('onMounted', {
+    lifecycleEventDefine('onMounted', {
       type: 'simple-function',
-      label: '渲染完成后',
-      isLifecycle: true
+      label: '渲染完成后'
     }),
-    eventDefine('onBeforeUnmount', {
+    lifecycleEventDefine('onBeforeUnmount', {
       type: 'simple-function',
-      label: '取消挂载前',
-      isLifecycle: true
+      label: '取消挂载前'
     }),
-    eventDefine('onUnmounted', {
+    lifecycleEventDefine('onUnmounted', {
       type: 'simple-function',
-      label: '取消挂载后',
-      isLifecycle: true
+      label: '取消挂载后'
     })
   ]
 }
@@ -2258,7 +2026,7 @@ export function buildEvalFnContext(editor: DesignerEditor, defaultKey?: string):
       }
     },
     $download: () => download,
-    $message: () => message,
+    $message: () => editor.getMessage(),
     $emit: (key, data) => editor.getEmitter().emit(getCustomEventKey(key), data),
     $close: (...args) => editor.close(...args),
     $dialog: (options) => editor.dialog(options),

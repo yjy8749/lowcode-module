@@ -1,10 +1,16 @@
 import { copyValue } from '../common/utils'
 import { chunk } from 'lodash-es'
 import { isNullOrUnDef, isEmpty } from '@/utils/is'
-import type {
-  DesignerEditorEventDefine,
-  WidgetPropDefine,
-  WidgetPropDefineOptions
+import {
+  AlignItemsOptions,
+  CssSymbols,
+  DisplayOptions,
+  FlexDirectionOptions,
+  FlexWrapOptions,
+  JustifyContentOptions,
+  type DesignerEditorEventDefine,
+  type WidgetPropDefine,
+  type WidgetPropDefineOptions
 } from './designer-editor.type'
 import {
   ElText,
@@ -36,7 +42,7 @@ import {
   ElButton,
   ElDivider
 } from 'element-plus'
-import { isEventKeyValid } from './designer-editor.utils'
+import { wrapCSSKey, wrapCusCSSKey } from './designer-editor.utils'
 import { Icon } from '@/components/Icon'
 import { WritableComputedRef } from 'vue'
 import FormatInputNumber from './components/propInput/FormatInputNumber.vue'
@@ -45,6 +51,7 @@ import EditableOptionsInput from './components/propInput/EditableOptionsInput.vu
 import EvalFunctionInput from './components/propInput/EvalFunctionInput.vue'
 import AceEditorInput from './components/propInput/AceEditorInput.vue'
 import ActionButtonInput from './components/propInput/ActionButtonInput.vue'
+import { writePropValuesCmd } from './designer-editor.cmd'
 
 type ExtractProps<T> = T extends { $props: infer P } ? P : never
 
@@ -845,11 +852,31 @@ export function propBindDefine(define: WidgetPropDefine): WidgetPropDefine {
   }
 }
 
+export function convertPropDefineToBind(define: WidgetPropDefine): WidgetPropDefine {
+  if (!(define.bindable ?? false) || define.type === 'propBind') {
+    return define
+  }
+  return propBindDefine({
+    key: define.key,
+    label: define.label,
+    helps: define.helps,
+    isShow: define.isShow,
+    onSaveBind: define.onSaveBind,
+    bindType: define.bindType,
+    hideLabel: define.hideLabel,
+    isArray: define.isArray,
+    formItemProps: {
+      ...define.formItemProps,
+      labelPosition: 'left'
+    }
+  })
+}
+
 export function eventDefine(
   key: string,
-  args?: Partial<DesignerEditorEventDefine> & { isLifecycle?: boolean }
+  args?: Partial<DesignerEditorEventDefine>
 ): DesignerEditorEventDefine {
-  if (!args?.isLifecycle && !isEventKeyValid(key)) {
+  if (['onBeforeMount', 'onMounted', 'onBeforeUnmount', 'onUnmounted'].includes(key)) {
     throw new Error(`event key ${key} is invalid`)
   }
   return {
@@ -945,4 +972,203 @@ export function actionButtonDefine(
       )
     }
   }
+}
+
+export function buildContainerStylePropsDef(type: string): WidgetPropDefine[] {
+  const _wrapKey = (propKey: string) => wrapCSSKey(type, propKey)
+
+  const _wrapCusKey = (propKey: string) => wrapCusCSSKey(type, propKey)
+
+  const isDisplayIs = (type: string) => {
+    return ({ widget }) => {
+      return !isNullOrUnDef(widget.props) && widget.props[_wrapKey('display')] == type
+    }
+  }
+
+  return [
+    radioButtonDefine(
+      {
+        key: _wrapKey('display'),
+        label: '布局方式(display)'
+      },
+      DisplayOptions,
+      {
+        _cancelable: true,
+        _chunkSize: 4
+      }
+    ),
+    // waterfall 布局参数
+    inputNumberDefine({
+      key: _wrapKey('column-count'),
+      label: '瀑布流列数(column-count)',
+      isShow: isDisplayIs('waterfall')
+    }),
+    formatInputNumberDefine(
+      {
+        key: _wrapKey('column-gap'),
+        label: '瀑布流列间距(column-gap)',
+        helps: '行间距需通过子元素 margin-bottom 设置',
+        isShow: isDisplayIs('waterfall')
+      },
+      {
+        symbol: ['px', 'rem']
+      }
+    ),
+    // grid 布局参数
+    inputNumberDefine({
+      key: _wrapCusKey('grid-template-columns-cnt'),
+      label: '每行列数',
+      helps: '网格布局每行列数,自动生成列模版',
+      isShow: isDisplayIs('grid'),
+      onSave: (editor, widget, propKey, propValue) => {
+        editor.executeCmd(
+          writePropValuesCmd(editor, {
+            widget: widget,
+            values: {
+              [propKey]: propValue,
+              [_wrapKey('grid-template-columns')]: `repeat(${propValue}, 1fr)`
+            }
+          })
+        )
+      }
+    }),
+    inputDefine({
+      key: _wrapKey('grid-template-columns'),
+      label: '列模版(grid-template-columns)',
+      isShow: isDisplayIs('grid')
+    }),
+    formatInputNumberDefine(
+      {
+        key: _wrapKey('grid-row-gap'),
+        label: '行间距(grid-row-gap)',
+        isShow: isDisplayIs('grid')
+      },
+      {
+        symbol: ['px', 'rem']
+      }
+    ),
+    formatInputNumberDefine(
+      {
+        key: _wrapKey('grid-column-gap'),
+        label: '列间距(grid-column-gap)',
+        isShow: isDisplayIs('grid')
+      },
+      {
+        symbol: ['px', 'rem']
+      }
+    ),
+    // flex 布局参数
+    radioButtonDefine(
+      {
+        key: _wrapKey('flex-direction'),
+        label: '排列方向(flex-direction)',
+        isShow: isDisplayIs('flex')
+      },
+      FlexDirectionOptions,
+      {
+        _cancelable: true
+      }
+    ),
+    radioButtonDefine(
+      {
+        key: _wrapKey('flex-wrap'),
+        label: '换行(flex-wrap)',
+        isShow: isDisplayIs('flex')
+      },
+      FlexWrapOptions,
+      {
+        _cancelable: true
+      }
+    ),
+    formatInputNumberDefine(
+      {
+        key: _wrapKey('gap'),
+        label: '间距(gap)',
+        isShow: isDisplayIs('flex')
+      },
+      {
+        symbol: ['px', 'rem']
+      }
+    ),
+    radioButtonDefine(
+      {
+        key: _wrapKey('justify-content'),
+        label: '主轴分布(justify-content)',
+        isShow: isDisplayIs('flex')
+      },
+      JustifyContentOptions,
+      {
+        _optionsOnlyIcon: true,
+        _cancelable: true,
+        _chunkSize: 3
+      }
+    ),
+    radioButtonDefine(
+      {
+        key: _wrapKey('align-items'),
+        label: '主轴排列(align-items)',
+        isShow: isDisplayIs('flex')
+      },
+      AlignItemsOptions,
+      {
+        _optionsOnlyIcon: true,
+        _cancelable: true,
+        _chunkSize: 3
+      }
+    ),
+    // 普通属性
+    inputNumberDefine({
+      key: _wrapKey('flex'),
+      label: '空间适配(flex)'
+    }),
+    formatInputNumberDefine(
+      {
+        key: _wrapKey('width'),
+        label: '宽度(width)'
+      },
+      {
+        symbol: CssSymbols
+      }
+    ),
+    formatInputNumberDefine(
+      {
+        key: _wrapKey('height'),
+        label: '高度(height)'
+      },
+      {
+        symbol: CssSymbols
+      }
+    ),
+    radioButtonDefine(
+      {
+        key: _wrapKey('overflow'),
+        label: '超出其容器边界时(overflow)'
+      },
+      [
+        { label: '隐藏', value: 'hidden' },
+        { label: '滚动', value: 'scroll' }
+      ],
+      {
+        _cancelable: true
+      }
+    ),
+    edgeInsetsDefine(
+      {
+        key: _wrapKey('padding'),
+        label: '内边距(padding)'
+      },
+      {
+        symbol: ['px', 'rem']
+      }
+    ),
+    edgeInsetsDefine(
+      {
+        key: _wrapKey('margin'),
+        label: '外边距(margin)'
+      },
+      {
+        symbol: ['px', 'rem']
+      }
+    )
+  ]
 }

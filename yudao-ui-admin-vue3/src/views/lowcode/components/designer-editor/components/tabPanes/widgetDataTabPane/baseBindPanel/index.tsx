@@ -3,8 +3,7 @@ import { joinKeys } from '../../../../../common/utils'
 import {
   useSelectedWidget,
   useSelectedWidgetRenderContext,
-  useSelectedWidgetDefine,
-  convertPropDefineToBind
+  useSelectedWidgetDefine
 } from '../../../../designer-editor.utils'
 import WidgetPropItem from '../../../WidgetPropItem.vue'
 import {
@@ -13,7 +12,7 @@ import {
   WidgetInstance,
   WidgetPropDefineBind
 } from '../../../../designer-editor.type'
-import { evalFunctionDefine } from '../../../../designer-editor.props'
+import { convertPropDefineToBind, evalFunctionDefine } from '../../../../designer-editor.props'
 import { writeWidgetValueBindCmd } from '../../../../designer-editor.cmd'
 
 export default defineComponent({

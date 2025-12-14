@@ -4,11 +4,11 @@ import { isEmpty } from '@/utils/is'
 import {
   useSelectedWidget,
   useSelectedWidgetRenderContext,
-  useSelectedWidgetDefine,
-  convertPropDefineToBind
+  useSelectedWidgetDefine
 } from '../../../../designer-editor.utils'
 import WidgetPropItem from '../../../WidgetPropItem.vue'
 import { DesignerEditor } from '../../../../designer-editor.type'
+import { convertPropDefineToBind } from '../../../../designer-editor.props'
 
 export default defineComponent({
   label: '高级属性&绑定',
