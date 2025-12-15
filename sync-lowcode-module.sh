@@ -76,6 +76,9 @@ git remote remove origin2
 cd ..
 
 cd lowcode-module
+git add .
+git commit -m "feat: 同步模块代码"
+git push origin
 git remote add origin2 git@github.com:yjy8749/lowcode-module.git
 git push origin2
 git push origin2 --tags

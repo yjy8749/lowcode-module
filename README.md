@@ -14,7 +14,7 @@
 
 ##### 在线体验
 
-- 演示地址：TBD  
+- 演示地址：[https://lowcode-demo.yangjiayong.com/](https://lowcode-demo.yangjiayong.com/) `租户: 低代码 用户名：lowcode 密码:lowcode`
 - 前端代码(整合)：[https://gitee.com/yjy8749/lowcode-yudao-ui-admin-vue3](https://gitee.com/yjy8749/lowcode-yudao-ui-admin-vue3)
 - 后端代码(整合)：[https://gitee.com/yjy8749/lowcode-ruoyi-vue-pro](https://gitee.com/yjy8749/lowcode-ruoyi-vue-pro)
 - 芋道-低代码模块代码：[https://gitee.com/yjy8749/lowcode-module](https://gitee.com/yjy8749/lowcode-module)

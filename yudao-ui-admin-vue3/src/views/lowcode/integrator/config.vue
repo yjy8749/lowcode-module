@@ -224,7 +224,7 @@ const localConfig = ref<IntegratorConfigVO>()
 
 const localEntry = computed(() => {
   const { host } = window.location
-  return `http://${host}/admin-api/lowcode/integrator-editor/entry`
+  return `${window.location.protocol}//${host}/admin-api/lowcode/integrator-editor/entry`
 })
 
 const doCopyLocalEntry = () => {
