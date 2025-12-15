@@ -132,7 +132,7 @@ const open = async (fileVO: Partial<MaterialFileVO>) => {
 
 defineExpose({ open })
 
-const emits = defineEmits(['success'])
+const emits = defineEmits(['success', 'create-folder'])
 const submitForm = async () => {
   await formRef.value?.validate()
   formLoading.value = true
@@ -146,6 +146,9 @@ const submitForm = async () => {
     }
     dialogVisible.value = false
     emits('success')
+    if (!formData.value.isFile) {
+      emits('create-folder')
+    }
   } finally {
     formLoading.value = false
   }

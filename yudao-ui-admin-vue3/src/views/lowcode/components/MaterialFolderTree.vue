@@ -192,6 +192,9 @@ watch(
 defineExpose({
   setCurrentKey(key?: TreeKey) {
     folderTreeRef.value?.setCurrentKey(key)
+  },
+  getFolderList() {
+    getFolderList()
   }
 })
 

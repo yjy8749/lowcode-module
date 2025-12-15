@@ -19,6 +19,7 @@
           :integrator-selectable="integratorSelectable"
           :integrator-selected-ids="integratorSelectedIds"
           @open-folder="handleOpenFolder"
+          @refresh-folder="onRefreshFolder"
           @integrator-select-change="onIntegratorSelectChange"
         />
       </ContentWrap>
@@ -61,5 +62,8 @@ const handleOpenFolder = (file?: MaterialFileVO) => {
 }
 const onIntegratorSelectChange = (ids) => {
   emits('integrator-select-change', ids)
+}
+const onRefreshFolder = () => {
+  treeRef.value?.getFolderList()
 }
 </script>

@@ -156,7 +156,7 @@
     v-model:limit="queryParams.pageSize"
     @pagination="getList"
   />
-  <MaterialFileForm ref="editFormRef" @success="getList" />
+  <MaterialFileForm ref="editFormRef" @success="getList" @create-folder="onCreateFolder" />
   <MaterialMoveForm ref="moveFormRef" @success="getList" />
   <MaterialTransferForm ref="transferFormRef" @success="getList" />
   <MaterialFileLogDialog ref="fileLogRef" />
@@ -187,6 +187,7 @@ interface MaterialFileListProps {
 
 type MaterialFileListEmits = {
   'open-folder': [file?: MaterialFileVO]
+  'refresh-folder': []
   'integrator-select-change': [ids: number[]]
 }
 
@@ -443,6 +444,9 @@ const fileActionList = ref<FileActionType[]>([
       await MaterialFileApi.deleteMaterialFile(file)
       message.success('删除成功')
       await getList()
+      if (!file.isFile) {
+        emits('refresh-folder')
+      }
     }
   },
   {
@@ -453,6 +457,9 @@ const fileActionList = ref<FileActionType[]>([
     isDisabled: (file) => !isCreator(file) || isLocked(file),
     onClick: (file) => {
       moveFormRef.value?.open(file)
+      if (!file.isFile) {
+        emits('refresh-folder')
+      }
     }
   },
   {
@@ -463,6 +470,9 @@ const fileActionList = ref<FileActionType[]>([
     isDisabled: (file) => !isCreator(file) || isLocked(file),
     onClick: (file) => {
       transferFormRef.value?.open(file)
+      if (!file.isFile) {
+        emits('refresh-folder')
+      }
     }
   },
   {
@@ -558,6 +568,10 @@ const showSelectedFiles = async () => {
     queryParams.pageNo = 1
     await getList()
   }
+}
+
+const onCreateFolder = () => {
+  emits('refresh-folder')
 }
 
 defineExpose({

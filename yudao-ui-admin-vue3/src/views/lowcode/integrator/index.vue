@@ -12,7 +12,12 @@
     </el-col>
     <el-col :span="19" :xs="16">
       <ContentWrap class="h-1/1">
-        <MaterialFileList ref="listRef" source="integrator" @open-folder="handleOpenFolder" />
+        <MaterialFileList
+          ref="listRef"
+          source="integrator"
+          @open-folder="handleOpenFolder"
+          @refresh-folder="onRefreshFolder"
+        />
       </ContentWrap>
     </el-col>
   </el-row>
@@ -37,5 +42,8 @@ const handleNodeUnselect = () => {
 }
 const handleOpenFolder = (file?: MaterialFileVO) => {
   treeRef.value?.setCurrentKey(file?.id)
+}
+const onRefreshFolder = () => {
+  treeRef.value?.getFolderList()
 }
 </script>
