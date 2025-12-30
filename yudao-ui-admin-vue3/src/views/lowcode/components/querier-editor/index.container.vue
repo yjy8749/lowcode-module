@@ -335,12 +335,11 @@ const doCopyApi = () => {
 }
 
 onBeforeMount(async () => {
-  dataSourceConfigList.value = await QuerierEditorApi.getDataSourceList()
-  if (
-    !isEmpty(dataSourceConfigList.value) &&
-    !dataSourceConfigList.value.some((e) => e.id == state.value.editorData.dataSourceId)
-  ) {
-    state.value.editorData.dataSourceId = dataSourceConfigList.value[0].id ?? 0
+  dataSourceConfigList.value = (await QuerierEditorApi.getDataSourceList()) ?? []
+  if (!state.value.materialFileData?.id) {
+    if (!dataSourceConfigList.value.find((e) => e.id == state.value.editorData.dataSourceId)) {
+      state.value.editorData.dataSourceId = dataSourceConfigList.value[0].id ?? 0
+    }
   }
 })
 </script>
