@@ -62,14 +62,36 @@ echo "   - 结果目录: lowcode-module/ruoyi-vue-pro"
 echo "   - 结果目录: lowcode-module/yudao-ui-admin-vue3"
 
 cd lowcode-ruoyi-vue-pro 
+echo "🧹 正在删除本地所有标签..."
+git tag -d $(git tag -l) >/dev/null 2>&1
+echo "📥 正在从 origin 拉取所有标签..."
+git fetch origin --tags --prune-tags
 git remote add origin2 git@github.com:yjy8749/lowcode-ruoyi-vue-pro.git
+echo "🗑️ 正在删除 origin2 上的所有远程标签..."
+remote_tags=$(git ls-remote --tags origin2 | cut -f2 | sed 's|refs/tags/||')
+if [ -n "$remote_tags" ]; then
+    # 使用 xargs 分批删除（避免参数过长）
+    echo "$remote_tags" | xargs -I {} git push origin2 :refs/tags/{}
+fi
+echo "📤 正在将本地代码推送到 origin2..."
 git push origin2
 git push origin2 --tags
 git remote remove origin2
 cd ..
 
 cd lowcode-yudao-ui-admin-vue3
+echo "🧹 正在删除本地所有标签..."
+git tag -d $(git tag -l) >/dev/null 2>&1
+echo "📥 正在从 origin 拉取所有标签..."
+git fetch origin --tags --prune-tags
 git remote add origin2 git@github.com:yjy8749/lowcode-yudao-ui-admin-vue3.git
+echo "🗑️ 正在删除 origin2 上的所有远程标签..."
+remote_tags=$(git ls-remote --tags origin2 | cut -f2 | sed 's|refs/tags/||')
+if [ -n "$remote_tags" ]; then
+    # 使用 xargs 分批删除（避免参数过长）
+    echo "$remote_tags" | xargs -I {} git push origin2 :refs/tags/{}
+fi
+echo "📤 正在将本地代码推送到 origin2..."
 git push origin2
 git push origin2 --tags
 git remote remove origin2
@@ -78,8 +100,14 @@ cd ..
 cd lowcode-module
 git add .
 git commit -m "feat: 同步模块代码"
+echo "🧹 正在删除本地所有标签..."
+git tag -d $(git tag -l) >/dev/null 2>&1
+echo "📥 正在从 origin 拉取所有标签..."
+git fetch origin --tags --prune-tags
+echo "📤 正在将本地代码推送到 origin..."
 git push origin
 git remote add origin2 git@github.com:yjy8749/lowcode-module.git
+echo "📤 正在将本地代码推送到 origin2..."
 git push origin2
 git push origin2 --tags
 git remote remove origin2
