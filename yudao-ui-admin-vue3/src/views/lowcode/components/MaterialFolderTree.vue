@@ -42,6 +42,7 @@ import { useUserStore } from '@/store/modules/user'
 import { showContextMenu } from './common/contextMenu'
 import { getSourceValue, sourceEditorPermiValue } from './common/utils'
 import { TreeKey } from 'element-plus/es/components/tree/src/tree.type'
+import { useLoadingService } from './common/hooks'
 
 interface MaterialFolderTreeProps {
   source: string
@@ -55,6 +56,8 @@ const sourceValue = computed(() => getSourceValue(props.source))
 const hasEditorPermi = computed(() => checkPermi([sourceEditorPermiValue(props.source)]))
 
 const message = useMessage()
+
+const loadingService = useLoadingService()
 
 const searchValue = ref('')
 
@@ -93,6 +96,7 @@ const handleNodeClick = async (row: { [key: string]: any }) => {
     lastSelectNodeKey.value = undefined
     emits('node-unselect', row)
   } else {
+    folderTreeRef.value?.setCurrentKey(row.id)
     lastSelectNodeKey.value = key
     emits('node-select', row)
   }
@@ -125,6 +129,22 @@ const handleNodeContextMenu = (e: MouseEvent, row: MaterialFileVO) => {
       disabled: !isCreator(row),
       onClick: () => {
         editFormRef.value?.open(row)
+      }
+    },
+    {
+      label: '复制',
+      icon: 'ep:copy-document',
+      hidden: !hasEditorPermi.value,
+      disabled: !isCreator(row),
+      onClick: async () => {
+        await loadingService.callWithLoading(async () => {
+          await message.confirm('是否执行复制？')
+          const copyFile = await MaterialFileApi.copyMaterialFile(row)
+          message.success('复制成功')
+          await getFolderList()
+          folderTreeRef.value?.setCurrentKey(copyFile.id)
+          emits('node-select', copyFile)
+        }, '复制中...')
       }
     },
     {

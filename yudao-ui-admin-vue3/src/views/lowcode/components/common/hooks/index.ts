@@ -1,4 +1,4 @@
-import { useFormItem } from 'element-plus'
+import { useFormItem, ElLoading } from 'element-plus'
 import { isFunction } from 'min-dash'
 import { WritableComputedOptions, computed } from 'vue'
 
@@ -69,6 +69,33 @@ export function useScopeLoading() {
   return {
     loading,
     isLoading,
+    callWithLoading
+  }
+}
+
+export function useLoadingService() {
+  const loadingCount = ref(0)
+  const loadingInstance = ref<any | undefined>()
+  const callWithLoading = async (
+    fn?: (() => Promise<any>) | boolean | (() => boolean),
+    text?: string
+  ) => {
+    try {
+      if (loadingCount.value <= 0) {
+        loadingInstance.value = ElLoading.service({ text: text ?? '处理中...' })
+      }
+      loadingCount.value++
+      await (fn as () => Promise<any>)?.()
+    } finally {
+      loadingCount.value--
+      if (loadingCount.value <= 0) {
+        loadingCount.value = 0
+        loadingInstance.value.close()
+        loadingInstance.value = undefined
+      }
+    }
+  }
+  return {
     callWithLoading
   }
 }

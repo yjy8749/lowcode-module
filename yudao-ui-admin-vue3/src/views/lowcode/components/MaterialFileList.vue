@@ -106,13 +106,13 @@
               type="primary"
               link
               :disabled="btn.isDisabled && btn.isDisabled(file)"
-              @click="() => handleCommand(file, btn.key)"
+              @click.stop="() => handleCommand(file, btn.key)"
             >
               {{ btn.label }}
             </el-button>
             <el-button size="small" type="primary" link>
               <el-dropdown @command="(key: string) => handleCommand(file, key)">
-                <Icon class="c-[--el-color-primary]" icon="ep:more-filled" />
+                <Icon class="c-[--el-color-primary]" icon="ep:more-filled" @click.stop />
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item
@@ -176,6 +176,7 @@ import { getSourceValue, sourceEditorPermiValue } from './common/utils'
 import { ElForm } from 'element-plus'
 import EmptyText from './common/EmptyText.vue'
 import { LOWCODE_DICT_TYPE } from './common/dict'
+import { useLoadingService } from './common/hooks'
 
 defineOptions({ name: 'MaterialFileList' })
 
@@ -213,6 +214,8 @@ const currentFolder = ref<MaterialFileVO>()
 const parentId = computed(() => {
   return currentFolder.value?.id ?? 0
 })
+
+const loadingService = useLoadingService()
 
 const message = useMessage()
 
@@ -399,6 +402,20 @@ const fileActionList = ref<FileActionType[]>([
     isDisabled: (file) => !isCreator(file) || isLocked(file),
     onClick: (file) => {
       editFormRef.value?.open(file)
+    }
+  },
+  {
+    key: 'copy',
+    label: '复制',
+    icon: 'ep:copy-document',
+    isHidden: () => !hasEditorPermi.value,
+    onClick: async (file) => {
+      await loadingService.callWithLoading(async () => {
+        await message.confirm('是否执行复制操作？')
+        await MaterialFileApi.copyMaterialFile(file)
+        message.success('复制成功')
+        await getList()
+      })
     }
   },
   {

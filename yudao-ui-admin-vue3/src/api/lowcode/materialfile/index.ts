@@ -78,6 +78,9 @@ export interface MaterialFileMoveReqVO {
   parentId: number
   parentName: string
 }
+export interface MaterialFileCopyReqVO {
+  id: number
+}
 
 // 低代码-物料文件 API
 export const MaterialFileApi = {
@@ -116,5 +119,9 @@ export const MaterialFileApi = {
   // 移动位置-物料文件
   moveMaterialFile: async (data: MaterialFileMoveReqVO) => {
     return await request.put({ url: `/lowcode/material-file/move`, data })
+  },
+  // 复制文件-物料文件
+  copyMaterialFile: async (data: MaterialFileCopyReqVO) => {
+    return await request.put({ url: `/lowcode/material-file/copy`, data })
   }
 }
