@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { isNullOrUnDef } from '@/utils/is'
+import { isEmpty, isNullOrUnDef } from '@/utils/is'
 import { generateVForKey } from '../../../common/utils'
 import {
   WidgetRenderContext,
@@ -88,7 +88,8 @@ const handleRemove = (index: number) => {
   if (!isNullOrUnDef(minLength) && valueVModel.value.length <= minLength) {
     valueVModel.value = [...valueVModel.value]
   } else {
-    valueVModel.value = valueVModel.value.toSpliced(index, 1)
+    const vals = valueVModel.value.toSpliced(index, 1)
+    valueVModel.value = isEmpty(vals) ? undefined : vals
   }
 }
 </script>

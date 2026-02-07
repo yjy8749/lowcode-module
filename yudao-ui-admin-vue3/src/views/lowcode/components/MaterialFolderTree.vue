@@ -61,9 +61,7 @@ const loadingService = useLoadingService()
 
 const searchValue = ref('')
 
-const folderList = ref<MaterialFileVO[]>([])
-
-const folderTree = computed(() => handleTree(folderList.value))
+const folderTree = ref<any[]>([])
 
 const folderTreeRef = ref<InstanceType<typeof ElTree>>()
 
@@ -77,10 +75,11 @@ const fileLogRef = ref<InstanceType<typeof MaterialFileLogDialog>>()
 
 const emits = defineEmits(['node-select', 'node-unselect'])
 const getFolderList = async () => {
-  folderList.value = await MaterialFileApi.getMaterialFileFolderList({
+  const list = await MaterialFileApi.getMaterialFileFolderList({
     source: sourceValue.value,
     integratorSelectable: props.integratorSelectable
   })
+  folderTree.value = handleTree(list)
 }
 
 const filterFolder = (name: string, data: Tree) => {
