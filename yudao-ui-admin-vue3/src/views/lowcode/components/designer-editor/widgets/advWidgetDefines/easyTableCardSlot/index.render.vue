@@ -29,7 +29,7 @@
     <template v-if="isShowFooter" #footer>
       <div class="flex justify-end">
         <QuerierTableBodyRowActions
-          :scope="{ row: vforItemRefData.data, $index: vforItemRefData.index }"
+          :scope="{ row: vforItemData.data, $index: vforItemData.index }"
           :rowActions="rowActionsConfig.rowActions"
           :expandRowActions="rowActionsConfig.expandRowActions"
           :foldRowActions="rowActionsConfig.foldRowActions"
@@ -44,16 +44,21 @@
 <script setup lang="ts">
 import { useElColPropAttrs, useWidget, type WidgetRenderProps } from '../../hooks'
 import WidgetItem from '../../../components/WidgetItem.vue'
-import { customWidgetOptions } from '../../../designer-editor.utils'
 import QuerierTableBodyRowActions from '../../../../querier-table/components/QuerierTableBodyRowActions.vue'
 import { isEmpty } from '@/utils/is'
 
-const widgetItemOptions = customWidgetOptions({ putable: true, selectable: true })
-
 const props = defineProps<WidgetRenderProps>()
 
-const { usePropAndEvent, useDefaultSlot, useParent, useVForItemRefData, useExposeContext } =
-  useWidget(props)
+const {
+  usePropAndEvent,
+  useDefaultSlot,
+  useParent,
+  useVForItemData,
+  useExposeContext,
+  generateOptions
+} = useWidget(props)
+
+const widgetItemOptions = generateOptions({ putable: true, selectable: true })
 
 const cardAttrs = computed(() => usePropAndEvent({ omit: ['justify'] }))
 
@@ -74,29 +79,29 @@ const parentTableRef = (): any | undefined => {
 const isTableSelectable = computed(() => parentTableContext.value?.isSelectable())
 
 const isSelectable = computed(() => {
-  return parentTableRef()?.isRowSelectable(vforItemRefData.value.data) ?? true
+  return parentTableRef()?.isRowSelectable(vforItemData.value.data) ?? true
 })
 
-const vforItemRefData = computed(() => useVForItemRefData())
+const vforItemData = computed(() => useVForItemData())
 
 const isChecked = computed(() => {
-  return parentTableRef()?.isRowChecked(vforItemRefData.value.data)
+  return parentTableRef()?.isRowChecked(vforItemData.value.data)
 })
 
 const toggleSelected = () => {
   if (isTableSelectable.value && isSelectable.value) {
-    parentTableRef()?.toggleRowsSelection(vforItemRefData.value.data)
+    parentTableRef()?.toggleRowsSelection(vforItemData.value.data)
   }
 }
 
 const bgStyle = computed(() => {
-  if (parentTableRef()?.isCurrentRow(vforItemRefData.value.data)) {
+  if (parentTableRef()?.isCurrentRow(vforItemData.value.data)) {
     return 'background-color:#ecf5ff'
   }
 })
 
 const toggleCurrentRow = () => {
-  parentTableRef()?.toggleCurrentRow(vforItemRefData.value.data)
+  parentTableRef()?.toggleCurrentRow(vforItemData.value.data)
 }
 
 const isShowAction = ref(true)

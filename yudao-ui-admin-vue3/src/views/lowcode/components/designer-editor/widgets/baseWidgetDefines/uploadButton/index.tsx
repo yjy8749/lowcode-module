@@ -10,7 +10,7 @@ import {
 } from '../../../designer-editor.props'
 
 const widget: WidgetDefine = {
-  label: '文件上传按钮',
+  label: '上传按钮',
   icon: 'ep:upload-filled',
   render: (args) => () => {
     return <Render {...args} />
@@ -27,6 +27,7 @@ const widget: WidgetDefine = {
     switchDefine({ key: 'drag', label: '是否拖拽上传' }),
     switchDefine({ key: 'isShowTip', label: '是否显示提示', defaultValue: true }),
     switchDefine({ key: 'hiddenFileList', label: '是否隐藏文件列表' }),
+    switchDefine({ key: 'moreFileInfo', label: '是否返回文件信息' }),
     inputDefine({ key: 'directory', label: '上传目录' })
   ],
   advDesignerProps: [],

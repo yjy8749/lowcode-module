@@ -8,7 +8,7 @@
       :parent-render-context="wrapItemRenderContext(item, index)"
       :widget="defaultSlotWidget"
       :widget-index="index"
-      :options="customWidgetOptions({ putable: index == 0, selectable: index == 0 })"
+      :options="generateOptions({ putable: index == 0, selectable: index == 0 })"
     />
   </div>
 </template>
@@ -19,12 +19,12 @@ import { generateVForKey } from '../../../../common/utils'
 import { useWidget, type WidgetRenderProps } from '../../hooks'
 import { WidgetRenderContext } from '../../../designer-editor.type'
 import WidgetItem from '../../../components/WidgetItem.vue'
-import { getForItemDataId } from './utils'
-import { customWidgetOptions, regenSeekDataFunctionRuntime } from '../../../designer-editor.utils'
+import { regenSeekDataFunctionRuntime } from '../../../designer-editor.utils'
+import { getVForItemDataId } from './utils'
 
 const props = defineProps<WidgetRenderProps>()
 
-const { isPreviewMode, editor, usePropValue, useDefaultSlot } = useWidget(props)
+const { isPreviewMode, editor, usePropValue, useDefaultSlot, generateOptions } = useWidget(props)
 
 const defaultSlotWidget = computed(() => useDefaultSlot())
 
@@ -41,7 +41,7 @@ const wrapItemRenderContext = (data: any, index: number): WidgetRenderContext =>
         editor,
         props.widgetRenderContext,
         {
-          [getForItemDataId(props.widget)]: {
+          [getVForItemDataId(props.widget)]: {
             __key__: data.id ?? data.__key__,
             index: index,
             length: bindData.value.length,

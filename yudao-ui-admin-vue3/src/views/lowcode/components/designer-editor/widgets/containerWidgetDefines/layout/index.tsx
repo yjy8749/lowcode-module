@@ -6,7 +6,7 @@ import {
   WidgetDefine,
   WidgetInstance
 } from '../../../designer-editor.type'
-import { createSlotItem, createWidgetInstanceDefault } from '../../../designer-editor.utils'
+import { createSlotRender, createWidgetInstanceDefault } from '../../../designer-editor.utils'
 import { inputNumberDefine, radioButtonDefine } from '../../../designer-editor.props'
 import { batchCmd, writePropValueCmd, writeWidgetValueCmd } from '../../../designer-editor.cmd'
 
@@ -23,7 +23,7 @@ function createSlots(
   return Array.from({ length: rowCnt * colCnt }).map((_, index) => {
     const slotKey = `slot#${index}`
     const oldSlotInstance = layout.slots.find((item: any) => item.slotKey === slotKey)
-    const slotInstance = oldSlotInstance ?? createSlotItem(editor, slotKey)
+    const slotInstance = oldSlotInstance ?? createSlotRender(editor, slotKey)
     if (isAdjustSpan) {
       slotInstance.props.span = Math.floor(24 / colCnt)
     }

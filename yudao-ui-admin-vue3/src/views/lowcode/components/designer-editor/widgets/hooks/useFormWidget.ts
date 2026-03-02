@@ -68,7 +68,7 @@ async function buildItemRules(
   rules.push(...customItemValidRules(widget))
   //添加自定义校验规则
   if (props.isCustomValid && !isEmpty(props.customValidFun?.evalFunction)) {
-    const evalFn = wrapEvalFunction(editor, props.customValidFun, evalFnContext)
+    const evalFn = wrapEvalFunction(editor, evalFnContext, props.customValidFun)
     rules.push({
       validator: async (_, value, callback) => {
         try {
@@ -123,8 +123,8 @@ export function useFormWidget(props: ReturnType<typeof useWidget>) {
         ) {
           formModel.value[child.props.prop] = await executeEvalFunction(
             editor,
-            child.props.defaultValue,
-            evalFnContext
+            evalFnContext,
+            child.props.defaultValue
           )
         }
       } catch (e) {

@@ -98,7 +98,7 @@
         </el-form-item>
         <el-form-item label="加载函数" prop="remoteMethod" v-else>
           <EvalFunctionValueInput
-            name="选项加载函数"
+            title="选项加载函数"
             type="simple-function"
             :height="100"
             :editor="editor"
@@ -151,7 +151,7 @@
         </el-form-item>
         <el-form-item label="搜索函数" prop="filterMethod" v-if="formModel.filterable">
           <EvalFunctionValueInput
-            name="数据搜索函数"
+            title="数据搜索函数"
             type="simple-function"
             :height="100"
             :editor="editor"
@@ -164,7 +164,7 @@
         </el-form-item>
         <el-form-item label="加载函数" prop="loadData">
           <EvalFunctionValueInput
-            name="数据加载函数"
+            title="数据加载函数"
             type="simple-function"
             :height="100"
             :editor="editor"
@@ -196,7 +196,7 @@
         </el-form-item>
         <el-form-item label="加载函数" prop="remoteMethod" v-else>
           <EvalFunctionValueInput
-            name="数据加载函数"
+            title="数据加载函数"
             type="simple-function"
             :height="100"
             :editor="editor"
@@ -240,7 +240,7 @@
         </div>
         <el-form-item label="激活状态值" prop="activeValue">
           <EvalFunctionValueInput
-            name="激活状态值"
+            title="激活状态值"
             type="simple-function"
             :height="100"
             :editor="editor"
@@ -251,7 +251,7 @@
         </el-form-item>
         <el-form-item label="关闭状态值" prop="inactiveValue">
           <EvalFunctionValueInput
-            name="关闭状态值"
+            title="关闭状态值"
             type="simple-function"
             :height="100"
             :editor="editor"
@@ -352,7 +352,7 @@
         </el-form-item>
         <el-form-item label="日期是否禁用" prop="disabledDate">
           <EvalFunctionValueInput
-            name="判断日期是否被禁用的函数"
+            title="判断日期是否被禁用的函数"
             type="simple-function"
             :height="100"
             :editor="editor"
@@ -364,7 +364,7 @@
         </el-form-item>
         <el-form-item label="获取快捷选项" prop="shortcuts">
           <EvalFunctionValueInput
-            name="获取日期快捷选项函数"
+            title="获取日期快捷选项函数"
             type="simple-function"
             :height="100"
             :editor="editor"
@@ -408,7 +408,7 @@
         prop="fetchSuggestions"
       >
         <EvalFunctionValueInput
-          name="获取输入建议的函数"
+          title="获取输入建议的函数"
           type="simple-function"
           :height="100"
           :editor="editor"
@@ -463,7 +463,7 @@
         </el-form-item>
         <el-form-item label="搜索函数" prop="filterMethod" v-if="formModel.filterable">
           <EvalFunctionValueInput
-            name="数据搜索函数"
+            title="数据搜索函数"
             type="simple-function"
             :height="100"
             :editor="editor"
@@ -478,7 +478,7 @@
         </el-form-item>
         <el-form-item label="加载函数" prop="loadData">
           <EvalFunctionValueInput
-            name="数据加载函数"
+            title="数据加载函数"
             type="simple-function"
             :height="100"
             :editor="editor"

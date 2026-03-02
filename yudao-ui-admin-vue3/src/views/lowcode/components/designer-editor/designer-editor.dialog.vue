@@ -6,6 +6,7 @@
     :max-height="dialogArgs.maxHeight"
     v-model="dialogVisible"
     @close="onDialogClose"
+    @keyup.enter="doConfirm"
   >
     <div v-loading="dialogLoading">
       <DesignerPreview
@@ -17,8 +18,21 @@
       />
     </div>
     <template #footer>
-      <el-button type="primary" :loading="dialogLoading" @click="doConfirm">确 定</el-button>
-      <el-button @click="dialogVisible = false">取 消</el-button>
+      <el-button
+        v-if="dialogArgs.showConfirmButton ?? true"
+        type="primary"
+        :loading="dialogLoading"
+        @click="doConfirm"
+      >
+        {{ dialogArgs.confirmButtonText ?? '确 定' }}
+      </el-button>
+      <el-button
+        v-if="dialogArgs.showCancelButton ?? true"
+        type="default"
+        @click="dialogVisible = false"
+      >
+        {{ dialogArgs.cancelButtonText ?? '取 消' }}
+      </el-button>
     </template>
   </Dialog>
 </template>
@@ -44,6 +58,14 @@ export interface DesignerEditorDialogArgs {
   version?: number
   /** 透传给低代码页面的自定义参数，类型不限，根据业务需求使用 */
   params?: any
+  /** 是否显示确定按钮 */
+  showConfirmButton?: boolean
+  /** 确定按钮的文本内容 */
+  confirmButtonText?: string
+  /** 是否显示取消按钮 */
+  showCancelButton?: boolean
+  /** 取消按钮的文本内容 */
+  cancelButtonText?: string
 }
 
 const designerRef = ref<InstanceType<typeof DesignerPreview>>()

@@ -1,6 +1,6 @@
 <template>
   <LowcodeCard
-    :name="name"
+    :title="title"
     :tips="tips"
     :helps="isSpringBeanInput ? undefined : jsFunctionBuiltInHelps()"
     :actions="disabled ? [] : cardActions"
@@ -23,6 +23,7 @@
     <template v-else>
       <span class="c-#A8ABB2">JS前处理函数:</span>
       <AceEditor
+        ref="preHandleEditorRef"
         lang="javascript"
         :height="120"
         :readonly="disabled"
@@ -36,6 +37,7 @@
       />
       <span class="c-#A8ABB2">JS后处理函数:</span>
       <AceEditor
+        ref="postHandleEditorRef"
         lang="javascript"
         :height="120"
         :readonly="disabled"
@@ -52,7 +54,7 @@
 </template>
 <script lang="ts" setup>
 import { isNullOrUnDef } from '@/utils/is'
-import LowcodeCard, { LowcodeCardAction } from '../../common/LowcodeCard.vue'
+import LowcodeCard from '../../common/LowcodeCard.vue'
 import AceEditor from '../../ace-editor/index.vue'
 import {
   defaultQueryInterceptorPostHandle,
@@ -63,7 +65,7 @@ import { computedVModel } from '../../common/hooks'
 import { QueryInterceptorValue } from '../querier-editor.type'
 
 export interface QueryXmlInterceptorValueInputProps {
-  name: string
+  title: string
   tips?: string
   disabled?: boolean
   modelValue?: QueryInterceptorValue
@@ -78,6 +80,10 @@ const props = defineProps<QueryXmlInterceptorValueInputProps>()
 
 const emits = defineEmits<QueryXmlInterceptorValueInputEmits>()
 
+const preHandleEditorRef = ref<InstanceType<typeof AceEditor>>()
+
+const postHandleEditorRef = ref<InstanceType<typeof AceEditor>>()
+
 const { valueVModel, triggerUpdate } = computedVModel({
   get() {
     return props.modelValue ?? {}
@@ -90,7 +96,7 @@ const { valueVModel, triggerUpdate } = computedVModel({
 
 const isSpringBeanInput = computed(() => !isNullOrUnDef(valueVModel.value?.clazz))
 
-const cardActions = computed((): LowcodeCardAction[] => {
+const cardActions = computed(() => {
   return [
     {
       type: 'warning',
@@ -112,6 +118,15 @@ const cardActions = computed((): LowcodeCardAction[] => {
         valueVModel.value.postHandleValue = { value: defaultQueryInterceptorPostHandle() }
         valueVModel.value.clazz = undefined
         triggerUpdate()
+      }
+    },
+    {
+      color: '#fff',
+      icon: 'ep:finished',
+      isShow: !isSpringBeanInput.value,
+      onClick: () => {
+        preHandleEditorRef.value?.beautify()
+        postHandleEditorRef.value?.beautify()
       }
     }
   ]

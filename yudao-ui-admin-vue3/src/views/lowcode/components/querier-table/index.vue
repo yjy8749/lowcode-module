@@ -217,9 +217,9 @@ const getRowKey = (row?: any): string | undefined => {
   }
 }
 
-const selectedRowsToParams = (vals?: any): QueryDomainWhereParams[] => {
-  const params: QueryDomainWhereParams[] = []
+const selectedRowsToParams = (vals?: any): QueryDomainWhereParams[] | undefined => {
   if (!isEmpty(rowKeyColumns.value) && !isEmpty(vals)) {
+    const params: QueryDomainWhereParams[] = []
     rowKeyColumns.value.forEach((col) => {
       const prop = getTableBodyColumnProp(col)
       params.push({ name: prop, symbol: 'IN', values: [...new Set(vals.map((e) => e[prop]))] })
@@ -238,13 +238,15 @@ const selectedRowsToParams = (vals?: any): QueryDomainWhereParams[] => {
         })
       })
     }
+    return params
   }
-  return params
 }
 
-const onTableDataChange = useDebounceFn(() => {
+const onTableDataChange = () => {
   emits('change', tableData.value)
-}, 100)
+}
+
+const onTableDataChangeDebounce = useDebounceFn(onTableDataChange, 100)
 
 const doSearch = async (params?: QueryDomainParams, options?: { isSortChange?: boolean }) => {
   pageParams.value.pageNo = params?.pageParams?.pageNo ?? pageParams.value.pageNo
@@ -309,7 +311,7 @@ const doLoadData = async (params: QueryDomainParams) => {
           tableData.value.forEach(async (item, index) => {
             const result = props.itemProcess?.(item)
             tableData.value[index] = isPromise(result) ? await result : result
-            onTableDataChange()
+            onTableDataChangeDebounce()
           })
         })
       } else {

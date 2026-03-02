@@ -49,9 +49,9 @@ import FormatInputNumber from './components/propInput/FormatInputNumber.vue'
 import EdgeInsetsInput from './components/propInput/EdgeInsetsInput.vue'
 import EditableOptionsInput from './components/propInput/EditableOptionsInput.vue'
 import EvalFunctionInput from './components/propInput/EvalFunctionInput.vue'
-import AceEditorInput from './components/propInput/AceEditorInput.vue'
 import ActionButtonInput from './components/propInput/ActionButtonInput.vue'
 import { writePropValuesCmd } from './designer-editor.cmd'
+import AceInputCard from '../common/AceInputCard.vue'
 
 type ExtractProps<T> = T extends { $props: infer P } ? P : never
 
@@ -920,7 +920,7 @@ export function evalFunctionDefine(
 
 export function aceInputDefine(
   define: WidgetPropDefine,
-  props?: Partial<ExtractProps<InstanceType<typeof AceEditorInput>>>
+  props?: Partial<ExtractProps<InstanceType<typeof AceInputCard>>>
 ): WidgetPropDefine {
   return {
     type: 'aceInput',
@@ -930,12 +930,11 @@ export function aceInputDefine(
     render: (modelValue, propRenderContext) => {
       return () => (
         <>
-          <AceEditorInput
+          <AceInputCard
             vModel={modelValue.value}
             editor={propRenderContext.editor}
             widget={propRenderContext.widget}
-            name={define.label}
-            lang="json"
+            title={define.label}
             {...props}
           />
         </>

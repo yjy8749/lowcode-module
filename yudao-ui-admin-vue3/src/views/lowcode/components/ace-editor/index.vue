@@ -1,11 +1,12 @@
 <template>
   <div class="w-full" :style="style">
     <VAceEditor
+      ref="editorRef"
       :style="{ width: '100%', height: '100%' }"
       :lang="lang"
       :theme="theme"
-      :options="{ useWorker: true }"
       :readonly="readonly"
+      :options="editorOptions"
       v-model:value="valueVModel"
     />
   </div>
@@ -13,16 +14,18 @@
 
 <script setup lang="ts">
 import { VAceEditor } from 'vue3-ace-editor'
-import './ace-editor.config'
+import ace from './ace-editor.config'
 import { isNullOrUnDef, isString } from '@/utils/is'
 import { computedVModel } from '../common/hooks'
+import { jsonStringify } from '../common/utils'
 
 export interface AceEditorProps {
   modelValue?: string
-  lang: string
+  lang?: string
   theme?: string
   readonly?: boolean
   height?: string | number
+  options?: Record<string, any>
 }
 
 export type AceEditorEmits = {
@@ -32,12 +35,23 @@ export type AceEditorEmits = {
 
 const props = withDefaults(defineProps<AceEditorProps>(), {
   modelValue: '',
-  type: 'javascript',
+  lang: 'javascript',
   theme: 'github',
   readonly: false
 })
 
 const emits = defineEmits<AceEditorEmits>()
+
+const editorRef = ref<InstanceType<typeof VAceEditor>>()
+
+const editorOptions = computed(() => {
+  return {
+    tabSize: 2,
+    useSoftTabs: true,
+    useWorker: true,
+    ...props.options
+  }
+})
 
 const { valueVModel, triggerValidate } = computedVModel({
   get() {
@@ -59,6 +73,17 @@ const style = computed(() => {
     }
   }
   return { height: '100%' }
+})
+
+defineExpose({
+  beautify() {
+    if (props.lang === 'json') {
+      valueVModel.value = jsonStringify(JSON.parse(valueVModel.value))
+    } else {
+      //@ts-expect-error
+      ace.require('ace/ext/beautify').beautify(editorRef.value?.getAceInstance().session)
+    }
+  }
 })
 </script>
 

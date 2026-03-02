@@ -23,6 +23,7 @@
 
 <script lang="ts" setup>
 import {
+  buildEvalFnContext,
   executeEvalFunction,
   promiseWithLoading,
   readPageEventBind,
@@ -74,19 +75,35 @@ executeGetData(useDataDefines(props.editor, { _types: ['def', 'remote'], isAutoL
 
 // 页面生命周期
 onBeforeMount(() => {
-  executeEvalFunction(props.editor, readPageEventBind(props.editor, 'onBeforeMount'))
+  executeEvalFunction(
+    props.editor,
+    buildEvalFnContext(props.editor, { runtime: true }),
+    readPageEventBind(props.editor, 'onBeforeMount')
+  )
 })
 
 onMounted(() => {
-  executeEvalFunction(props.editor, readPageEventBind(props.editor, 'onMounted'))
+  executeEvalFunction(
+    props.editor,
+    buildEvalFnContext(props.editor, { runtime: true }),
+    readPageEventBind(props.editor, 'onMounted')
+  )
 })
 
 onBeforeUnmount(() => {
-  executeEvalFunction(props.editor, readPageEventBind(props.editor, 'onBeforeUnmount'))
+  executeEvalFunction(
+    props.editor,
+    buildEvalFnContext(props.editor, { runtime: true }),
+    readPageEventBind(props.editor, 'onBeforeUnmount')
+  )
 })
 
 onUnmounted(() => {
-  executeEvalFunction(props.editor, readPageEventBind(props.editor, 'onUnmounted'))
+  executeEvalFunction(
+    props.editor,
+    buildEvalFnContext(props.editor, { runtime: true }),
+    readPageEventBind(props.editor, 'onUnmounted')
+  )
 })
 </script>
 

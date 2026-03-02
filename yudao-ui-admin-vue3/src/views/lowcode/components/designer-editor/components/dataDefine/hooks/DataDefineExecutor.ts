@@ -159,6 +159,11 @@ export class RefGetDataExecutor implements GetDataExecutor {
           { _vid: refBindItem.bind?.refWidgetId },
           { _vid: refBindItem.bind?.refDataId }
         )
+        if (refBindItemDataDefine?._type == 'runtime') {
+          const msg = `数据定义 ${refBindItem.bind?.label} 仅在运行时可获取执行结果`
+          console.warn(msg)
+          this.editor.getMessage().warning(msg)
+        }
         if (!isNullOrUnDef(refBindItemDataDefine)) {
           const { value, isNotExecuted, getData } = useDataDefineExecutor(this.editor, {
             dataDefine: refBindItemDataDefine

@@ -17,13 +17,12 @@
 <script setup lang="ts">
 import { useElColPropAttrs, useWidget, type WidgetRenderProps } from '../../hooks'
 import WidgetItem from '../../../components/WidgetItem.vue'
-import { customWidgetOptions } from '../../../designer-editor.utils'
-
-const widgetItemOptions = customWidgetOptions({ putable: true, selectable: true })
 
 const props = defineProps<WidgetRenderProps>()
 
-const { usePropAndEvent, useDefaultSlot } = useWidget(props)
+const { usePropAndEvent, useDefaultSlot, generateOptions } = useWidget(props)
+
+const widgetItemOptions = generateOptions({ putable: true, selectable: true })
 
 const cardAttrs = computed(() => usePropAndEvent({ omit: ['justify'] }))
 

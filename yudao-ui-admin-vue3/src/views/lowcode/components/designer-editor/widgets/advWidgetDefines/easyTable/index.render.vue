@@ -1,13 +1,19 @@
 <!-- index.render.vue -->
 <template>
   <QuerierTable ref="tableRef" v-bind="tableAttrs" :loadData="loadData" @change="onTableDataChange">
-    <template v-for="slotWidget in tableSlots" :key="slotWidget.slotKey" #[slotWidget.slotKey]>
+    <template
+      v-for="(slotWidget, index) in tableSlots"
+      :key="slotWidget.slotKey"
+      #[slotWidget.slotKey]
+    >
       <WidgetItem
         :editor="editor"
         :parent-widget="widget"
         :parent-render-context="widgetRenderContext"
         :widget="slotWidget"
-        :options="widgetItemOptions"
+        :widget-index="index"
+        :widget-custom-options="{ putable: isSlotRenderInstance(slotWidget) }"
+        :options="isSlotRenderInstance(slotWidget) ? slotRenderOptions : undefined"
       />
     </template>
   </QuerierTable>
@@ -19,15 +25,13 @@ import QuerierTable from '../../../../querier-table/index.vue'
 import {
   requestDataDefine,
   createDataDefine,
-  customWidgetOptions
+  isSlotRenderInstance
 } from '../../../designer-editor.utils'
 import { getTableDataId } from './utils'
 import { useDataDefineExecutor } from '../../../components/dataDefine/hooks'
 import { WidgetInstance } from '../../../designer-editor.type'
 
 const tableRef = ref<InstanceType<typeof QuerierTable>>()
-
-const widgetItemOptions = customWidgetOptions({ putable: true, selectable: true })
 
 const props = defineProps<WidgetRenderProps>()
 
@@ -38,8 +42,11 @@ const {
   usePropValue,
   usePropObject,
   toActionButtonProps,
-  toEvalFunction
+  toEvalFunction,
+  generateOptions
 } = useWidget(props)
+
+const slotRenderOptions = generateOptions({ putable: true, selectable: true })
 
 const tableAttrs = computed(() => {
   return {

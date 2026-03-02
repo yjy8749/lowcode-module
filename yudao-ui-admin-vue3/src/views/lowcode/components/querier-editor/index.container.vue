@@ -36,14 +36,15 @@
             </el-input>
           </el-form-item>
           <el-form-item label="XML配置" prop="queryXml">
-            <LowcodeCard name="查询 XML" :actions="queryXmlActions" v-loading="queryTestLoading">
-              <AceEditor
-                lang="xml"
-                :height="400"
-                :readonly="isPreviewMode"
-                v-model="state.editorData.queryXml"
-              />
-            </LowcodeCard>
+            <AceInputCard
+              title="查询 XML"
+              lang="xml"
+              :height="400"
+              :readonly="isPreviewMode"
+              :actions="queryXmlActions"
+              v-model="state.editorData.queryXml"
+              v-loading="queryTestLoading"
+            />
           </el-form-item>
         </el-form>
       </el-card>
@@ -129,8 +130,6 @@
 </template>
 <script lang="ts" setup>
 import { ElForm, FormRules } from 'element-plus'
-import LowcodeCard from '../common/LowcodeCard.vue'
-import AceEditor from '../ace-editor/index.vue'
 import QueryTestResultDialog from './components/QueryTestResultDialog.vue'
 import QueryXmlDialog from './components/QueryXmlDialog.vue'
 import { FILE_SOURCE_QUERIER, QUERIER_DATA_TYPE_MAIN, QuerierEditor } from './querier-editor.type'
@@ -146,6 +145,7 @@ import dayjs from 'dayjs'
 import { LOWCODE_DICT_TYPE } from '../common/dict'
 import { checkPermi } from '@/utils/permission'
 import { sourceDeployPermiValue } from '../common/utils'
+import AceInputCard from '../common/AceInputCard.vue'
 
 const message = useMessage()
 

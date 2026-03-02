@@ -3,11 +3,11 @@ import Render from './index.render.vue'
 import { WidgetDefine } from '../../../designer-editor.type'
 import {
   checkDataDefineAreBound,
-  createSlotItem,
+  createSlotRender,
   createWidgetInstanceDefault
 } from '../../../designer-editor.utils'
 import { propBindDefine } from '../../../designer-editor.props'
-import { buildVforItemDefine, getForItemDataId } from './utils'
+import { buildVforItemDefine, getVForItemDataId } from './utils'
 import { writePropBindCmd } from '../../../designer-editor.cmd'
 
 const message = useMessage()
@@ -28,7 +28,7 @@ const widget: WidgetDefine = {
           const boundList = checkDataDefineAreBound(
             editor,
             widget,
-            { _vid: getForItemDataId(widget) },
+            { _vid: getVForItemDataId(widget) },
             true
           )
           if (!isEmpty(boundList)) {
@@ -48,7 +48,7 @@ const widget: WidgetDefine = {
   ],
   create(editor, define) {
     const instance = createWidgetInstanceDefault(editor, define)
-    instance.slots = [createSlotItem(editor)]
+    instance.slots = [createSlotRender(editor)]
     return instance
   },
   runtimeDataDefines(editor, widget) {

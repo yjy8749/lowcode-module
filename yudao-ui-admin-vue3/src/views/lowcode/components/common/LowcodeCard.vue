@@ -2,7 +2,7 @@
   <div class="LowcodeCard">
     <div class="min-h-8 px-2 flex justify-between items-center bg-#000">
       <div class="flex items-center gap-1 c-#fff">
-        {{ name }}
+        {{ title }}
         <el-tooltip placement="bottom" v-if="!isEmpty(helps)">
           <div class="ml-2px mt-2px">
             <Icon icon="ep:question-filled" :size="14" />
@@ -16,12 +16,14 @@
         <template v-for="item in actionList" :key="item.__key__">
           <el-button
             v-if="item.isShow"
+            :style="{ color: item.color }"
             class="!m-0"
             size="small"
             :link="true"
             :type="item.type"
             @click="item.onClick"
           >
+            <Icon v-if="item.icon" :size="14" :icon="item.icon" />
             {{ item.label }}
           </el-button>
         </template>
@@ -39,7 +41,7 @@ import { generateVForKey } from './utils'
 import { isEmpty } from '@/utils/is'
 
 export interface LowcodeCardProps {
-  name?: string
+  title?: string
   tips?: string
   helps?: string
   actions?: LowcodeCardAction[]
@@ -47,6 +49,8 @@ export interface LowcodeCardProps {
 
 export interface LowcodeCardAction {
   type?: string
+  color?: string
+  icon?: string
   label?: string | ComputedRef<string>
   isShow?: boolean | ComputedRef<boolean>
   onClick?: () => void

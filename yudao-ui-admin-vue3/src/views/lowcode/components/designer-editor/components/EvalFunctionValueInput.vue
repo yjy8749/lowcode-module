@@ -1,63 +1,61 @@
 <template>
-  <LowcodeCard
+  <AceInputCard
     class="EvalFunctionValueInput"
-    :name="name"
-    :actions="actions"
+    :title="title"
+    lang="javascript"
     :tips="tips"
     :helps="helps"
+    :height="height"
+    :actions="actions"
+    v-model="valueVModel.evalFunction"
+    @change="triggerUpdateDebounce"
   >
-    <div class="flex items-center gap-4 mb-1" v-if="!isSimpleFunction">
-      <template v-if="isMouseFunction">
-        <TextLabel label="阻止事件冒泡" />
-        <el-switch v-model="valueVModel.stop" @change="triggerUpdateDebounce" />
-        <TextLabel label="阻止默认行为" />
-        <el-switch v-model="valueVModel.prevent" @change="triggerUpdateDebounce" />
-      </template>
-      <TextLabel label="函数防抖" />
-      <el-switch
-        v-model="valueVModel.debounce"
-        @change="
-          () => (
-            valueVModel.debounce ? (valueVModel.throttle = false) : undefined,
-            triggerUpdateDebounce()
-          )
-        "
-      />
-      <TextLabel label="函数节流" />
-      <el-switch
-        v-model="valueVModel.throttle"
-        @change="
-          () => (
-            valueVModel.throttle ? (valueVModel.debounce = false) : undefined,
-            triggerUpdateDebounce()
-          )
-        "
-      />
-      <template v-if="valueVModel.debounce || valueVModel.throttle">
-        <TextLabel label="间隔(毫秒)" />
-        <el-input-number
-          :placeholder="`${DEFAULT_EVAL_FUNCTION_DEALY}`"
-          :min="100"
-          :step="100"
-          :precision="0"
-          v-model="valueVModel.dealy"
-          @change="triggerUpdateDebounce"
+    <template #tools>
+      <div class="flex items-center gap-4 mb-1" v-if="!isSimpleFunction">
+        <template v-if="isMouseFunction">
+          <TextLabel label="阻止事件冒泡" />
+          <el-switch v-model="valueVModel.stop" @change="triggerUpdateDebounce" />
+          <TextLabel label="阻止默认行为" />
+          <el-switch v-model="valueVModel.prevent" @change="triggerUpdateDebounce" />
+        </template>
+        <TextLabel label="函数防抖" />
+        <el-switch
+          v-model="valueVModel.debounce"
+          @change="
+            () => (
+              valueVModel.debounce ? (valueVModel.throttle = false) : undefined,
+              triggerUpdateDebounce()
+            )
+          "
         />
-      </template>
-    </div>
-    <AceEditor
-      lang="javascript"
-      :height="height"
-      v-model="valueVModel.evalFunction"
-      @change="triggerUpdateDebounce"
-    />
-  </LowcodeCard>
+        <TextLabel label="函数节流" />
+        <el-switch
+          v-model="valueVModel.throttle"
+          @change="
+            () => (
+              valueVModel.throttle ? (valueVModel.debounce = false) : undefined,
+              triggerUpdateDebounce()
+            )
+          "
+        />
+        <template v-if="valueVModel.debounce || valueVModel.throttle">
+          <TextLabel label="间隔(毫秒)" />
+          <el-input-number
+            :placeholder="`${DEFAULT_EVAL_FUNCTION_DEALY}`"
+            :min="100"
+            :step="100"
+            :precision="0"
+            v-model="valueVModel.dealy"
+            @change="triggerUpdateDebounce"
+          />
+        </template>
+      </div>
+    </template>
+  </AceInputCard>
 </template>
 <script lang="ts" setup>
 import TextLabel from '../../common/TextLabel.vue'
 import { computedVModel } from '../../common/hooks'
-import LowcodeCard from '../../common/LowcodeCard.vue'
-import AceEditor from '../../ace-editor/index.vue'
 import {
   DEFAULT_EVAL_FUNCTION_DEALY,
   DesignerEditor,
@@ -74,12 +72,13 @@ import {
 } from '../designer-editor.utils'
 import { useDebounceFn } from '@vueuse/core'
 import { isEmpty, isNullOrUnDef } from '@/utils/is'
+import AceInputCard from '../../common/AceInputCard.vue'
 
 export interface EvalFunctionValueInputProps {
   editor: DesignerEditor
   widget: WidgetInstance
   type?: DesignerEditorEvalFunctionType
-  name?: string
+  title: string
   height?: number
   helps?: string
   defaultFunction?: string
@@ -94,7 +93,7 @@ export type EvalFunctionValueInputEmits = {
 
 const props = withDefaults(defineProps<EvalFunctionValueInputProps>(), {
   type: 'function',
-  name: '输入函数',
+  title: '输入函数',
   height: 200
 })
 
@@ -130,8 +129,11 @@ const actions = [
     type: 'success',
     label: '运行',
     onClick: async () => {
-      const evalFnContext = buildEvalFnContext(props.editor, props.widget._vid)
-      const result = await executeEvalFunction(props.editor, valueVModel.value, evalFnContext)
+      const result = await executeEvalFunction(
+        props.editor,
+        buildEvalFnContext(props.editor, { runtime: false, _vid: props.widget._vid }),
+        valueVModel.value
+      )
       message.info(`执行结果${JSON.stringify(result)}`)
     }
   },

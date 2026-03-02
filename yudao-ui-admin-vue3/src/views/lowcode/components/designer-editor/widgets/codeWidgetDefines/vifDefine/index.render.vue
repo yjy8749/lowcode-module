@@ -12,13 +12,12 @@
 <script setup lang="ts">
 import { useWidget, type WidgetRenderProps } from '../../hooks'
 import WidgetItem from '../../../components/WidgetItem.vue'
-import { customWidgetOptions } from '../../../designer-editor.utils'
-
-const widgetItemOptions = customWidgetOptions({ putable: true, selectable: true })
 
 const props = defineProps<WidgetRenderProps>()
 
-const { usePropValue, isPreviewMode, useDefaultSlot } = useWidget(props)
+const { usePropValue, isPreviewMode, useDefaultSlot, generateOptions } = useWidget(props)
+
+const widgetItemOptions = generateOptions({ putable: true, selectable: true })
 
 const defaultSlotWidget = computed(() => useDefaultSlot())
 

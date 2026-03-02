@@ -2,7 +2,7 @@
   <Dialog title="输入函数" width="900px" v-model="dialogVisible">
     <EvalFunctionValueInput
       v-if="!isNullOrUnDef(dialogArgs)"
-      name="输入函数代码"
+      title="输入函数代码"
       :editor="editor"
       :widget="dialogArgs.widget"
       :type="dialogArgs.type"
@@ -26,6 +26,7 @@ import {
   WidgetInstance
 } from '../designer-editor.type'
 import EvalFunctionValueInput from './EvalFunctionValueInput.vue'
+import { cloneDeep } from 'lodash-es'
 
 defineProps<{ editor: DesignerEditor }>()
 
@@ -57,7 +58,7 @@ const doConfirm = async () => {
 
 const open = async (args: EvalFunctionEditDialogArgs) => {
   dialogArgs.value = args
-  evalFunctionValue.value = { ...args.value }
+  evalFunctionValue.value = cloneDeep(args.value)
   dialogVisible.value = true
 }
 

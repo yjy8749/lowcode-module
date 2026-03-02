@@ -277,7 +277,7 @@
               prop="itemSelectableFunction"
             >
               <EvalFunctionValueInput
-                name="判断元素是否可选择函数代码"
+                title="判断元素是否可选择函数代码"
                 type="simple-function"
                 :height="100"
                 :editor="editor"
@@ -296,7 +296,7 @@
             </div>
             <el-form-item label="默认查询参数" label-position="top" prop="defaultParamsFunction">
               <EvalFunctionValueInput
-                name="读取默认查询参数函数"
+                title="读取默认查询参数函数"
                 type="simple-function"
                 :height="100"
                 :editor="editor"
@@ -310,7 +310,7 @@
             </el-form-item>
             <el-form-item label="数据转换函数" label-position="top" prop="itemProcessFunction">
               <EvalFunctionValueInput
-                name="加载后对数据二次处理函数"
+                title="加载后对数据二次处理函数"
                 type="simple-function"
                 :height="100"
                 :editor="editor"
@@ -379,7 +379,7 @@ import { buildTableDataDefines, getTableDataId } from '../utils'
 import { calcDatetimeColumnWidth, DEFAULT_DATETIME_FORMAT } from './utils'
 import { useWidgetDefine } from '../../../index'
 import {
-  createSlotItem,
+  createSlotRender,
   createWidgetInstance,
   getWidgetShortVidOrVar,
   isWidgetInstanceOf
@@ -535,22 +535,22 @@ const regenSlots = async (): Promise<WidgetInstance[]> => {
   const slots = [...widget.slots]
   if (formModel.value.enableSearchActionSlot) {
     if (!slots.some((item) => item.slotKey == 'searchActionSlot')) {
-      slots.push(createSlotItem(props.editor, 'searchActionSlot'))
+      slots.push(createSlotRender(props.editor, 'searchActionSlot'))
     }
   }
   if (formModel.value.enableOperationActionSlot) {
     if (!slots.some((item) => item.slotKey == 'operationActionSlot')) {
-      slots.push(createSlotItem(props.editor, 'operationActionSlot'))
+      slots.push(createSlotRender(props.editor, 'operationActionSlot'))
     }
   }
   if (formModel.value.enableTableHeaderSlot) {
     if (!slots.some((item) => item.slotKey == 'tableHeaderSlot')) {
-      slots.push(createSlotItem(props.editor, 'tableHeaderSlot'))
+      slots.push(createSlotRender(props.editor, 'tableHeaderSlot'))
     }
   }
   if (formModel.value.enableTableFooterSlot) {
     if (!slots.some((item) => item.slotKey == 'tableFooterSlot')) {
-      slots.push(createSlotItem(props.editor, 'tableFooterSlot'))
+      slots.push(createSlotRender(props.editor, 'tableFooterSlot'))
     }
   }
   if (formModel.value.enableTableBodySlot) {

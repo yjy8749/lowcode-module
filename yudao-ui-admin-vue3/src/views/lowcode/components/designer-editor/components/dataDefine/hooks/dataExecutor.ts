@@ -1,11 +1,12 @@
 import { ref } from 'vue'
-import { isNullOrUnDef, isEmpty } from '@/utils/is'
+import { isNullOrUnDef, isEmpty, isUnDef } from '@/utils/is'
 import {
   DesignerEditor,
   DesignerEditorEvalFunction,
   GetDataArgs,
   GetDataResult,
-  WidgetDataDefine
+  WidgetDataDefine,
+  WidgetInstance
 } from '../../../designer-editor.type'
 import {
   ConstGetDataExecutor,
@@ -16,7 +17,11 @@ import {
   SubmitGetDataExecutor,
   UndefinedGetDataExecutor
 } from './DataDefineExecutor'
-import { buildEvalFnContext, executeEvalFunction } from '../../../designer-editor.utils'
+import {
+  buildEvalFnContext,
+  executeEvalFunction,
+  useWidgetById
+} from '../../../designer-editor.utils'
 
 interface UseDataDefineExecutorArgs {
   dataDefine?: WidgetDataDefine
@@ -53,8 +58,12 @@ export function useDataDefineExecutor(editor: DesignerEditor, args?: UseDataDefi
     }
     if (!isEmpty(callbackFn?.evalFunction)) {
       nextTick(async () => {
-        const evalFnContext = buildEvalFnContext(editor, dataDefine.value!.widgetId)
-        const result = await executeEvalFunction(editor, callbackFn, evalFnContext, val?.data)
+        const result = await executeEvalFunction(
+          editor,
+          buildEvalFnContext(editor, { runtime: true, _vid: dataDefine.value?.widgetId }),
+          callbackFn,
+          val?.data
+        )
         console.log(`executeCallback dataDefine`, dataDefine.value, 'result', result, 'val', val)
       })
     }

@@ -1,4 +1,4 @@
-import { isArray, isNullOrUnDef, isEmpty } from '@/utils/is'
+import { isArray, isNullOrUnDef, isEmpty, isString } from '@/utils/is'
 import {
   DesignerEditorEventBind,
   SeekWidgetFunction,
@@ -10,7 +10,8 @@ import {
   WidgetRenderProps as WidgetRenderPropsType,
   ActionButtonConfig,
   SLOT_DEFAULT_KEY,
-  DesignerEditorEvalFunction
+  DesignerEditorEvalFunction,
+  WidgetItemOptions
 } from '../../designer-editor.type'
 import {
   buildEvalFnContext,
@@ -20,13 +21,12 @@ import {
   useSeekDataFunction,
   wrapEvalFunction
 } from '../../designer-editor.utils'
-import { isString } from 'min-dash'
 import { inputNumberDefine } from '../../designer-editor.props'
 import { checkPermi } from '@/utils/permission'
 import { computedAsync } from '@vueuse/core'
-import { getForItemDataId } from '../codeWidgetDefines/vforDefine/utils'
 import { ActionButtonProps } from '../../../common/ActionButton.vue'
 import { DATA_ROOT_ITEM_FLAG, isPromise } from '../../../common/utils'
+import { getVForItemDataId } from '../codeWidgetDefines/vforDefine/utils'
 
 export type WidgetRenderProps = WidgetRenderPropsType
 
@@ -36,9 +36,7 @@ export function isDirectParent(
   { widgetRenderContext }: WidgetPropRenderContext,
   _moduleName: string
 ): boolean {
-  return !isNullOrUnDef(
-    widgetRenderContext.seekParent?.({ _moduleName, directParent: true }).seekWidget
-  )
+  return !isNullOrUnDef(widgetRenderContext.seekParent?.({ directParent: true }).seekWidget)
 }
 function _inputNumberDefine(key: string, label: string) {
   return inputNumberDefine({ key, label }, { min: 0, step: 1, precision: 0 })
@@ -93,18 +91,18 @@ export function useWidget(props: WidgetRenderProps) {
   }
   const toEvalFunction = (val?: DesignerEditorEvalFunction) => {
     if (!isEmpty(val?.evalFunction)) {
-      return wrapEvalFunction(props.editor, val, evalFnContext)
+      return wrapEvalFunction(props.editor, evalFnContext, val)
     }
   }
 
-  const useVForItemRefData = () => {
+  const useVForItemData = () => {
     const vforWidget = useParent({ _moduleName: 'codeWidgetDefines', _key: 'vforDefine' })
     if (!isNullOrUnDef(vforWidget)) {
       return seekData({
         bindList: [
           {
             bind: {
-              refDataId: getForItemDataId(vforWidget),
+              refDataId: getVForItemDataId(vforWidget),
               refWidgetId: vforWidget._vid
             },
             refPropKey: DATA_ROOT_ITEM_FLAG
@@ -116,7 +114,11 @@ export function useWidget(props: WidgetRenderProps) {
 
   const { isPreviewMode } = store
 
-  const evalFnContext = buildEvalFnContext(props.editor, props.widget._vid)
+  const evalFnContext = buildEvalFnContext(props.editor, {
+    runtime: true,
+    _vid: props.widget._vid,
+    useVForItemData
+  })
 
   const usePropAndEvent = (args?: { only?: string[]; omit?: string[] }) => {
     const results: any = {}
@@ -190,10 +192,13 @@ export function useWidget(props: WidgetRenderProps) {
       if (!isEmpty(_vIfPermisVal)) {
         _vIfPermisResult = checkPermi(isArray(_vIfPermisVal) ? _vIfPermisVal : [_vIfPermisVal])
       }
+
       let _vIfFunResult = true
       if (!isNullOrUnDef(_vIfFunVal)) {
         const result = _vIfFunVal?.(...args)
         _vIfFunResult = isPromise(result) ? await result : result
+      } else if (!isNullOrUnDef(obj?._vIfFun)) {
+        _vIfFunResult = !!obj?._vIfFun
       }
       return _vIfPermisResult && _vIfFunResult
     }
@@ -213,19 +218,19 @@ export function useWidget(props: WidgetRenderProps) {
   }
 
   onBeforeMount(() => {
-    executeEvalFunction(props.editor, lifecycleEvent('onBeforeMount'), evalFnContext)
+    executeEvalFunction(props.editor, evalFnContext, lifecycleEvent('onBeforeMount'))
   })
 
   onMounted(() => {
-    executeEvalFunction(props.editor, lifecycleEvent('onMounted'), evalFnContext)
+    executeEvalFunction(props.editor, evalFnContext, lifecycleEvent('onMounted'))
   })
 
   onBeforeUnmount(() => {
-    executeEvalFunction(props.editor, lifecycleEvent('onBeforeUnmount'), evalFnContext)
+    executeEvalFunction(props.editor, evalFnContext, lifecycleEvent('onBeforeUnmount'))
   })
 
   onUnmounted(() => {
-    executeEvalFunction(props.editor, lifecycleEvent('onUnmounted'), evalFnContext)
+    executeEvalFunction(props.editor, evalFnContext, lifecycleEvent('onUnmounted'))
   })
 
   // 组件生命周期
@@ -285,6 +290,19 @@ export function useWidget(props: WidgetRenderProps) {
     })
   }
 
+  //自定义options
+  const generateOptions = (options?: WidgetItemOptions): WidgetItemOptions => {
+    return {
+      selectable: false,
+      putable: false,
+      sortable: false,
+      deleteable: false,
+      copyable: false,
+      ...options,
+      ...props.widgetCustomOptions
+    }
+  }
+
   // 返回
   return {
     ...props,
@@ -308,8 +326,9 @@ export function useWidget(props: WidgetRenderProps) {
     useEventBind,
     toEvalFunction,
     useIsShowFunction,
-    useVForItemRefData,
+    useVForItemData,
     toActionButtonProps,
-    refresh
+    refresh,
+    generateOptions
   }
 }

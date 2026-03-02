@@ -9,6 +9,7 @@
       :widget-define="widgetDef"
       :widget-render-context="currWidgetRenderContext"
       :widget-index="widgetIndex"
+      :widget-custom-options="widgetCustomOptions"
     />
   </template>
   <template v-else>
@@ -32,6 +33,7 @@
         :widget-define="widgetDef"
         :widget-render-context="currWidgetRenderContext"
         :widget-index="widgetIndex"
+        :widget-custom-options="widgetCustomOptions"
       />
 
       <div class="label" @click.stop="onLabelClick"> {{ widget.label }} {{ vidOrVar }} </div>
@@ -46,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { isNullOrUnDef } from '@/utils/is'
+import { isNullOrUnDef, isEmpty } from '@/utils/is'
 import { MenuItem } from '@imengyu/vue3-context-menu'
 import { showContextMenu } from '../../common/contextMenu'
 import { WidgetItemProps } from '../designer-editor.type'
@@ -67,7 +69,6 @@ import {
   useOpenWidgetDrawerPanelMenu
 } from '../designer-editor.menu'
 import { useWidgetDefine } from '../widgets'
-import { isEmpty } from 'lodash-es'
 
 const props = defineProps<WidgetItemProps>()
 

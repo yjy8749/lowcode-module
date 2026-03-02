@@ -1,6 +1,6 @@
 <template>
   <LowcodeCard
-    :name="name"
+    :title="title"
     :tips="tips"
     :helps="isSpringBeanInput ? undefined : jsFunctionBuiltInHelps()"
     :actions="disabled ? [] : cardActions"
@@ -23,6 +23,7 @@
     <template v-else>
       <span class="c-#A8ABB2">JS动态函数:</span>
       <AceEditor
+        ref="valueEditorRef"
         lang="javascript"
         :height="120"
         :readonly="disabled"
@@ -39,7 +40,7 @@
 </template>
 <script lang="ts" setup>
 import { isNullOrUnDef } from '@/utils/is'
-import LowcodeCard, { LowcodeCardAction } from '../../common/LowcodeCard.vue'
+import LowcodeCard from '../../common/LowcodeCard.vue'
 import AceEditor from '../../ace-editor/index.vue'
 import { jsFunctionBuiltInHelps } from '../querier-editor.utils'
 import { computedVModel } from '../../common/hooks'
@@ -50,7 +51,7 @@ export interface QueryXmlBeanInputValue {
 }
 
 export interface QueryXmlBeanInputProps {
-  name: string
+  title: string
   tips?: string
   disabled?: boolean
   defaultJsFunction?: () => string
@@ -66,6 +67,8 @@ const props = defineProps<QueryXmlBeanInputProps>()
 
 const emits = defineEmits<QueryXmlBeanInputEmits>()
 
+const valueEditorRef = ref<InstanceType<typeof AceEditor>>()
+
 const { valueVModel, triggerUpdate } = computedVModel({
   get() {
     return props.modelValue ?? {}
@@ -78,7 +81,7 @@ const { valueVModel, triggerUpdate } = computedVModel({
 
 const isSpringBeanInput = computed(() => !isNullOrUnDef(valueVModel.value?.clazz))
 
-const cardActions = computed((): LowcodeCardAction[] => {
+const cardActions = computed(() => {
   return [
     {
       type: 'warning',
@@ -98,6 +101,14 @@ const cardActions = computed((): LowcodeCardAction[] => {
         valueVModel.value.value = props.defaultJsFunction?.()
         valueVModel.value.clazz = undefined
         triggerUpdate()
+      }
+    },
+    {
+      color: '#fff',
+      icon: 'ep:finished',
+      isShow: !isSpringBeanInput.value,
+      onClick: () => {
+        valueEditorRef.value?.beautify()
       }
     }
   ]

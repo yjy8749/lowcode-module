@@ -1,5 +1,5 @@
+import { isFunction } from '@/utils/is'
 import { useFormItem, ElLoading } from 'element-plus'
-import { isFunction } from 'min-dash'
 import { WritableComputedOptions, computed } from 'vue'
 
 export function computedVModel<T, S = T>(options: WritableComputedOptions<T, S>) {

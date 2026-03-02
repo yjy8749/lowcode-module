@@ -328,18 +328,30 @@ export function useWidgetAddMenu(
   const allModules = Object.values(useWidgetModules()) as WidgetModuleInfo[]
 
   let putableParent: WidgetInstance | undefined
+  let putableParentParent: WidgetInstance | undefined
 
   if (args?.widgetRenderContext?.options?.putable == true) {
     putableParent = args.widget
+    putableParentParent = args.parentWidget
   }
 
   if (isNullOrUnDef(putableParent)) {
     const seekParentResult = args?.widgetRenderContext?.seekParent({ putable: true })
     putableParent = seekParentResult?.seekWidget
+    putableParentParent = seekParentResult?.seekWidgetRenderContext?.seekParent?.({
+      directParent: true
+    })?.seekWidget
   }
 
+  let menuLable = '添加组件'
+  if (!isNullOrUnDef(putableParent)) {
+    menuLable = getWidgetShowLabel(putableParent)
+  }
+  if (!isNullOrUnDef(putableParentParent)) {
+    menuLable = `${putableParentParent.label}(${menuLable})`
+  }
   return {
-    label: !isNullOrUnDef(putableParent) ? getWidgetShowLabel(putableParent) : '添加组件',
+    label: menuLable,
     icon: 'ep:circle-plus',
     children: allModules.map((moduleInfo) => {
       const hiddenInMenu = moduleInfo.hiddenInMenu?.(

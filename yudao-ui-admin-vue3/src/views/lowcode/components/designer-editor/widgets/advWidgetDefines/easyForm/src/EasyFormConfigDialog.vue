@@ -1,9 +1,14 @@
 <template>
   <Dialog title="表单配置" width="900px" v-model="dialogVisible" @close="onDialogClose">
     <div class="flex flex-col gap-2" v-loading="dialogLoading">
-      <LowcodeCard name="JSON数据" tips="解析JSON数据, 自动生成表单配置" :actions="jsonDataActions">
-        <AceEditor lang="json" :height="100" v-model="dataDefine.jsonData" />
-      </LowcodeCard>
+      <AceInputCard
+        title="JSON数据"
+        lang="json"
+        tips="解析JSON数据, 自动生成表单配置"
+        :height="100"
+        :actions="jsonDataActions"
+        v-model="dataDefine.jsonData"
+      />
       <EasyFormFieldArrayValueInput v-model="formFields" @label-change="onFieldLabelChange" />
     </div>
     <template #footer>
@@ -15,8 +20,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { isNullOrUnDef, isEmpty } from '@/utils/is'
-import LowcodeCard from '../../../../../common/LowcodeCard.vue'
-import AceEditor from '../../../../../ace-editor/index.vue'
+import AceInputCard from '../../../../../common/AceInputCard.vue'
 import {
   DesignerEditor,
   PromiseCallback,
@@ -27,7 +31,7 @@ import {
 import {
   addWidgetToSlot,
   createDataDefine,
-  createSlotItem,
+  createSlotRender,
   createWidgetInstance,
   createWidgetInstanceDefault
 } from '../../../../designer-editor.utils'
@@ -96,15 +100,9 @@ const onFieldLabelChange = (item: EasyFormConfigFormField) => {
 
 const getMappingInputWidget = (item: WidgetDataDefinePropDefine) => {
   if (item.type === 'string') {
-    return {
-      _moduleName: 'formWidgetDefines',
-      _key: 'input'
-    }
+    return { _moduleName: 'formWidgetDefines', _key: 'input' }
   } else {
-    return {
-      _moduleName: 'formWidgetDefines',
-      _key: 'input'
-    }
+    return { _moduleName: 'formWidgetDefines', _key: 'input' }
   }
 }
 
@@ -133,7 +131,7 @@ const createWidgetInstanceWithFields = async () => {
     return define
   })
   const easyFormWidget = createWidgetInstanceDefault(props.editor, dialogArgs.value!.define)
-  easyFormWidget.slots = [createSlotItem(props.editor)]
+  easyFormWidget.slots = [createSlotRender(props.editor)]
   addWidgetToSlot(easyFormWidget, formWidget, { slotKey: SLOT_DEFAULT_KEY })
   return easyFormWidget
 }

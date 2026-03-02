@@ -31,7 +31,12 @@
 
 <script lang="ts" setup>
 import { useDesignerStore } from './designer-editor.store'
-import { executeEvalFunction, readEditorDataValue, useWidgetTree } from './designer-editor.utils'
+import {
+  buildEvalFnContext,
+  executeEvalFunction,
+  readEditorDataValue,
+  useWidgetTree
+} from './designer-editor.utils'
 import { isEmpty } from '@/utils/is'
 import { DesignerEditor } from './designer-editor.type'
 import DesignerContainer from './index.container.vue'
@@ -107,8 +112,8 @@ const loadData = async () => {
 const doEditorClose = async (...args: any) => {
   const reuslt = await executeEvalFunction(
     editor.value,
+    buildEvalFnContext(editor.value, { runtime: true }),
     readEditorDataValue(editor.value, 'onPageClose'),
-    undefined,
     ...args
   )
   emits('close', reuslt)

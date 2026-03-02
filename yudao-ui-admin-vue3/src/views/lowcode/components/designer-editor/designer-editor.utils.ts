@@ -36,7 +36,8 @@ import {
   readValueByJsonPath,
   joinKeys,
   generateVid,
-  copyValue
+  copyValue,
+  DATA_ROOT_ITEM_FLAG
 } from '../common/utils'
 import { useDebounceFn, useThrottleFn } from '@vueuse/core'
 import request from '@/config/axios'
@@ -47,8 +48,7 @@ import { computed } from 'vue'
 import { highlightTextHtml } from '../common/utils'
 import download from '@/utils/download'
 import { requestOriginal } from '@/api/lowcode/utils'
-import { useI18n } from '@/hooks/web/useI18n'
-import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
+import { getVForItemDataId } from './widgets/codeWidgetDefines/vforDefine/utils'
 
 /** 参数是否为 DesignerEditor */
 export function isDesignerEditor(val?: any): val is DesignerEditor {
@@ -783,7 +783,7 @@ export function readPageEventBind(
 
 /** 默认检索父组件方法 */
 export function defaultSeekParentFunction(): SeekWidgetFunction {
-  return (_, seekLink) => ({ seekWidget: undefined, seekLink })
+  return (_, seekLink) => ({ seekLink })
 }
 
 /** 引用值转换函数执行 */
@@ -856,6 +856,7 @@ function wrapSeekParentFunction(
     if (!isNullOrUnDef(parentWidget)) {
       seekLink.push(parentWidget)
       if (
+        args?.directParent ||
         (!isNullOrUnDef(args?._vid) && parentWidget._vid == args?._vid) ||
         (!isNullOrUnDef(args?._var) && parentWidget._var == args?._var) ||
         (!isNullOrUnDef(args?._moduleName) &&
@@ -869,11 +870,16 @@ function wrapSeekParentFunction(
           parentRenderContext?.options?.putable == true)
       ) {
         console.log('检索到父组件', args, parentWidget.label)
-        return { seekWidget: parentWidget, seekLink }
+
+        return {
+          seekWidget: parentWidget,
+          seekWidgetRenderContext: parentRenderContext,
+          seekLink
+        }
       } else if (!isNullOrUnDef(parentRenderContext?.seekParent)) {
         if (args?.directParent) {
           console.warn('未检索到直接上级组件, 当前上级组件', parentWidget.label, args)
-          return { seekWidget: undefined, seekLink }
+          return { seekLink }
         } else {
           console.warn('父组件不正确，继续向上检索', parentWidget.label, args)
           return parentRenderContext.seekParent(args, seekLink)
@@ -881,19 +887,7 @@ function wrapSeekParentFunction(
       }
     }
     console.warn('已检索完所有父组件，未找到符合条件的父组件', args)
-    return { seekWidget: undefined, seekLink }
-  }
-}
-
-/** 自定义组件属性 */
-export function customWidgetOptions(options?: WidgetItemOptions): WidgetItemOptions {
-  return {
-    selectable: false,
-    putable: false,
-    sortable: false,
-    deleteable: false,
-    copyable: false,
-    ...options
+    return { seekLink }
   }
 }
 
@@ -1514,8 +1508,13 @@ export function useRootRenderContext(editor: DesignerEditor): WidgetRenderContex
   }
 }
 
+/** 判断组件是否插槽 */
+export function isSlotRenderInstance(w: WidgetInstance) {
+  return w && isWidgetInstanceOf(w, { _moduleName: 'innerWidgetDefines', _key: 'slotRender' })
+}
+
 /** 创建单个插槽 */
-export function createSlotItem(editor: DesignerEditor, slotKey?: string): WidgetInstance {
+export function createSlotRender(editor: DesignerEditor, slotKey?: string): WidgetInstance {
   const slotDefine = useWidgetDefine({ _moduleName: 'innerWidgetDefines', _key: 'slotRender' })
   const slotItem = createWidgetInstanceDefault(editor, slotDefine, slotKey ?? SLOT_DEFAULT_KEY)
   slotItem.props.span = 24
@@ -1861,6 +1860,7 @@ export function evalFunctionBuiltInHelps(exts?: string[] | string) {
     `变量:${highlightTextHtml('$close(...args) => Promise<结果>')}, 触发页面关闭,获取结果`,
     `变量:${highlightTextHtml('$dialog({title, width, fileId, version, params}) => Promise<结果>')}, 触发弹框弹框关闭时返回结果`,
     `变量:${highlightTextHtml('$useExposeContext(_vid|_var) => Promise<上下文>')}, 获取组件暴露上下文, 默认获取当前组件的上下文`,
+    `变量:${highlightTextHtml('$vforItem() => 数据')}, 获取组件 在 v-for 循环中的循环项数据`,
     `变量:${highlightTextHtml('$data(_var|参数, 数据, { partial }) => Promise<数据>')}, 根据数据变量获取数据或设置数据, 设置partial可部分更新`,
     `变量:${highlightTextHtml('$submit(_var|参数) => Promise<结果>')}, 触发提交数据`,
     `变量:${highlightTextHtml('$log(...args)')}, 打印日志, 显示数据`,
@@ -1882,11 +1882,10 @@ export function getEvalFunctionTips(evalFunction: DesignerEditorEvalFunction): s
 
 /** 包装可执行函数 */
 export function wrapEvalFunction(
-  editor: DesignerEditor,
-  evalFn?: DesignerEditorEvalFunction,
-  evalFnContext?: EvalFnContext
+  _: DesignerEditor,
+  evalFnContext: EvalFnContext,
+  evalFn?: DesignerEditorEvalFunction
 ): (...args: any[]) => any {
-  evalFnContext ??= buildEvalFnContext(editor)
   const contextKeys = Object.keys(evalFnContext)
   const evalFunction = (...args) => {
     try {
@@ -1917,17 +1916,17 @@ function _executeEvalFunction(evalFunction: (...args: any[]) => Promise<any>, ..
 /** 执行可执行函数免包装 */
 export function executeEvalFunction(
   editor: DesignerEditor,
+  evalFnContext: EvalFnContext,
   evalFunction?: DesignerEditorEvalFunction | DesignerEditorEvalFunction[],
-  evalFnContext?: EvalFnContext,
   ...args: any[]
 ): any {
   if (!isNullOrUnDef(evalFunction)) {
     if (isArray(evalFunction)) {
       return Promise.all(
-        evalFunction.map((item) => executeEvalFunction(editor, item, evalFnContext, ...args))
+        evalFunction.map((item) => executeEvalFunction(editor, evalFnContext, item, ...args))
       )
     } else {
-      return _executeEvalFunction(wrapEvalFunction(editor, evalFunction, evalFnContext), ...args)
+      return _executeEvalFunction(wrapEvalFunction(editor, evalFnContext, evalFunction), ...args)
     }
   }
 }
@@ -2016,7 +2015,10 @@ export async function alwaysWaitFor<T>(
 }
 
 /** 构建可执行函数上下文 */
-export function buildEvalFnContext(editor: DesignerEditor, defaultKey?: string): EvalFnContext {
+export function buildEvalFnContext(
+  editor: DesignerEditor,
+  options: { runtime: boolean; _vid?: string; useVForItemData?: () => any | undefined }
+): EvalFnContext {
   return {
     $request: (arg1, arg2) => {
       if (!isNullOrUnDef(arg1?.method && arg1?.url)) {
@@ -2033,10 +2035,10 @@ export function buildEvalFnContext(editor: DesignerEditor, defaultKey?: string):
     $useExposeContext: async (arg1) => {
       const ctx = await alwaysWaitFor<Record<string, any>>(
         (val) => !isNullOrUnDef(val),
-        async () => seekWidgetExposeContext(editor, arg1 ?? defaultKey)
+        async () => seekWidgetExposeContext(editor, arg1 ?? options?._vid)
       )
       if (!ctx) {
-        const msg = `未检索到组件上下文, 请检查参数是否正确, 组件是否暴露上下文 参数: ${arg1 ?? defaultKey}`
+        const msg = `未检索到组件上下文, 请检查参数是否正确, 组件是否暴露上下文 参数: ${arg1 ?? options?._vid}`
         console.error(msg)
         if (!editor.getStore().isPreviewMode.value) {
           message.error(msg)
@@ -2044,6 +2046,9 @@ export function buildEvalFnContext(editor: DesignerEditor, defaultKey?: string):
         return undefined
       }
       return ctx
+    },
+    $vforItem: () => {
+      return options.useVForItemData?.()
     },
     $data: (arg1, data, options) => {
       if (isString(arg1)) {

@@ -1,6 +1,6 @@
 import Render from './index.render.vue'
 import { LayoutJustifyOptions, WidgetDefine } from '../../../designer-editor.type'
-import { createSlotItem, createWidgetInstanceDefault } from '../../../designer-editor.utils'
+import { createSlotRender, createWidgetInstanceDefault } from '../../../designer-editor.utils'
 import { eventDefine, inputDefine, radioButtonDefine } from '../../../designer-editor.props'
 
 const widget: WidgetDefine = {
@@ -48,7 +48,7 @@ const widget: WidgetDefine = {
   ],
   create(editor, define) {
     const instance = createWidgetInstanceDefault(editor, define)
-    instance.slots = [createSlotItem(editor)]
+    instance.slots = [createSlotRender(editor)]
     return instance
   },
   events: [eventDefine('click', { type: 'mouse-function', label: '卡片点击' })]

@@ -252,9 +252,13 @@
           "
         >
           <el-form-item label="RequestBody输入" prop="requestBody">
-            <LowcodeCard name="RequestBody数据" :actions="requestBodyActions">
-              <AceEditor lang="json" :height="200" v-model="analyzerDataDefine.requestBody" />
-            </LowcodeCard>
+            <AceInputCard
+              title="RequestBody数据"
+              lang="json"
+              :height="200"
+              :actions="requestBodyActions"
+              v-model="analyzerDataDefine.requestBody"
+            />
           </el-form-item>
         </template>
         <template
@@ -276,9 +280,13 @@
 
         <!-- responseBody -->
         <el-form-item label="ResponseBody数据" prop="responseBody">
-          <LowcodeCard name="ResponseBody数据" :actions="responseBodyActions">
-            <AceEditor lang="json" :height="200" v-model="analyzerDataDefine.responseBody" />
-          </LowcodeCard>
+          <AceInputCard
+            title="ResponseBody数据"
+            lang="json"
+            :height="200"
+            :actions="responseBodyActions"
+            v-model="analyzerDataDefine.responseBody"
+          />
         </el-form-item>
 
         <!-- jsonDataPath -->
@@ -309,23 +317,21 @@
 
       <!-- <template v-if="isType('runtime')">
         <el-form-item label="运行时函数" prop="runtimeFunction">
-          <LowcodeCard name="运行时辅助函数">
-            <AceEditor
-              lang="javascript"
-              :height="200"
-              v-model="analyzerDataDefine.runtimeFunction"
-            />
-          </LowcodeCard>
+          <AceInputCard
+            title="运行时辅助函数"
+            lang="javascript"
+            :height="200"
+            v-model="analyzerDataDefine.runtimeFunction"
+          />
         </el-form-item>
         <el-form-item label="辅助函数" prop="analyzerFunction">
-          <LowcodeCard name="结构分析时辅助函数">
-            <AceEditor
-              :readonly="true"
-              lang="javascript"
-              :height="200"
-              v-model="analyzerDataDefine.analyzerFunction"
-            />
-          </LowcodeCard>
+          <AceInputCard
+            title="结构分析时辅助函数"
+            lang="javascript"
+            :readonly="true"
+            :height="200"
+            v-model="analyzerDataDefine.analyzerFunction"
+          />
         </el-form-item>
       </template> -->
 
@@ -337,7 +343,7 @@
         <template #label>
           <TextLabel label="属性定义" helps="定义数组属性时名称为空可用“-”代替" />
         </template>
-        <LowcodeCard name="属性定义" :actions="propDefineActions">
+        <LowcodeCard title="属性定义" :actions="propDefineActions">
           <DataPropDefineInput
             :data-id="analyzerDataDefine._vid"
             :read-only="!isPropDefinesEditable"
@@ -354,14 +360,14 @@
         <template #label>
           <TextLabel label="JSON数据" helps="实际使用时的实际数据，远程数据时仅作为示例" />
         </template>
-        <LowcodeCard name="JSON数据" :actions="jsonDataActions">
-          <AceEditor
-            lang="json"
-            :height="200"
-            :readonly="isType('ref', 'bind', 'runtime')"
-            v-model="analyzerDataDefine.jsonData"
-          />
-        </LowcodeCard>
+        <AceInputCard
+          title="JSON数据"
+          lang="json"
+          :height="200"
+          :readonly="isType('ref', 'bind', 'runtime')"
+          :actions="jsonDataActions"
+          v-model="analyzerDataDefine.jsonData"
+        />
       </el-form-item>
       <!-- onSuccess -->
       <el-form-item
@@ -370,7 +376,7 @@
         v-if="isType('def', 'remote', 'const', 'submit')"
       >
         <EvalFunctionValueInput
-          name="数据加载成功时触发可执行函数"
+          title="数据加载成功时触发可执行函数"
           type="simple-function"
           :editor="editor"
           :widget="dialogArgs!.widget"
@@ -386,7 +392,7 @@
         v-if="isType('def', 'remote', 'const', 'submit')"
       >
         <EvalFunctionValueInput
-          name="数据加载错误时触发可执行函数"
+          title="数据加载错误时触发可执行函数"
           type="simple-function"
           :editor="editor"
           :widget="dialogArgs!.widget"
@@ -433,7 +439,6 @@ import {
   PromiseCallback
 } from '../designer-editor.type'
 import LowcodeCard from '../../common/LowcodeCard.vue'
-import AceEditor from '../../ace-editor/index.vue'
 import DataPropDefineInput from './dataDefine/DataPropDefineInput.vue'
 import RequestHeadersInput from './dataDefine/RequestHeadersInput.vue'
 import RequestFormInput from './dataDefine/RequestFormInput.vue'
@@ -452,6 +457,7 @@ import {
 import { useDataDefineAnalyzer, useDataDefineExecutor } from '../components/dataDefine/hooks'
 import { ElForm } from 'element-plus'
 import EvalFunctionValueInput from '../components/EvalFunctionValueInput.vue'
+import AceInputCard from '../../common/AceInputCard.vue'
 
 const DATA_TYPE_OPTIONS: Array<{ value: WidgetDataDefineType; label: string }> = [
   {

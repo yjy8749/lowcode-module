@@ -18,15 +18,16 @@
       />
     </template>
   </ArrayValueInput>
-  <LowcodeCard class="mt-2" name="转换代码" :actions="refFunctionActions">
-    <AceEditor
-      lang="javascript"
-      :height="100"
-      :readonly="disabled"
-      v-model="valueVModel.refFunction"
-      @change="triggerUpdate"
-    />
-  </LowcodeCard>
+  <AceInputCard
+    class="mt-2"
+    title="转换代码"
+    lang="javascript"
+    :height="100"
+    :readonly="disabled"
+    :actions="refFunctionActions"
+    v-model="valueVModel.refFunction"
+    @change="triggerUpdate"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -39,12 +40,11 @@ import {
   WidgetPropDefineBindBase,
   DesignerEditor
 } from '../../designer-editor.type'
-import LowcodeCard from '../../../common/LowcodeCard.vue'
-import AceEditor from '../../../ace-editor/index.vue'
 import { createDataDefine } from '../../designer-editor.utils'
 import ArrayValueInput from '../../../common/ArrayValueInput.vue'
 import DataRefBindBaseInput from './DataRefBindBaseInput.vue'
 import { computedVModel } from '../../../common/hooks'
+import AceInputCard from '../../../common/AceInputCard.vue'
 
 export interface DataRefBindInputProps {
   editor: DesignerEditor

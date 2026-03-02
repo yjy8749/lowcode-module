@@ -18,17 +18,16 @@
 <script setup lang="ts">
 import { useElColPropAttrs, useWidget, type WidgetRenderProps } from '../../hooks'
 import WidgetItem from '../../../components/WidgetItem.vue'
-import { customWidgetOptions } from '../../../designer-editor.utils'
-
-const widgetItemOptions = customWidgetOptions({ putable: true, selectable: true })
 
 const props = defineProps<WidgetRenderProps>()
 
-const { useSlot, usePropValue, usePropAndEvent } = useWidget(props)
+const { useSlot, usePropValue, usePropAndEvent, generateOptions } = useWidget(props)
 
-const rowCnt = computed(() => usePropValue('rowCnt'))
+const widgetItemOptions = generateOptions({ putable: true, selectable: true })
 
-const colCnt = computed(() => usePropValue('colCnt'))
+const rowCnt = computed(() => usePropValue('rowCnt') as number)
+
+const colCnt = computed(() => usePropValue('colCnt') as number)
 
 const rowAttrs = computed(() => usePropAndEvent({ only: ['justify', 'align', 'gutter'] }))
 

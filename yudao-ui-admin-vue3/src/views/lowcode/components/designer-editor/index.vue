@@ -76,6 +76,7 @@
 <script lang="ts" setup>
 import { useDesignerStore } from './designer-editor.store'
 import {
+  buildEvalFnContext,
   executeEvalFunction,
   readEditorDataValue,
   useRootRenderContext,
@@ -84,7 +85,7 @@ import {
 } from './designer-editor.utils'
 import { isNullOrUnDef, isEmpty } from '@/utils/is'
 import { showContextMenu } from '../common/contextMenu'
-import { useWidgetMenus } from './designer-editor.menu'
+import { useRedoMenu, useUndoMenu, useWidgetMenus } from './designer-editor.menu'
 import { DesignerEditor, WidgetInstance } from './designer-editor.type'
 import WidgetDrawerPanel from './components/WidgetDrawerPanel.vue'
 import PageDrawerPanel from './components/PageDrawerPanel.vue'
@@ -114,6 +115,7 @@ import EasyTableConfigDialog, {
   EasyTableConfigDialogArgs
 } from './widgets/advWidgetDefines/easyTable/src/EasyTableConfigDialog.vue'
 import DeployMenuDialog, { DeployMenuDialogArgs } from './components/DeployMenuDialog.vue'
+import { useDebounceFn } from '@vueuse/core'
 
 interface DesignerEditorProps {
   fileId?: number | string
@@ -199,8 +201,8 @@ const loadData = async () => {
 const doEditorClose = async (...args: any) => {
   const reuslt = await executeEvalFunction(
     editor.value,
+    buildEvalFnContext(editor.value, { runtime: true }),
     readEditorDataValue(editor.value, 'onPageClose'),
-    undefined,
     ...args
   )
   emits('close', reuslt)
@@ -339,6 +341,67 @@ const onRootEmptyClick = (e: MouseEvent) => {
 
 defineExpose({
   getEditor: () => editor.value
+})
+
+// --- 快捷键 ---
+const isProcessing = ref(false)
+const executeAction = useDebounceFn((actionFn: () => Promise<void>) => {
+  if (isProcessing.value) return
+  isProcessing.value = true
+  actionFn()
+    .catch((e) => {
+      console.error('快捷键执行出错:', e)
+    })
+    .finally(() => {
+      setTimeout(() => {
+        isProcessing.value = false
+      }, 50)
+    })
+})
+
+const handleKeyDown = (event) => {
+  // 只响应 Ctrl 或 Cmd
+  if (!(event.ctrlKey || event.metaKey)) return
+
+  // 按住按键产生的重复事件，直接忽略
+  if (event.repeat) return
+
+  const key = event.key.toLowerCase()
+
+  // 撤销
+  if (key === 'z' && !event.shiftKey) {
+    event.preventDefault()
+    executeAction(async () => {
+      useUndoMenu(editor.value).onClick?.()
+    })
+    return
+  }
+
+  // 重做
+  if (key === 'y' || (key === 'z' && event.shiftKey)) {
+    event.preventDefault()
+    executeAction(async () => {
+      useRedoMenu(editor.value).onClick?.()
+    })
+    return
+  }
+
+  // 保存
+  if (key === 's' && !event.shiftKey) {
+    event.preventDefault()
+    executeAction(async () => {
+      await store.saveMaterialFileData()
+    })
+    return
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown)
 })
 </script>
 

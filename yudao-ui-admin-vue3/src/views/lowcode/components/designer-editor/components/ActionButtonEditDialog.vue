@@ -19,6 +19,7 @@
 import { isEmpty, isNullOrUnDef } from '@/utils/is'
 import { ActionButtonConfig, DesignerEditor, WidgetInstance } from '../designer-editor.type'
 import ActionButtonValueInput from './ActionButtonValueInput.vue'
+import { cloneDeep } from 'lodash-es'
 
 defineProps<{ editor: DesignerEditor }>()
 
@@ -44,7 +45,7 @@ const doConfirm = async () => {
 
 const open = async (args: ActionButtonEditDialogArgs) => {
   dialogArgs.value = args
-  btnActionValue.value = { ...args.value }
+  btnActionValue.value = cloneDeep(args.value) ?? {}
   if (isNullOrUnDef(btnActionValue.value.onClick)) {
     btnActionValue.value.onClick = {}
   }

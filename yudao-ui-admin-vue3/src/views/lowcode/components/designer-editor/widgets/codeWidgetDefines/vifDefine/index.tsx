@@ -1,6 +1,6 @@
 import Render from './index.render.vue'
 import { WidgetDefine } from '../../../designer-editor.type'
-import { createSlotItem, createWidgetInstanceDefault } from '../../../designer-editor.utils'
+import { createSlotRender, createWidgetInstanceDefault } from '../../../designer-editor.utils'
 import { propBindDefine } from '../../../designer-editor.props'
 
 const widget: WidgetDefine = {
@@ -15,7 +15,7 @@ const widget: WidgetDefine = {
   ],
   create(editor, define) {
     const instance = createWidgetInstanceDefault(editor, define)
-    instance.slots = [createSlotItem(editor)]
+    instance.slots = [createSlotRender(editor)]
     return instance
   }
 }

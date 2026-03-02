@@ -1,6 +1,6 @@
 <template>
   <LowcodeCard
-    :name="`${dataDefine.name} ${dataDefine._var ?? ''}`"
+    :title="`${dataDefine.name} ${dataDefine._var ?? ''}`"
     :tips="tips"
     :actions="actions"
     v-loading="isDataDefineExecuting"

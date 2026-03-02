@@ -1,8 +1,13 @@
 <template>
   <Dialog :title="`${isImport ? '导入' : '导出'}编辑器数据`" width="900px" v-model="dialogVisible">
-    <LowcodeCard name="JSON数据" :actions="actions">
-      <AceEditor lang="json" :height="400" :readonly="!isImport" v-model="editorData" />
-    </LowcodeCard>
+    <AceInputCard
+      title="JSON数据"
+      lang="json"
+      :height="400"
+      :readonly="!isImport"
+      :actions="actions"
+      v-model="editorData"
+    />
     <template #footer>
       <el-button v-if="isImport" type="primary" @click="doImport">确 定</el-button>
       <el-button @click="dialogVisible = false">关 闭</el-button>
@@ -13,9 +18,8 @@
 import { isEmpty } from '@/utils/is'
 import { copyValue, jsonStringify } from '../../common/utils'
 import { DesignerEditor } from '../designer-editor.type'
-import LowcodeCard from '../../common/LowcodeCard.vue'
-import AceEditor from '../../ace-editor/index.vue'
 import { updateEditorDataCmd } from '../designer-editor.cmd'
+import AceInputCard from '../../common/AceInputCard.vue'
 
 const props = defineProps<{ editor: DesignerEditor }>()
 

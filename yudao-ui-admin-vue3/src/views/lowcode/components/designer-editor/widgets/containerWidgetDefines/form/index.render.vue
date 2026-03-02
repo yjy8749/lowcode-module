@@ -25,10 +25,7 @@
 import { useElColPropAttrs, useWidget, type WidgetRenderProps } from '../../hooks'
 import WidgetItem from '../../../components/WidgetItem.vue'
 import { useFormWidget } from '../../hooks/useFormWidget'
-import { customWidgetOptions } from '../../../designer-editor.utils'
 import { ElForm } from 'element-plus'
-
-const widgetItemOptions = customWidgetOptions({ putable: true, selectable: true })
 
 const props = defineProps<WidgetRenderProps>()
 
@@ -42,8 +39,11 @@ const {
   usePropAndEvent,
   exposeContext,
   useDefaultSlot,
-  updateFormModel
+  updateFormModel,
+  generateOptions
 } = useFormWidget(useWidget(props))
+
+const widgetItemOptions = generateOptions({ putable: true, selectable: true })
 
 const defaultSlotWidget = computed(() => useDefaultSlot())
 

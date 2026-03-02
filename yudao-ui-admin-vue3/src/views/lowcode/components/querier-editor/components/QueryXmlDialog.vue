@@ -87,17 +87,17 @@
         </el-tab-pane>
         <el-tab-pane lazy label="查询条件" name="queryWhere.value">
           <el-form-item label-position="top" prop="mainTableList">
-            <LowcodeCard name="默认查询条件" tips="输入默认查询条件, 每次查询均会执行">
-              <AceEditor
-                lang="sql"
-                :height="200"
-                :readonly="isPreview"
-                :model-value="formData.queryWhere?.value"
-                @update:model-value="
-                  (value) => (formData.queryWhere = !isEmpty(value) ? { value } : undefined)
-                "
-              />
-            </LowcodeCard>
+            <AceInputCard
+              title="默认查询条件"
+              lang="sql"
+              tips="输入默认查询条件, 每次查询均会执行"
+              :height="200"
+              :readonly="isPreview"
+              :model-value="formData.queryWhere?.value"
+              @update:model-value="
+                (value) => (formData.queryWhere = !isEmpty(value) ? { value } : undefined)
+              "
+            />
           </el-form-item>
         </el-tab-pane>
         <el-tab-pane lazy label="过滤器" name="queryFilter">
@@ -147,8 +147,7 @@ import QueryXmlFilterArrayValueInput from './QueryXmlFilterArrayValueInput.vue'
 import QueryXmlInterceptorArrayValueInput from './QueryXmlInterceptorArrayValueInput.vue'
 import { ElForm, FormRules } from 'element-plus'
 import { isEmpty } from '@/utils/is'
-import LowcodeCard from '../../common/LowcodeCard.vue'
-import AceEditor from '../../ace-editor/index.vue'
+import AceInputCard from '../../common/AceInputCard.vue'
 
 export type QueryXmlDialogEmits = {
   success: [xml: string]

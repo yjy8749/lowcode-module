@@ -9,6 +9,7 @@
       :drag="uploadFileAttrs.drag"
       :is-show-tip="uploadFileAttrs.isShowTip"
       :directory="uploadFileAttrs.directory"
+      :more-file-info="uploadFileAttrs.moreFileInfo"
       :model-value="valueVModel"
       @update:model-value="onUpdateValueVModel"
     />
@@ -17,6 +18,7 @@
 <script lang="ts" setup>
 import { isArray } from '@/utils/is'
 import { useWidget, type WidgetRenderProps } from '../../hooks'
+import UploadFile from './src/UploadFile.vue'
 
 const props = defineProps<WidgetRenderProps>()
 
@@ -35,8 +37,10 @@ const valueVModel = ref<any>([])
 const onUpdateValueVModel = async (vals: string | string[]) => {
   try {
     let val = uploadFileAttrs.value.limit > 1 ? vals : vals?.[0]
-    if (vals && usePropValue('autoJoin') && isArray(vals)) {
-      val = vals?.join(',')
+    if (!uploadFileAttrs.value.moreFileInfo) {
+      if (vals && usePropValue('autoJoin') && isArray(vals)) {
+        val = vals?.join(',')
+      }
     }
     await onUploadSuccessHandler.value?.(val)
   } finally {

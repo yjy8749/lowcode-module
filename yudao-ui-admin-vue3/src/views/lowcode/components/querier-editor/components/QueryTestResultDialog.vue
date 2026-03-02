@@ -1,8 +1,6 @@
 <template>
   <Dialog title="查询执行&结果" v-model="dialogVisible">
-    <LowcodeCard name="结果">
-      <AceEditor lang="json" :height="400" :readonly="true" v-model="result" />
-    </LowcodeCard>
+    <AceInputCard title="结果" lang="json" :height="400" :readonly="true" v-model="result" />
     <template #footer>
       <el-button @click="dialogVisible = false">关 闭</el-button>
     </template>
@@ -10,9 +8,8 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import AceEditor from '../../ace-editor/index.vue'
-import LowcodeCard from '../../common/LowcodeCard.vue'
 import { jsonStringify } from '../../common/utils'
+import AceInputCard from '../../common/AceInputCard.vue'
 
 defineOptions({ name: 'QuerierTestResultDialog' })
 

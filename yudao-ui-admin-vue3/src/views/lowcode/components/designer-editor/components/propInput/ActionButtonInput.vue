@@ -36,6 +36,7 @@ import {
 } from '../../designer-editor.type'
 import { computedVModel } from '../../../common/hooks'
 import EvalFunctionBoundValueInput from '../EvalFunctionBoundValueInput.vue'
+import { run } from 'node:test'
 
 export interface ActionButtonInputProps {
   editor: DesignerEditor
@@ -94,11 +95,14 @@ const doBind = () => {
 }
 
 // const message = useMessage()
-//
+
 // const doAction = async () => {
 //   if (!isNullOrUnDef(onClickVModel.value)) {
-//     const evalFnContext = buildEvalFnContext(props.editor, props.widget._vid)
-//     const result = await executeEvalFunction(props.editor, onClickVModel.value, evalFnContext)
+//     const result = await executeEvalFunction(
+//       props.editor,
+//       buildEvalFnContext(props.editor, { runtime: false, _vid: props.widget?._vid }),
+//       onClickVModel.value
+//     )
 //     message.info(`执行结果${JSON.stringify(result)}`)
 //   }
 // }

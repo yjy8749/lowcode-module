@@ -68,3 +68,8 @@ ace.config.setModuleUrl('ace/snippets/sql', snippetsSqlUrl)
 
 import 'ace-builds/src-noconflict/ext-language_tools'
 ace.require('ace/ext/language_tools')
+
+import 'ace-builds/src-noconflict/ext-beautify'
+ace.require('ace/ext/beautify')
+
+export default ace

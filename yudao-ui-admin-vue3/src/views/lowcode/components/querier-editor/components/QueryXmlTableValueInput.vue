@@ -40,9 +40,14 @@
         />
       </div>
       <!-- 查询数据表 -->
-      <LowcodeCard name="查询数据表" tips="输入数据表名或子查询, 查询数据">
-        <AceEditor lang="sql" :height="60" :readonly="disabled" v-model="fromTableValue" />
-      </LowcodeCard>
+      <AceInputCard
+        title="查询数据表"
+        lang="sql"
+        tips="输入数据表名或子查询, 查询数据"
+        :height="60"
+        :readonly="disabled"
+        v-model="fromTableValue"
+      />
 
       <!-- 副表关联类型 -->
       <el-input v-if="!isMainTable" :disabled="disabled" v-model="joinOnValue">
@@ -61,7 +66,7 @@
       <!-- 数据表有效性验证 -->
       <QueryXmlBeanInput
         v-if="isEnableTableValid"
-        name="表有效性验证配置"
+        title="表有效性验证配置"
         tips="查询时验证数据表是否有效, 主表仅生效一个"
         :disabled="disabled"
         :default-js-function="defaultTableValid"
@@ -75,14 +80,13 @@
 </template>
 <script lang="ts" setup>
 import { isNullOrUnDef } from '@/utils/is'
-import LowcodeCard from '../../common/LowcodeCard.vue'
-import AceEditor from '../../ace-editor/index.vue'
 import { QueryTable, QueryField } from '../querier-editor.type'
 import QueryXmlTableFieldArrayValueInput from './QueryXmlTableFieldArrayValueInput.vue'
 import QueryXmlBeanInput from './QueryXmlBeanInput.vue'
 import { defaultTableValid } from '../querier-editor.utils'
 import { computedVModel } from '../../common/hooks'
 import TextLabel from '../../common/TextLabel.vue'
+import AceInputCard from '../../common/AceInputCard.vue'
 
 export interface QueryXmlTableValueInputProps {
   isMainTable?: boolean

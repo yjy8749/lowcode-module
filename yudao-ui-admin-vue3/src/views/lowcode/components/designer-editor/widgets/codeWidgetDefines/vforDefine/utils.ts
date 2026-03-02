@@ -1,5 +1,5 @@
 import { isNullOrUnDef } from '@/utils/is'
-import { joinKeys, generateVid } from '../../../../common/utils'
+import { generateVid, joinKeys } from '../../../../common/utils'
 import {
   DesignerEditor,
   WidgetDataDefinePropDefine,
@@ -9,10 +9,9 @@ import {
 import { createDataDefine } from '../../../designer-editor.utils'
 import { useDataDefineAnalyzer } from '../../../components/dataDefine/hooks'
 
-export function getForItemDataId(widget: WidgetInstance): string {
+export function getVForItemDataId(widget: WidgetInstance): string {
   return joinKeys(widget._vid, 'v-for-item')
 }
-
 export function buildVforItemDefine(
   editor: DesignerEditor,
   widget: WidgetInstance,
@@ -99,7 +98,7 @@ export function buildVforItemDefine(
 
   const { dataDefine: itemDataDefine } = useDataDefineAnalyzer(editor, {
     dataDefine: createDataDefine({
-      _vid: getForItemDataId(widget),
+      _vid: getVForItemDataId(widget),
       widgetId: widget._vid,
       _type: 'runtime',
       name: 'item in v-for',

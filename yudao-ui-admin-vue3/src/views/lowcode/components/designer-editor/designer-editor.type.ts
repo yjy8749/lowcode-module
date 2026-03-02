@@ -8,7 +8,6 @@ import { Emitter } from 'mitt'
 import { UseWidgetMenusArgs } from './designer-editor.menu'
 import { ButtonType, ComponentSize } from 'element-plus'
 import { jsonStringify } from '../common/utils'
-import { isEmpty } from '@/utils/is'
 
 export const FILE_SOURCE_DESIGNER = 2
 
@@ -366,6 +365,7 @@ export interface WidgetItemProps {
   parentRenderContext: WidgetRenderContext
   widget: WidgetInstance
   widgetIndex?: number
+  widgetCustomOptions?: WidgetItemOptions
   options?: WidgetItemOptions
 }
 // 编辑器渲染组件参数上下文
@@ -377,12 +377,15 @@ export interface WidgetRenderProps {
   widgetDefine: WidgetDefine
   widgetRenderContext: WidgetRenderContext
   widgetIndex?: number
+  widgetCustomOptions?: WidgetItemOptions
 }
 
 // 组件检索结果
 export interface SeekWidgetFunctionResult {
   // 检索组件结果
   seekWidget?: WidgetInstance
+  // 检索组件上下文
+  seekWidgetRenderContext?: WidgetRenderContext
   // 组件检索链路
   seekLink?: WidgetInstance[]
 }
@@ -545,6 +548,7 @@ export interface EvalFnContext {
   $close: (...args: any[]) => Promise<any>
   $dialog: (options: any) => Promise<any>
   $useExposeContext: (arg1?: string) => Promise<Record<string, any> | undefined>
+  $vforItem: () => any | undefined
   $data: (
     arg1: string | (GetDataArgs & { _var: string; refresh?: boolean }),
     data?: any,

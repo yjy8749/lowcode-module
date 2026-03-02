@@ -15,13 +15,12 @@
 import { useWidget, type WidgetRenderProps } from '../../hooks'
 import WidgetItem from '../../../components/WidgetItem.vue'
 import { useFormWidget } from '../../hooks/useFormWidget'
-import { customWidgetOptions } from '../../../designer-editor.utils'
-
-const widgetItemOptions = customWidgetOptions({ putable: true, selectable: true })
 
 const props = defineProps<WidgetRenderProps>()
 
-const { useDefaultSlot } = useFormWidget(useWidget(props))
+const { useDefaultSlot, generateOptions } = useFormWidget(useWidget(props))
+
+const widgetItemOptions = generateOptions({ putable: true, selectable: true })
 
 const defaultSlotWidget = computed(() => useDefaultSlot())
 </script>

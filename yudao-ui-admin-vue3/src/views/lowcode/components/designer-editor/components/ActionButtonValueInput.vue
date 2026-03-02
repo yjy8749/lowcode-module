@@ -60,7 +60,7 @@
       </div>
     </div>
     <EvalFunctionValueInput
-      name="显示控制函数"
+      title="显示控制函数"
       type="simple-function"
       :height="100"
       :editor="editor"
@@ -70,7 +70,7 @@
       v-model="vIfFunValueVModel"
     />
     <EvalFunctionValueInput
-      name="点击事件函数"
+      title="点击事件函数"
       type="mouse-function"
       :editor="editor"
       :widget="widget"

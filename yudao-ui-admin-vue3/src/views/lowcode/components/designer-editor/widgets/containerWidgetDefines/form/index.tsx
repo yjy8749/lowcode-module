@@ -5,7 +5,7 @@ import {
   LayoutJustifyOptions,
   WidgetDefine
 } from '../../../designer-editor.type'
-import { createSlotItem, createWidgetInstanceDefault } from '../../../designer-editor.utils'
+import { createSlotRender, createWidgetInstanceDefault } from '../../../designer-editor.utils'
 import {
   formatInputNumberDefine,
   inputDefine,
@@ -92,7 +92,7 @@ const widget: WidgetDefine = {
   ],
   create(editor, define) {
     const instance = createWidgetInstanceDefault(editor, define)
-    instance.slots = [createSlotItem(editor)]
+    instance.slots = [createSlotRender(editor)]
     instance.dataDefines = buildConstDataDefines(instance)
     return instance
   }

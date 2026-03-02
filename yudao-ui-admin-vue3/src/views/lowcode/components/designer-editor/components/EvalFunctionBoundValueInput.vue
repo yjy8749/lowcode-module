@@ -1,17 +1,17 @@
 <template>
-  <LowcodeCard name="绑定函数" :tips="tips" :helps="helps" :actions="actions">
-    <AceEditor
-      lang="javascript"
-      :height="120"
-      v-model:model-value="valueVModel.evalFunction"
-      @update:model-value="updateValueVModel"
-    />
-  </LowcodeCard>
+  <AceInputCard
+    title="绑定函数"
+    lang="javascript"
+    :height="120"
+    :tips="tips"
+    :helps="helps"
+    :actions="actions"
+    v-model:model-value="valueVModel.evalFunction"
+    @update:model-value="updateValueVModel"
+  />
 </template>
 <script lang="ts" setup>
 import { DesignerEditor, DesignerEditorEvalFunction, WidgetInstance } from '../designer-editor.type'
-import LowcodeCard from '../../common/LowcodeCard.vue'
-import AceEditor from '../../ace-editor/index.vue'
 import {
   evalFunctionBuiltInHelps,
   buildEvalFnContext,
@@ -20,6 +20,7 @@ import {
   toggleDeffaultFunction
 } from '../designer-editor.utils'
 import { computedVModel } from '../../common/hooks'
+import AceInputCard from '../../common/AceInputCard.vue'
 
 export interface EvalFunctionBoundValueInputProps {
   editor: DesignerEditor
@@ -67,8 +68,11 @@ const actions = computed(() => {
       type: 'success',
       label: '运行',
       onClick: async () => {
-        const evalFnContext = buildEvalFnContext(props.editor, props.widget?._vid)
-        const result = await executeEvalFunction(props.editor, valueVModel.value, evalFnContext)
+        const result = await executeEvalFunction(
+          props.editor,
+          buildEvalFnContext(props.editor, { runtime: false, _vid: props.widget._vid }),
+          valueVModel.value
+        )
         message.info(`执行结果${JSON.stringify(result)}`)
       }
     },

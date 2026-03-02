@@ -1,8 +1,14 @@
 <template>
   <Dialog title="数据执行&结果" v-model="dialogVisible">
-    <LowcodeCard name="最终结果" :actions="dataDefinesActions" v-loading="isExecuting">
-      <AceEditor lang="json" :height="400" :readonly="true" v-model="valueJson" />
-    </LowcodeCard>
+    <AceInputCard
+      title="最终结果"
+      lang="json"
+      :height="400"
+      :readonly="true"
+      :actions="dataDefinesActions"
+      v-model="valueJson"
+      v-loading="isExecuting"
+    />
     <template #footer>
       <el-button @click="dialogVisible = false">关 闭</el-button>
     </template>
@@ -13,9 +19,8 @@ import { jsonStringify } from '../../common/utils'
 import { isNullOrUnDef } from '@/utils/is'
 import { DesignerEditor, WidgetDataDefine, WidgetDataDefineType } from '../designer-editor.type'
 import { ref } from 'vue'
-import AceEditor from '../../ace-editor/index.vue'
-import LowcodeCard from '../../common/LowcodeCard.vue'
 import { useDataDefineExecutor } from '../components/dataDefine/hooks'
+import AceInputCard from '../../common/AceInputCard.vue'
 
 defineOptions({ name: 'WidgetDataDefineExecuteDialog' })
 

@@ -42,10 +42,10 @@
 import ActionButton from '../../../../common/ActionButton.vue'
 import { handleTree, defaultProps } from '@/utils/tree'
 import { useWidget, type WidgetRenderProps } from '../../hooks'
-import { isEmpty } from 'lodash-es'
 import { ElTree } from 'element-plus'
 import { showContextMenu } from '../../../../common/contextMenu'
 import { isPromise } from '../../../../common/utils'
+import { isEmpty } from '@/utils/is'
 
 const props = defineProps<WidgetRenderProps>()
 
