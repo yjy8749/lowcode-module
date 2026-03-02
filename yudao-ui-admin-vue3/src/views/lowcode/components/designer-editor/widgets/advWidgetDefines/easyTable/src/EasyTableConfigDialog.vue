@@ -166,7 +166,7 @@
                   />
                 </template>
                 <el-input-number
-                  placeholder="2"
+                  placeholder="1"
                   size="small"
                   :min="0"
                   :precision="0"
@@ -458,14 +458,22 @@ const doAnalyze = async () => {
               })
             }
             const col: QuerierTableBodyColumnProps = { label: field.comment, prop: field.name }
+            if (field.sortable) {
+              col.sort = 'enable'
+            }
             if (['createTime', 'updateTime', 'deletedTime'].includes(col.prop ?? '')) {
               col.columnType = 'datetime'
               col.datetimeFormat = DEFAULT_DATETIME_FORMAT
               col.width = calcDatetimeColumnWidth(DEFAULT_DATETIME_FORMAT)
             }
+
             if (col.prop == 'id') {
               col.rowKey = true
-              col.width = '65px'
+              col.width = '80px'
+              // id 支持排序时 默认倒序
+              if (!!col.sort) {
+                col.sort = 'desc'
+              }
             }
             formModel.value.columns?.push(col)
           }
@@ -510,7 +518,7 @@ const regenConstColumn = (
   })
   if (showIndexColumn) {
     if (!cols.some(isIndexColumn)) {
-      cols.unshift({ label: '#', prop: COLUMN_INDEX_PROP, width: '65px' })
+      cols.unshift({ label: '#', prop: COLUMN_INDEX_PROP, width: '80px' })
     }
   }
 

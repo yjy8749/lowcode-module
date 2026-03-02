@@ -96,24 +96,26 @@
             <el-button type="primary" :disabled="dataFormLoading" :loading="isSaving" @click="save">
               保 存
             </el-button>
-            <el-divider direction="vertical" />
-            <el-button
-              type="danger"
-              :disabled="deployFormLoading"
-              :loading="isDeploying"
-              @click="doDeployApi()"
-            >
-              发 布
-            </el-button>
-            <el-divider direction="vertical" />
-            <el-button
-              type="danger"
-              :disabled="deployFormLoading"
-              :loading="isDeploying"
-              @click="doDeployApi(true)"
-            >
-              发布&下线其他
-            </el-button>
+            <template v-if="hasDeployPermi">
+              <el-divider direction="vertical" />
+              <el-button
+                type="danger"
+                :disabled="deployFormLoading"
+                :loading="isDeploying"
+                @click="doDeployApi()"
+              >
+                发 布
+              </el-button>
+              <el-divider direction="vertical" />
+              <el-button
+                type="danger"
+                :disabled="deployFormLoading"
+                :loading="isDeploying"
+                @click="doDeployApi(true)"
+              >
+                发布&下线其他
+              </el-button>
+            </template>
           </div>
         </el-form>
       </el-card>
@@ -142,6 +144,8 @@ import { MaterialFileDataApi } from '@/api/lowcode/materialfiledata'
 import download from '@/utils/download'
 import dayjs from 'dayjs'
 import { LOWCODE_DICT_TYPE } from '../common/dict'
+import { checkPermi } from '@/utils/permission'
+import { sourceDeployPermiValue } from '../common/utils'
 
 const message = useMessage()
 
@@ -150,6 +154,8 @@ const props = defineProps<{ editor: QuerierEditor }>()
 const store = props.editor.getStore()
 
 const { state, isPreviewMode, isSaving, isDeploying } = store
+
+const hasDeployPermi = computed(() => checkPermi([sourceDeployPermiValue('querier')]))
 
 const fileId = computed(() => state.value.materialFileData?.fileId)
 

@@ -27,7 +27,6 @@
         :style="fieldStyles[3]"
         placeholder="列宽"
         symbol="px"
-        :disabled="isDisabled"
         v-model="valueVModel.width"
       />
     </div>
@@ -64,6 +63,18 @@
       <ColumnFormatInput v-model="valueVModel" :disabled="isDisabled" />
     </div>
     <div class="flex justify-center items-center" :style="fieldStyles[9]">
+      <Icon
+        v-if="!isDisabled"
+        class="cursor-pointer"
+        :class="{
+          'c-[--el-color-primary]': !!valueVModel.sort,
+          'c-[--el-color-info-light-5]': !valueVModel.sort
+        }"
+        :icon="sortIcon"
+        @click="toggleSort"
+      />
+    </div>
+    <div class="flex justify-center items-center" :style="fieldStyles[10]">
       <Icon v-if="!isDisabled" class="c-[--el-color-primary]" icon="ep:setting" @click="doConfig" />
     </div>
   </div>
@@ -83,6 +94,7 @@ export interface EasyTableBodyColumnValueInputProps {
 export type EasyTableBodyColumnValueInputEmits = {
   'update:modelValue': [val?: EasyTableBodyColumnProps]
   change: [val?: EasyTableBodyColumnProps]
+  sortChange: [val?: EasyTableBodyColumnProps]
 }
 
 const props = withDefaults(defineProps<EasyTableBodyColumnValueInputProps>(), {
@@ -115,7 +127,36 @@ const onPropChange = () => {
 }
 
 const toggleHidden = () => {
-  valueVModel.value.hidden = !valueVModel.value.hidden
+  if (!isDisabled.value) {
+    valueVModel.value.hidden = !valueVModel.value.hidden
+  }
+}
+
+const sortIcon = computed(() => {
+  if (valueVModel.value.sort == 'enable') {
+    return 'ep:d-caret'
+  } else if (valueVModel.value.sort == 'asc') {
+    return 'ep:caret-top'
+  } else if (valueVModel.value.sort == 'desc') {
+    return 'ep:caret-bottom'
+  } else {
+    return 'fa-solid:ban'
+  }
+})
+
+const toggleSort = () => {
+  if (!isDisabled.value) {
+    if (valueVModel.value.sort == 'enable') {
+      valueVModel.value.sort = 'asc'
+    } else if (valueVModel.value.sort == 'asc') {
+      valueVModel.value.sort = 'desc'
+    } else if (valueVModel.value.sort == 'desc') {
+      valueVModel.value.sort = ''
+    } else {
+      valueVModel.value.sort = 'enable'
+    }
+    emits('sortChange', valueVModel.value)
+  }
 }
 
 const openColumnConfigDialog = inject('openColumnConfigDialog') as Function

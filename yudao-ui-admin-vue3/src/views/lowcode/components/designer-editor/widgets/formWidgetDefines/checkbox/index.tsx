@@ -35,6 +35,18 @@ const widget: WidgetDefine = {
       label: '字典类型',
       isShow: ({ widget }) => !widget.props.remote
     }),
+    radioButtonDefine(
+      {
+        key: 'dictValueType',
+        label: '字典Value类型',
+        defaultValue: 'int'
+      },
+      [
+        { label: '整数', value: 'int' },
+        { label: '布尔值', value: 'bool' },
+        { label: '字符串', value: 'str' }
+      ]
+    ),
     evalFunctionDefine(
       { key: 'remoteMethod', label: '选项加载函数', isShow: ({ widget }) => widget.props.remote },
       {

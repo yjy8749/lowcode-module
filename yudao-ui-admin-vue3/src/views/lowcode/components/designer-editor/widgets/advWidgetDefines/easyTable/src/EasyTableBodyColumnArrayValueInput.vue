@@ -12,6 +12,7 @@
         :field-styles="fieldStyles"
         v-model="valueVModel[index]"
         @change="triggerUpdate"
+        @sort-change="onSortChange"
       />
     </template>
   </ArrayValueInput>
@@ -82,6 +83,10 @@ const fieldHeaders = [
     style: flexStyle
   },
   {
+    label: '排序',
+    style: 'width: 30px'
+  },
+  {
     label: '配置',
     style: 'width: 30px'
   }
@@ -117,6 +122,15 @@ const handleRemove = async (index: number) => {
     await message.confirm('是否确认删除列')
   }
   valueVModel.value = valueVModel.value.toSpliced(index, 1)
+}
+
+const onSortChange = (e: EasyTableBodyColumnProps) => {
+  valueVModel.value = valueVModel.value.map((item) => {
+    if (item.prop !== e.prop && !!item.sort && item.sort !== 'enable') {
+      item.sort = 'enable'
+    }
+    return item
+  })
 }
 </script>
 

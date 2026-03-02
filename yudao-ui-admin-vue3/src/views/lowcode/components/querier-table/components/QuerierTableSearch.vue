@@ -85,8 +85,6 @@ const emits = defineEmits<QuerierTableSearchEmits>()
 
 const slots = useSlots()
 
-const formRef = ref<InstanceType<typeof ElForm>>()
-
 const showSearchFields = computed(() => {
   return props.searchs?.filter((e) => e.hidden != true || isShowAllFields.value) ?? []
 })
@@ -158,7 +156,11 @@ const setWhereParams = (whereParams?: QueryDomainWhereParams[]): void => {
     props.searchs?.forEach((c) => {
       const key = getSearchFieldProp(c)
       const val = whereParams?.find((e) => e.name == c.prop && e.symbol == c.symbolType)
-      formModel[key] = val?.value ?? val?.values
+      if (val?.value) {
+        formModel[key] == `${val.value}`
+      } else if (val?.values) {
+        formModel[key] == val.values.map((val) => `${val}`)
+      }
     })
   }
 }

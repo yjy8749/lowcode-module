@@ -159,6 +159,7 @@ const columnAttrs = computed(() => {
     prop: getTableBodyColumnProp(props),
     width: props.width,
     showOverflowTooltip: true,
+    sortable: !!props.sort,
     fixed: props.fixed ? (props.fixedRight ? 'right' : 'left') : undefined
   }
 })

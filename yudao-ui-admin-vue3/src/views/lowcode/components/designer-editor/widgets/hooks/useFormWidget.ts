@@ -89,6 +89,8 @@ async function buildItemRules(
 export function useFormWidget(props: ReturnType<typeof useWidget>) {
   const formRules = ref({})
 
+  const isIniting = ref(true)
+
   const { editor } = props
 
   const evalFnContext = props.evalFnContext
@@ -100,6 +102,8 @@ export function useFormWidget(props: ReturnType<typeof useWidget>) {
   )
 
   const { value: formModel } = formModelExecutor.updateExecutor({ dataDefine: formModelDataDefine })
+
+  formModel.value = JSON.parse(formModelDataDefine?.jsonData ?? '{}')
   const readFromSlots = async (
     widget: WidgetInstance,
     callback: (widget: WidgetInstance) => Promise<void>
@@ -108,9 +112,6 @@ export function useFormWidget(props: ReturnType<typeof useWidget>) {
       await callback(child)
     }
   }
-
-  formModel.value = JSON.parse(formModelDataDefine?.jsonData ?? '{}')
-
   const readFormModelProp = async (slotWidget: WidgetInstance) => {
     for (const child of slotWidget.slotChildren) {
       try {
@@ -132,9 +133,6 @@ export function useFormWidget(props: ReturnType<typeof useWidget>) {
       await readFromSlots(child, readFormModelProp)
     }
   }
-
-  readFromSlots(props.widget, readFormModelProp)
-
   const readFormRules = async (slotWidget: WidgetInstance) => {
     for (const child of slotWidget.slotChildren) {
       try {
@@ -150,15 +148,25 @@ export function useFormWidget(props: ReturnType<typeof useWidget>) {
       await readFromSlots(child, readFormRules)
     }
   }
-
-  readFromSlots(props.widget, readFormRules)
-
   const updateFormModel = (val?: any) => {
     formModel.value = val
   }
 
+  nextTick(async () => {
+    isIniting.value = true
+    try {
+      //构建formModel
+      await readFromSlots(props.widget, readFormModelProp)
+      //构建formRules
+      await readFromSlots(props.widget, readFormRules)
+    } finally {
+      isIniting.value = false
+    }
+  })
+
   return {
     ...props,
+    isIniting,
     formModel,
     formRules,
     updateFormModel

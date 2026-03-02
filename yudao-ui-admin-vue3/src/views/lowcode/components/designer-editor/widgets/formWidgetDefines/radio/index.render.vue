@@ -45,7 +45,7 @@ import { useWidget, type WidgetRenderProps } from '../../hooks'
 import { useFormItemWidget } from '../../hooks/useFormItemWidget'
 import { useScopeLoading } from '../../../../common/hooks'
 import { isNullOrUnDef, isEmpty } from '@/utils/is'
-import { getStrDictOptions } from '@/utils/dict'
+import { getStrDictOptions, getIntDictOptions, getBoolDictOptions } from '@/utils/dict'
 
 const props = defineProps<WidgetRenderProps>()
 
@@ -68,7 +68,14 @@ const radioOptions = ref<any[]>([])
 const radioDictLoad = async () => {
   const dictType = formInputAttrs.value.dictType
   if (!isNullOrUnDef(dictType)) {
-    radioOptions.value = getStrDictOptions(dictType)
+    const dictValueType = formInputAttrs.value.dictValueType
+    if (dictValueType == 'int') {
+      radioOptions.value = getIntDictOptions(dictType)
+    } else if (dictValueType == 'bool') {
+      radioOptions.value = getBoolDictOptions(dictType)
+    } else {
+      radioOptions.value = getStrDictOptions(dictType)
+    }
   }
 }
 

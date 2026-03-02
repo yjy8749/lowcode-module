@@ -33,6 +33,7 @@ const widget: WidgetDefine = {
     switchDefine({
       key: 'showBtnText',
       label: '是否显示按钮文字',
+      defaultValue: true,
       isShow: ({ widget }) => !widget.props.multiple
     }),
     ...formItemBaseDefine()

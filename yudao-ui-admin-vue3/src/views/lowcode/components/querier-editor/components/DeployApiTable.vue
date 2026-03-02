@@ -64,17 +64,19 @@
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" width="120px" v-if="hasEditorPermi">
+      <el-table-column label="操作" align="center" width="120px">
         <template #default="{ row }">
-          <el-button v-if="row.apiStatus == 1" link type="danger" @click="doOffline(row)">
-            下线
-          </el-button>
-          <el-button v-if="row.apiStatus != 1" link type="primary" @click="doOnline(row)">
-            上线
-          </el-button>
-          <el-button v-if="row.apiStatus != 1" link type="danger" @click="doDelete(row)">
-            删除
-          </el-button>
+          <template v-if="hasDeployPermi">
+            <el-button v-if="row.apiStatus == 1" link type="danger" @click="doOffline(row)">
+              下线
+            </el-button>
+            <el-button v-if="row.apiStatus != 1" link type="primary" @click="doOnline(row)">
+              上线
+            </el-button>
+            <el-button v-if="row.apiStatus != 1" link type="danger" @click="doDelete(row)">
+              删除
+            </el-button>
+          </template>
         </template>
       </el-table-column>
     </el-table>
@@ -92,7 +94,7 @@
 import { QuerierEditorApi, DeployApiVO, DeployApiPageReqVO } from '@/api/lowcode/editor/querier'
 import { getIntDictOptions } from '@/utils/dict'
 import { checkPermi } from '@/utils/permission'
-import { sourceEditorPermiValue } from '../../common/utils'
+import { sourceDeployPermiValue } from '../../common/utils'
 import { copyApis } from '../querier-editor.utils'
 import { ElForm } from 'element-plus'
 import { LOWCODE_DICT_TYPE } from '../../common/dict'
@@ -109,7 +111,7 @@ const props = defineProps<DeployApiTableProps>()
 
 const emits = defineEmits<DeployApiTableEmits>()
 
-const hasEditorPermi = computed(() => checkPermi([sourceEditorPermiValue('querier')]))
+const hasDeployPermi = computed(() => checkPermi([sourceDeployPermiValue('querier')]))
 
 const message = useMessage()
 

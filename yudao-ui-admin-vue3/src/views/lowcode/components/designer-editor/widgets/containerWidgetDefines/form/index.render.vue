@@ -2,6 +2,7 @@
   <el-row :justify="rowJustify">
     <el-col v-bind="colAttrs">
       <el-form
+        v-if="!isIniting"
         :class="{ 'form-compact': isCompact }"
         ref="formRef"
         v-bind="formAttrs"
@@ -34,6 +35,7 @@ const props = defineProps<WidgetRenderProps>()
 const formRef = ref<InstanceType<typeof ElForm>>()
 
 const {
+  isIniting,
   formModel,
   formRules,
   usePropValue,

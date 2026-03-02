@@ -61,6 +61,7 @@ export interface QuerierTableBodyColumnProps {
   defaultSlot?: Component
   fixed?: boolean | 'left' | 'right'
   rowKey?: boolean
+  sort?: '' | 'enable' | 'asc' | 'desc'
 }
 
 export interface QuerierTableOptions {

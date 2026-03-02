@@ -45,7 +45,7 @@ import { useWidget, type WidgetRenderProps } from '../../hooks'
 import { useFormItemWidget } from '../../hooks/useFormItemWidget'
 import { useScopeLoading } from '../../../../common/hooks'
 import { isNullOrUnDef, isEmpty, isDef } from '@/utils/is'
-import { getStrDictOptions } from '@/utils/dict'
+import { getStrDictOptions, getIntDictOptions, getBoolDictOptions } from '@/utils/dict'
 
 const props = defineProps<WidgetRenderProps>()
 
@@ -68,7 +68,14 @@ const checkboxOptions = ref<any[]>([])
 const checkboxDictLoad = async () => {
   const dictType = formInputAttrs.value.dictType
   if (!isNullOrUnDef(dictType)) {
-    checkboxOptions.value = getStrDictOptions(dictType)
+    const dictValueType = formInputAttrs.value.dictValueType
+    if (dictValueType == 'int') {
+      checkboxOptions.value = getIntDictOptions(dictType)
+    } else if (dictValueType == 'bool') {
+      checkboxOptions.value = getBoolDictOptions(dictType)
+    } else {
+      checkboxOptions.value = getStrDictOptions(dictType)
+    }
   }
 }
 

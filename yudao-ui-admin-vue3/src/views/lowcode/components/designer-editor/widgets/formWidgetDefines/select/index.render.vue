@@ -31,7 +31,7 @@ import { isNullOrUnDef } from '@/utils/is'
 import ElFormItemWrapper from '../../../../common/ElFormItemWrapper.vue'
 import { useWidget, type WidgetRenderProps } from '../../hooks'
 import { useFormItemWidget } from '../../hooks/useFormItemWidget'
-import { getStrDictOptions } from '@/utils/dict'
+import { getStrDictOptions, getIntDictOptions, getBoolDictOptions } from '@/utils/dict'
 import { useScopeLoading } from '../../../../common/hooks'
 
 const props = defineProps<WidgetRenderProps>()
@@ -42,7 +42,7 @@ const { formItemAttrs, valueModel, useFormInputAttrs, usePropValue, toEvalFuncti
   useFormItemWidget(useWidget(props))
 
 const formInputAttrs = computed(() =>
-  useFormInputAttrs({ omit: ['prefixIcon', 'dictType', 'remoteMethod'] })
+  useFormInputAttrs({ omit: ['prefixIcon', 'dictType', 'dictValueType', 'remoteMethod'] })
 )
 
 const prefixIcon = computed(() => usePropValue('prefixIcon'))
@@ -56,7 +56,14 @@ const selectDictLoad = async () => {
   await callWithLoading(async () => {
     const dictType = usePropValue('dictType')
     if (!isNullOrUnDef(dictType)) {
-      selectOptions.value = getStrDictOptions(dictType)
+      const dictValueType = usePropValue('dictValueType')
+      if (dictValueType == 'int') {
+        selectOptions.value = getIntDictOptions(dictType)
+      } else if (dictValueType == 'bool') {
+        selectOptions.value = getBoolDictOptions(dictType)
+      } else {
+        selectOptions.value = getStrDictOptions(dictType)
+      }
     }
   })
 }

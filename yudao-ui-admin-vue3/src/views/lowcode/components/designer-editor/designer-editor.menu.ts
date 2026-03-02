@@ -28,6 +28,8 @@ import {
   WidgetItemOptions
 } from './designer-editor.type'
 import { useDataDefineExecutor } from './components/dataDefine/hooks'
+import { checkPermi } from '@/utils/permission'
+import { sourceDeployPermiValue } from '../common/utils'
 
 const message = useMessage()
 
@@ -99,6 +101,7 @@ export function useDeployPageMenu(editor: DesignerEditor, args: UseWidgetMenusAr
   return {
     icon: 'ep:upload-filled',
     label: '发布页面',
+    hidden: !checkPermi([sourceDeployPermiValue('designer')]),
     onClick: async () => {
       await autoSaveImmediately(editor)
       const { materialFileData } = editor.getStore().state.value

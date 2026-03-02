@@ -49,7 +49,7 @@ type QuerierTableBodyRowActionsEmits = {
 }
 
 const props = withDefaults(defineProps<QuerierTableBodyRowActionsProps>(), {
-  autoFoldNum: 2
+  autoFoldNum: 1
 })
 
 const emits = defineEmits<QuerierTableBodyRowActionsEmits>()
@@ -62,7 +62,7 @@ watchEffect(async () => {
   const promises = (props.rowActions ?? []).map(async (action) => {
     if (!action.isShow) return { action, isVisible: true }
     try {
-      const result = action.isShow(props.scope)
+      const result = action.isShow(undefined, props.scope)
       const isVisible = await (isPromise(result) ? result : Promise.resolve(result))
       return { action, isVisible }
     } catch {

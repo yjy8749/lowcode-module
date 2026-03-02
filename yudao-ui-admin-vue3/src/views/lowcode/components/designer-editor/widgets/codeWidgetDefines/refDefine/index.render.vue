@@ -21,7 +21,7 @@ const { query, params } = useRoute()
 const dataDefines = computed(() => props.widget.dataDefines)
 
 const dataResults = ref<any[]>([
-  { id: getPageParamsDataId(props.widget), data: { ...editor.getPageParams() } },
+  { id: getPageParamsDataId(props.widget), data: editor.getPageParams() },
   { id: getParamsDataId(props.widget), data: { ...params } },
   { id: getQueryDataId(props.widget), data: { ...query } }
 ])
@@ -48,7 +48,7 @@ watch(
     const dataDefine = dataDefines.value?.find((d) => d._vid == getPageParamsDataId(props.widget))
     if (!isNullOrUnDef(dataDefine)) {
       const { value } = useDataDefineExecutor(editor, { dataDefine })
-      value.value = editor.getPageParams() ?? {}
+      value.value = editor.getPageParams()
     }
   }
 )

@@ -119,6 +119,11 @@ export function sourceEditorPermiValue(name: string) {
   return `lowcode:${name}:editor`
 }
 
+/** 将 source 解析为 Deploy权限 */
+export function sourceDeployPermiValue(name: string) {
+  return `lowcode:${name}:deploy`
+}
+
 /** 帮助说明文本高亮显示 */
 export function highlightTextHtml(text: string) {
   const escapedText = text

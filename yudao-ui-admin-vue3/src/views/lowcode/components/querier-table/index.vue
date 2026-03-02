@@ -95,6 +95,7 @@
             :row-key="getRowKey"
             @current-change="onCurrentChange"
             @selection-change="onSelectionChange"
+            @sort-change="onSortChange"
           />
         </template>
         <!-- 分页区 -->
@@ -167,11 +168,17 @@ const tableBodyRef = ref<InstanceType<typeof QuerierTableBody>>()
 
 const loading = ref(false)
 
-const pageParams = ref<QueryDomainPageParams & { total: number }>({
-  total: 0,
-  pageNo: 1,
-  pageSize: props.defaultPageSize
-})
+const initPageParams = (): QueryDomainPageParams & { total: number } => {
+  const col = props.columns?.find((e) => !!e.sort && e.sort != 'enable')
+  return {
+    total: 0,
+    pageNo: 1,
+    pageSize: props.defaultPageSize,
+    sortingFields: col ? [{ field: getTableBodyColumnProp(col), order: col?.sort }] : undefined
+  }
+}
+
+const pageParams = ref(initPageParams())
 
 const selectedWhereParams = ref<QueryDomainWhereParams[] | undefined>()
 
@@ -239,7 +246,7 @@ const onTableDataChange = useDebounceFn(() => {
   emits('change', tableData.value)
 }, 100)
 
-const doSearch = async (params?: QueryDomainParams) => {
+const doSearch = async (params?: QueryDomainParams, options?: { isSortChange?: boolean }) => {
   pageParams.value.pageNo = params?.pageParams?.pageNo ?? pageParams.value.pageNo
   pageParams.value.pageSize = params?.pageParams?.pageSize ?? pageParams.value.pageSize
   pageParams.value.sortingFields =
@@ -247,6 +254,9 @@ const doSearch = async (params?: QueryDomainParams) => {
   await doLoadData({ ...params, pageParams: pageParams.value })
   if (!isNullOrUnDef(params?.whereParams)) {
     searchRef.value?.setWhereParams(params.whereParams)
+  }
+  if (!options?.isSortChange) {
+    setTableBodySortField()
   }
 }
 
@@ -440,6 +450,23 @@ const toggleRowsSelection = (val: any) => {
     selectedRows.value = newSelectedRows
   } else {
     items.forEach((item) => tableBodyRef.value?.toggleRowSelection(item))
+  }
+}
+
+const isAsc = (val) => val == 'ascending' || val == 'asc'
+const onSortChange = (data: { column: any; prop: string; order: any }) => {
+  let sortingFields: any
+  if (data.order) {
+    sortingFields = [{ field: data.prop, order: isAsc(data.order) ? 'asc' : 'desc' }]
+  }
+  doSearch({ pageParams: { pageNo: 1, sortingFields } }, { isSortChange: true })
+}
+
+const setTableBodySortField = () => {
+  if (!isEmpty(pageParams.value.sortingFields)) {
+    const col = pageParams.value.sortingFields?.[0]
+    tableBodyRef.value?.clearSort()
+    tableBodyRef.value?.sort(col?.field ?? '', isAsc(col?.order) ? 'ascending' : 'descending')
   }
 }
 
