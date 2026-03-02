@@ -69,7 +69,7 @@ git fetch origin2 --tags --prune-tags
 git push origin2 --delete $(git tag -l)
 git tag -d $(git tag -l) >/dev/null 2>&1
 echo "📤 正在将本地代码推送到 origin2..."
-git fetch origin --tags --prune-tags
+git pull origin --tags --prune-tags
 git push origin2
 git push origin2 --tags
 git remote remove origin2
@@ -84,7 +84,7 @@ git fetch origin2 --tags --prune-tags
 git push origin2 --delete $(git tag -l)
 git tag -d $(git tag -l) >/dev/null 2>&1
 echo "📤 正在将本地代码推送到 origin2..."
-git fetch origin --tags --prune-tags
+git pull origin --tags --prune-tags
 git push origin2
 git push origin2 --tags
 git remote remove origin2
